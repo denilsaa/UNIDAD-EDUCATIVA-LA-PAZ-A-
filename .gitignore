@@ -2,9 +2,13 @@
 __pycache__/
 *.py[codz]
 *$py.class
-
+# Ignorar la carpeta del entorno virtual
+venv/
 # C extensions
 *.so
+# Ignorar archivos de cache de Python
+__pycache__/
+*.pyc
 
 # Distribution / packaging
 .Python
