@@ -17,7 +17,7 @@ Antes de comenzar, asegúrate de tener instalados los siguientes requisitos:
    Primero, clona el repositorio a tu máquina local usando Git:
 
    ```bash
-   git clone https://github.com/denilsaa/EnglishClub_TutosClub.git
+   git clone https://github.com/denilsaa/UNIDAD-EDUCATIVA-LA-PAZ-A-.git
    cd EnglishClub_TutosClub
 2. **Crear un entorno virtual**:
     Asegúrate de estar en el directorio del proyecto, luego crea un entorno virtual para instalar las dependencias.
