@@ -18,7 +18,7 @@ Antes de comenzar, asegúrate de tener instalados los siguientes requisitos:
 
    ```bash
    git clone https://github.com/denilsaa/UNIDAD-EDUCATIVA-LA-PAZ-A-.git
-   cd EnglishClub_TutosClub
+   cd UNIDAD-EDUCATIVA-LA-PAZ-A-
 2. **Crear un entorno virtual**:
     Asegúrate de estar en el directorio del proyecto, luego crea un entorno virtual para instalar las dependencias.
 ## Windows
