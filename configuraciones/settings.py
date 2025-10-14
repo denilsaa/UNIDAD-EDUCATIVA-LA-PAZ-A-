@@ -37,6 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "apps.cuentas.apps.CuentasConfig",
+    "apps.cursos.apps.CursosConfig",
+    "apps.estudiantes.apps.EstudiantesConfig",
+    "apps.citaciones.apps.CitacionesConfig",
+    "apps.notificaciones.apps.NotificacionesConfig",
+
 ]
 
 MIDDLEWARE = [
@@ -74,8 +80,12 @@ WSGI_APPLICATION = 'configuraciones.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'beu0hpduvweswzq20pvc',  # Nombre de la base de datos
+        'USER': 'uffjaj6pssk7gxuz',  # Usuario
+        'PASSWORD': 'SNMfzxXMBbtDLKmHT5Y1',  # Contraseña
+        'HOST': 'beu0hpduvweswzq20pvc-mysql.services.clever-cloud.com',  # Host
+        'PORT': '3306',  # Puerto por defecto de MySQL
     }
 }
 
