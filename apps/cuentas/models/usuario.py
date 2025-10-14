@@ -1,8 +1,9 @@
 from django.db import models
-from .base import SelladoTiempo
+from django.contrib.auth.models import AbstractUser
 from .rol import Rol
+from .base import SelladoTiempo
 
-class Usuario(SelladoTiempo):
+class Usuario(SelladoTiempo, AbstractUser):  # Extiende AbstractUser para manejar los campos predeterminados de Django
     rol = models.ForeignKey(Rol, on_delete=models.RESTRICT, related_name="usuarios")
     ci = models.CharField("CI", max_length=40, unique=True, null=True, blank=True)
     nombres = models.CharField(max_length=120)

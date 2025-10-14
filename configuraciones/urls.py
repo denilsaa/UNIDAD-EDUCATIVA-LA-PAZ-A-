@@ -14,9 +14,12 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path
+from apps.cuentas.views.login import login_view  # Importa la vista correctamente
+from django.views.generic import RedirectView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('', login_view, name='login'),  # Esto hace que la raíz sea la página de login
+    path('login/', login_view, name='login'),  # Esta ruta puede permanecer si quieres que esté también en /login
+    # Otras URLs
 ]
