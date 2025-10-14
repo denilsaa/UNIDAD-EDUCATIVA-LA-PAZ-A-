@@ -40,9 +40,8 @@ INSTALLED_APPS = [
     "apps.cuentas.apps.CuentasConfig",
     "apps.cursos.apps.CursosConfig",
     "apps.estudiantes.apps.EstudiantesConfig",
-    "apps.citaciones.apps.CitacionesConfig",
+    "apps.citaciones.apps.CitacionesConfig",      
     "apps.notificaciones.apps.NotificacionesConfig",
-
 ]
 
 MIDDLEWARE = [
