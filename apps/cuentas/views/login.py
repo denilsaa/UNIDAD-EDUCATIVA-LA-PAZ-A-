@@ -1,9 +1,9 @@
-from django.contrib.auth.hashers import check_password
-from django.contrib import messages
+# apps/cuentas/views/login.py (como lo tienes ahora)
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login
-
 from apps.cuentas.models import Usuario
+from django.contrib import messages
 
 def login_view(request):
     if request.method == 'POST':
@@ -24,7 +24,7 @@ def login_view(request):
             auth_login(request, user)
             # Redirigir según el rol del usuario
             if user.rol.nombre == "Director":
-                return redirect('director_dashboard')
+                return redirect('director_dashboard')  # Redirige a 'director_dashboard'
             elif user.rol.nombre == "Regente":
                 return redirect('regente_dashboard')
             elif user.rol.nombre == "Secretaria":

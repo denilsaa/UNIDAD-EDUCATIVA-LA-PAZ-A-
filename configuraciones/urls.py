@@ -14,12 +14,12 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path
-from apps.cuentas.views.login import login_view  # Importa la vista correctamente
-from django.views.generic import RedirectView
+from django.urls import path, include
+from apps.cuentas.views.login import login_view  # Importa la vista de login
+from apps.cuentas.views.director_dashboard import director_dashboard  # Importa la vista del dashboard
 
 urlpatterns = [
-    path('', login_view, name='login'),  # Esto hace que la raíz sea la página de login
-    path('login/', login_view, name='login'),  # Esta ruta puede permanecer si quieres que esté también en /login
-    # Otras URLs
+    path('login/', login_view, name='login'),
+    path('dashboard/director/', director_dashboard, name='director_dashboard'),
+    path('', include('apps.cuentas.urls')),  # Incluir las URLs de la aplicación 'cuentas'
 ]
