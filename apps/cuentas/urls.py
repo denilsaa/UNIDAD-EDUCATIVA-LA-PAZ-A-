@@ -32,11 +32,10 @@ urlpatterns = [
         name="padre_dashboard",
     ),
 
-    # Home (puedes cambiarlo luego)
-    path("home/", RedirectView.as_view(pattern_name="cuentas:login", permanent=False), name="home"),
-    path('crear/', crear_usuario, name='crear_usuario'),
-    path('listar/', lista_usuarios, name='lista_usuarios'),
-    path('ver/<int:user_id>/', ver_usuario, name='ver_usuario'),
-    path('editar/<int:user_id>/', editar_usuario, name='editar_usuario'),
-    path('eliminar/<int:user_id>/', eliminar_usuario, name='eliminar_usuario'),
+    # CRUD usuarios
+    path("usuarios/crear/", crear_usuario, name="crear_usuario"),
+    path("usuarios/", lista_usuarios, name="lista_usuarios"),
+    path("usuarios/<int:user_id>/", ver_usuario, name="ver_usuario"),
+    path("usuarios/<int:user_id>/editar/", editar_usuario, name="editar_usuario"),
+    path("usuarios/<int:user_id>/eliminar/", eliminar_usuario, name="eliminar_usuario"),
 ]

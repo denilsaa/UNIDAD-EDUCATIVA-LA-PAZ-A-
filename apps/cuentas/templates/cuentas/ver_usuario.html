@@ -1,20 +1,20 @@
-<!-- En templates/cuentas/ver_usuario.html -->
-
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Ver Usuario</title>
-</head>
+<head><meta charset="UTF-8"><title>Detalle Usuario</title></head>
 <body>
-    <h2>Detalles del Usuario</h2>
-    <p><strong>CI:</strong> {{ usuario.ci }}</p>
-    <p><strong>Nombres:</strong> {{ usuario.nombres }}</p>
-    <p><strong>Apellidos:</strong> {{ usuario.apellidos }}</p>
-    <p><strong>Email:</strong> {{ usuario.email }}</p>
-    <p><strong>Estado:</strong> {{ usuario.is_activo|yesno:"Activo,Inactivo" }}</p>
-    <a href="{% url 'cuentas:editar_usuario' usuario.id %}">Editar</a>
-    <a href="{% url 'cuentas:eliminar_usuario' usuario.id %}">Eliminar</a>
-    <a href="{% url 'cuentas:lista_usuarios' %}">Volver a la lista</a>
+  <h2>Detalle del Usuario</h2>
+  <p><b>CI:</b> {{ usuario.ci }}</p>
+  <p><b>Nombres:</b> {{ usuario.nombres }}</p>
+  <p><b>Apellidos:</b> {{ usuario.apellidos }}</p>
+  <p><b>Email:</b> {{ usuario.email }}</p>
+  <p><b>Teléfono:</b> {{ usuario.telefono }}</p>
+  <p><b>Rol:</b> {{ usuario.rol.nombre }}</p>
+  <p><b>Estado:</b> {{ usuario.is_activo|yesno:"Activo,Inactivo" }}</p>
+  <p><b>Creado:</b> {{ usuario.creado_en }}</p>
+  <p><b>Última actualización:</b> {{ usuario.actualizado_en }}</p>
+  <p>
+    <a href="{% url 'cuentas:editar_usuario' usuario.id %}">Editar</a> |
+    <a href="{% url 'cuentas:lista_usuarios' %}">Volver</a>
+  </p>
 </body>
 </html>
