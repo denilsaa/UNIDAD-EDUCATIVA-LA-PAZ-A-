@@ -1,9 +1,9 @@
 from django.contrib.auth.hashers import check_password
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from django.contrib.auth import login as auth_login  # Importa la función login
+from django.contrib.auth import login as auth_login
 
-from apps.cuentas.models import Usuario  # Asegúrate de importar el modelo Usuario
+from apps.cuentas.models import Usuario
 
 def login_view(request):
     if request.method == 'POST':
@@ -19,7 +19,7 @@ def login_view(request):
             except Usuario.DoesNotExist:
                 user = None
         
-        if user and check_password(password, user.password_hash):  # Verificación de contraseña con 'check_password'
+        if user and user.check_password(password):  # Usar la función check_password
             # Iniciar sesión manualmente
             auth_login(request, user)
             # Redirigir según el rol del usuario

@@ -1,34 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio de sesión</title>
-</head>
-<body>
-    <div>
-        <h2>Iniciar sesión</h2>
-        <form method="POST">
-            {% csrf_token %}
-            <div>
-                <label for="username">Usuario (CI o Email):</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div>
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div>
-                <button type="submit">Ingresar</button>
-            </div>
-        </form>
-        {% if messages %}
-            <div>
-                {% for message in messages %}
-                    <p>{{ message }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-</body>
-</html>
+<form method="POST" action="{% url 'login' %}">
+    {% csrf_token %}
+    <label for="username">CI o Email</label>
+    <input type="text" name="username" required>
+    <label for="password">Contraseña</label>
+    <input type="password" name="password" required>
+    <button type="submit">Iniciar sesión</button>
+</form>

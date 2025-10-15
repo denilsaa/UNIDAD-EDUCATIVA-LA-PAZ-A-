@@ -44,6 +44,10 @@ INSTALLED_APPS = [
     "apps.citaciones.apps.CitacionesConfig",      
     "apps.notificaciones.apps.NotificacionesConfig",
 ]
+# settings.py
+AUTHENTICATION_BACKENDS = [
+    'apps.cuentas.backends.CustomBackend',  # Apunta al backend personalizado
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
