@@ -1,0 +1,41 @@
+<!-- En templates/cuentas/lista_usuarios.html -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Usuarios</title>
+</head>
+<body>
+    <h2>Lista de Usuarios</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>CI</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
+                <th>Email</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.ci }}</td>
+                <td>{{ usuario.nombres }}</td>
+                <td>{{ usuario.apellidos }}</td>
+                <td>{{ usuario.email }}</td>
+                <td>{{ usuario.is_activo|yesno:"Activo,Inactivo" }}</td>
+                <td>
+                    <a href="{% url 'cuentas:ver_usuario' usuario.id %}">Ver</a>
+                    <a href="{% url 'cuentas:editar_usuario' usuario.id %}">Editar</a>
+                    <a href="{% url 'cuentas:eliminar_usuario' usuario.id %}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'cuentas:crear_usuario' %}">Registrar Nuevo Usuario</a>
+</body>
+</html>

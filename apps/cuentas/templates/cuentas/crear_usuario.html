@@ -1,0 +1,18 @@
+<!-- En templates/cuentas/crear_usuario.html -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Usuario</title>
+</head>
+<body>
+    <h2>Registrar Nuevo Usuario</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Registrar Usuario</button>
+    </form>
+    <a href="{% url 'cuentas:lista_usuarios' %}">Ver lista de usuarios</a>
+</body>
+</html>
