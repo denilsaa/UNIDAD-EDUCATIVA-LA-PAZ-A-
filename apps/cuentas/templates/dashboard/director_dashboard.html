@@ -1,31 +1,30 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard del Director</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
 </head>
 <body>
-    <h1>Bienvenido al Dashboard del Director</h1>
+    <header class="dashboard-header">
+        Bienvenido al Dashboard del Director
+    </header>
 
-    <div>
-        <h2>Gestionar Usuarios</h2>
-        <!-- Enlace para registrar un nuevo usuario -->
+    <div class="dashboard-content">
+        <h2>👤 Gestionar Usuarios</h2>
         <a href="{% url 'cuentas:crear_usuario' %}">Registrar Nuevo Usuario</a>
-    </div>
 
-    <div>
-        <h2>Usuarios por Rol</h2>
+        <h2>📊 Usuarios por Rol</h2>
         <ul>
             <li><strong>Directores:</strong> {{ director_count }}</li>
             <li><strong>Regentes:</strong> {{ regente_count }}</li>
             <li><strong>Secretarias:</strong> {{ secretaria_count }}</li>
             <li><strong>Padres de familia:</strong> {{ padre_count }}</li>
         </ul>
-    </div>
 
-    <div>
-        <h2>Lista de Usuarios</h2>
+        <h2>📋 Lista de Usuarios</h2>
         <table>
             <thead>
                 <tr>
@@ -55,6 +54,5 @@
             </tbody>
         </table>
     </div>
-
 </body>
 </html>

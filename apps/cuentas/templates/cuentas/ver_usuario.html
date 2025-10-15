@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head><meta charset="UTF-8"><title>Detalle Usuario</title></head>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+
 <body>
-  <h2>Detalle del Usuario</h2>
+  <div class="detalle-usuario">
+    <h2>Detalle del Usuario</h2>
   <p><b>CI:</b> {{ usuario.ci }}</p>
   <p><b>Nombres:</b> {{ usuario.nombres }}</p>
   <p><b>Apellidos:</b> {{ usuario.apellidos }}</p>
@@ -16,5 +20,7 @@
     <a href="{% url 'cuentas:editar_usuario' usuario.id %}">Editar</a> |
     <a href="{% url 'cuentas:lista_usuarios' %}">Volver</a>
   </p>
+  </div>
+  
 </body>
 </html>

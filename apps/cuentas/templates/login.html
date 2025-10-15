@@ -1,8 +1,35 @@
-<form method="POST" action="{% url 'login' %}">
-    {% csrf_token %}
-    <label for="username">CI o Email</label>
-    <input type="text" name="username" required>
-    <label for="password">Contraseña</label>
-    <input type="password" name="password" required>
-    <button type="submit">Iniciar sesión</button>
-</form>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión | Unidad Educativa La Paz A</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body class="login-split">
+
+    <div class="login-left">
+        <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo">
+        <h1>Unidad Educativa<br>La Paz "A"</h1>
+        
+    </div>
+
+    <div class="login-right">
+        <div class="form-container">
+            <h2>Iniciar Sesión</h2>
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                <input type="text" name="username" placeholder="CI o Email" required>
+                <input type="password" name="password" placeholder="Contraseña" required>
+
+                <div class="form-options">
+                    
+                    <button type="submit" class="btn-go">Entrar →</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,22 +1,32 @@
 <!DOCTYPE html>
 <html lang="es">
-<head><meta charset="UTF-8"><title>Crear Usuario</title></head>
+<head>
+  <meta charset="UTF-8">
+  <title>Crear Usuario</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
 <body>
-  <h2>Registrar Nuevo Usuario</h2>
-  <form method="post">
-    {% csrf_token %}
-    <p>CI (opcional): {{ form.ci }}</p>
-    <p>Nombres: {{ form.nombres }}</p>
-    <p>Apellidos: {{ form.apellidos }}</p>
-    <p>Email (opcional): {{ form.email }}</p>
-    <p>Teléfono: {{ form.telefono }}</p>
-    <p>Rol: {{ form.rol }}</p>
-    <p>Activo: {{ form.is_activo }}</p>
-    <hr>
-    <p>Contraseña: {{ form.password1 }}</p>
-    <p>Confirmar contraseña: {{ form.password2 }}</p>
-    <button type="submit">Guardar</button>
-  </form>
-  <p><a href="{% url 'cuentas:lista_usuarios' %}">Volver a la lista</a></p>
+  <!-- Contenedor principal para que el CSS se aplique -->
+  <div class="container-crud">
+    <h2>Registrar Nuevo Usuario</h2>
+
+    <form method="post">
+      {% csrf_token %}
+      <p>CI (opcional): {{ form.ci }}</p>
+      <p>Nombres: {{ form.nombres }}</p>
+      <p>Apellidos: {{ form.apellidos }}</p>
+      <p>Email (opcional): {{ form.email }}</p>
+      <p>Teléfono: {{ form.telefono }}</p>
+      <p>Rol: {{ form.rol }}</p>
+      <p>Activo: {{ form.is_activo }}</p>
+      <hr>
+      <p>Contraseña: {{ form.password1 }}</p>
+      <p>Confirmar contraseña: {{ form.password2 }}</p>
+      <button type="submit">Guardar</button>
+    </form>
+
+    <p><a href="{% url 'cuentas:lista_usuarios' %}">Volver a la lista</a></p>
+  </div>
 </body>
 </html>

@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head><meta charset="UTF-8"><title>Usuarios</title></head>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+
 <body>
-  <h2>Lista de Usuarios</h2>
+  <div class="table-container">
+      <h2>Lista de Usuarios</h2>
   <p><a href="{% url 'cuentas:crear_usuario' %}">+ Crear usuario</a></p>
   <table border="1" cellpadding="6">
     <thead>
@@ -29,5 +33,7 @@
     {% endfor %}
     </tbody>
   </table>
+  </div>
+  
 </body>
 </html>
