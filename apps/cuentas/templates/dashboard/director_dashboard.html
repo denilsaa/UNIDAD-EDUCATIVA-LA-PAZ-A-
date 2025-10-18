@@ -54,5 +54,47 @@
             </tbody>
         </table>
     </div>
+            <h2>📚 Gestionar Cursos</h2>
+        <ul>
+            <li><a href="{% url 'cursos:lista_cursos' %}">Ver/Administrar Cursos</a></li>
+            <li><a href="{% url 'cursos:crear_curso' %}">Registrar Nuevo Curso</a></li>
+        </ul>
+
+        <!-- (Opcional) Mostrar conteo de cursos si lo envía desde la vista -->
+        {% if curso_count is not None %}
+        <p><strong>Total de cursos:</strong> {{ curso_count }}</p>
+        {% endif %}
+
+        <!-- (Opcional) Últimos cursos creados si los envía desde la vista -->
+        {% if ultimos_cursos %}
+        <h3>🆕 Cursos recientes</h3>
+        <table border="1" cellpadding="6">
+        <thead>
+            <tr>
+            <th>ID</th>
+            <th>Nivel</th>
+            <th>Paralelo</th>
+            <th>Regente</th>
+            <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in ultimos_cursos %}
+            <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.nivel }}</td>
+            <td>{{ c.paralelo }}</td>
+            <td>{{ c.regente }}</td>
+            <td>
+                <a href="{% url 'cursos:ver_curso' c.id %}">Ver</a> |
+                <a href="{% url 'cursos:editar_curso' c.id %}">Editar</a> |
+                <a href="{% url 'cursos:eliminar_curso' c.id %}">Eliminar</a>
+            </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+        {% endif %}
+
 </body>
 </html>
