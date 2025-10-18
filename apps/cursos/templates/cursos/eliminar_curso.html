@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Eliminar curso</title></head>
+<body>
+  <h1>Eliminar curso</h1>
+  <p>¿Está seguro de eliminar el curso <strong>{{ curso.nivel }} {{ curso.paralelo }}</strong>?</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, eliminar</button>
+    <a href="{% url 'cursos:ver_curso' curso.id %}">Cancelar</a>
+  </form>
+</body>
+</html>

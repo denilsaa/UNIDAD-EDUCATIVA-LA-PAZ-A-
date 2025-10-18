@@ -22,5 +22,5 @@ urlpatterns = [
     path('login/', login_view, name='login'),
     path('dashboard/director/', director_dashboard, name='director_dashboard'),
     path('', include('apps.cuentas.urls')),  # Incluir las URLs de la aplicación 'cuentas'
-    path('cursos/', include('apps.cursos.urls'))
+    path('cursos/', include('apps.cursos.urls')),
 ]

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Cursos</title></head>
+<body>
+  <h1>Cursos</h1>
+
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <form method="get">
+    <input type="text" name="q" value="{{ q }}" placeholder="Buscar por nivel o paralelo">
+    <button type="submit">Buscar</button>
+    <a href="{% url 'cursos:crear_curso' %}">Nuevo curso</a>
+  </form>
+
+  <table border="1" cellpadding="6">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nivel</th>
+        <th>Paralelo</th>
+        <th>Regente</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for curso in cursos %}
+      <tr>
+        <td>{{ curso.id }}</td>
+        <td>{{ curso.nivel }}</td>
+        <td>{{ curso.paralelo }}</td>
+        <td>{{ curso.regente }}</td>
+        <td>
+          <a href="{% url 'cursos:ver_curso' curso.id %}">Ver</a> |
+          <a href="{% url 'cursos:editar_curso' curso.id %}">Editar</a> |
+          <a href="{% url 'cursos:eliminar_curso' curso.id %}">Eliminar</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">No hay cursos registrados.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

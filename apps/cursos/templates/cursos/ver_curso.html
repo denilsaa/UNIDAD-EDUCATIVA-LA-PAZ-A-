@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Detalle del curso</title></head>
+<body>
+  <h1>Detalle del curso</h1>
+
+  <ul>
+    <li><strong>Nivel:</strong> {{ curso.nivel }}</li>
+    <li><strong>Paralelo:</strong> {{ curso.paralelo }}</li>
+    <li><strong>Regente:</strong> {{ curso.regente }}</li>
+    <li><strong>Creado en:</strong> {{ curso.creado_en }}</li>
+    <li><strong>Actualizado en:</strong> {{ curso.actualizado_en }}</li>
+  </ul>
+
+  <p>
+    <a href="{% url 'cursos:editar_curso' curso.id %}">Editar</a> |
+    <a href="{% url 'cursos:lista_cursos' %}">Volver a la lista</a>
+  </p>
+</body>
+</html>
