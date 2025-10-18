@@ -12,9 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 STATIC_URL = '/static/'
 
@@ -32,6 +32,10 @@ SECRET_KEY = 'django-insecure-if^n0ab85w_-8nsbz5!o^t=dk4%+ml^v&72vpez383d_ohdncf
 DEBUG = True
 
 ALLOWED_HOSTS = []
+# --- Autenticación / Login ---
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/director/'
+LOGOUT_REDIRECT_URL = '/login/'
 
 
 # Application definition
@@ -50,9 +54,10 @@ INSTALLED_APPS = [
     "apps.citaciones.apps.CitacionesConfig",      
     "apps.notificaciones.apps.NotificacionesConfig",
 ]
-# settings.py
+
 AUTHENTICATION_BACKENDS = [
-    'apps.cuentas.backends.CustomBackend',  # Apunta al backend personalizado
+    'apps.cuentas.backends.CustomBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 MIDDLEWARE = [
@@ -96,6 +101,17 @@ DATABASES = {
         'PASSWORD': 'SNMfzxXMBbtDLKmHT5Y1',  # Contraseña
         'HOST': 'beu0hpduvweswzq20pvc-mysql.services.clever-cloud.com',  # Host
         'PORT': '3306',  # Puerto por defecto de MySQL
+         # Claves para evitar conexiones muertas
+        'CONN_MAX_AGE': 0,              # fuerza nueva conexión por request
+        'CONN_HEALTH_CHECKS': True,     # valida conexión antes de usarla
+
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'use_unicode': True,
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            # Si tu instancia exige SSL, descomenta y coloca el CA provisto por Clever Cloud:
+            # 'ssl': {'ca': '/ruta/al/ca.pem'}
+        },
     }
 }
 
@@ -133,8 +149,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

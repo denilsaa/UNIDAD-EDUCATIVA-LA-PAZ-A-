@@ -1,21 +1,27 @@
 # apps/cuentas/urls.py
-
 from django.urls import path
 from django.views.generic import TemplateView, RedirectView
 
-from .views.login import login_view
+from .views.login import login_view, logout_view
 from .views.director_dashboard import director_dashboard
-from .views.usuarios import crear_usuario, lista_usuarios, ver_usuario, editar_usuario, eliminar_usuario
+from .views.usuarios import (
+    crear_usuario, lista_usuarios, ver_usuario, editar_usuario, eliminar_usuario
+)
 
 app_name = "cuentas"
 
 urlpatterns = [
+    # Login / Logout
     path("", login_view, name="login"),
     path("login/", login_view, name="login"),
+    path("logout/", logout_view, name="logout"),
+
+    # Alias de compatibilidad (por si algo redirige a /accounts/...)
+    path("accounts/login/", RedirectView.as_view(pattern_name="cuentas:login")),
+    path("accounts/logout/", RedirectView.as_view(pattern_name="cuentas:logout")),
 
     # Dashboards
-    path("dashboard/director/", director_dashboard, name="director_dashboard"),
-
+    path("dashboard/director/",  director_dashboard, name="director_dashboard"),
     path(
         "dashboard/regente/",
         TemplateView.as_view(template_name="dashboard/regente_dashboard.html"),
