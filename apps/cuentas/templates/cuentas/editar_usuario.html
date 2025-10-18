@@ -1,28 +1,22 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Editar Usuario</title></head>
-{% load static %}
-<link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Editar Usuario{% endblock %}
 
-<body>
-  <div class="container-crud">
-    <h2>Editar Usuario</h2>
+{% block content %}
+  <h2>Editar Usuario</h2>
   <form method="post">
     {% csrf_token %}
-    <p>CI: {{ form.ci }}</p>
-    <p>Nombres: {{ form.nombres }}</p>
-    <p>Apellidos: {{ form.apellidos }}</p>
-    <p>Email: {{ form.email }}</p>
-    <p>Teléfono: {{ form.telefono }}</p>
-    <p>Rol: {{ form.rol }}</p>
-    <p>Activo: {{ form.is_activo }}</p>
-    <hr>
-    <p>Nueva contraseña (opcional): {{ form.new_password1 }}</p>
-    <p>Confirmar nueva contraseña: {{ form.new_password2 }}</p>
-    <button type="submit">Guardar</button>
+    {{ form.as_p }}
+
+    <fieldset>
+      <legend>Nueva contraseña (opcional)</legend>
+      <p><label>Nueva contraseña: <input type="password" name="new_password1"></label></p>
+      <p><label>Confirmar nueva contraseña: <input type="password" name="new_password2"></label></p>
+    </fieldset>
+
+    <p>
+      <button type="submit">Guardar</button>
+      <a href="{% url 'cuentas:ver_usuario' usuario.id %}">Ver</a> |
+      <a href="{% url 'cuentas:lista_usuarios' %}">Volver</a>
+    </p>
   </form>
-  <p><a href="{% url 'cuentas:ver_usuario' usuario.id %}">Ver</a> | <a href="{% url 'cuentas:lista_usuarios' %}">Volver</a></p>
-  </div>
-  
-</body>
-</html>
+{% endblock %}

@@ -1,101 +1,70 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard del Director</title>
-    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
-</head>
-<body>
-    <header class="dashboard-header">
-        Bienvenido al Dashboard del Director
-    </header>
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Dashboard del Director{% endblock %}
 
-    <div class="dashboard-content">
-        <h2>👤 Gestionar Usuarios</h2>
-        <a href="{% url 'cuentas:crear_usuario' %}">Registrar Nuevo Usuario</a>
+{% block content %}
+  <h2>Usuarios por rol</h2>
+  <ul>
+    <li><strong>Directores:</strong> {{ director_count }}</li>
+    <li><strong>Regentes:</strong> {{ regente_count }}</li>
+    <li><strong>Secretarias:</strong> {{ secretaria_count }}</li>
+    <li><strong>Padres de familia:</strong> {{ padre_count }}</li>
+  </ul>
 
-        <h2>📊 Usuarios por Rol</h2>
-        <ul>
-            <li><strong>Directores:</strong> {{ director_count }}</li>
-            <li><strong>Regentes:</strong> {{ regente_count }}</li>
-            <li><strong>Secretarias:</strong> {{ secretaria_count }}</li>
-            <li><strong>Padres de familia:</strong> {{ padre_count }}</li>
-        </ul>
+  <h2>Lista de usuarios</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>CI</th><th>Nombres</th><th>Apellidos</th><th>Email</th><th>Estado</th><th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for usuario in usuarios %}
+      <tr>
+        <td>{{ usuario.ci }}</td>
+        <td>{{ usuario.nombres }}</td>
+        <td>{{ usuario.apellidos }}</td>
+        <td>{{ usuario.email }}</td>
+        <td>{{ usuario.is_activo|yesno:"Activo,Inactivo" }}</td>
+        <td>
+          <a href="{% url 'cuentas:ver_usuario' usuario.id %}">Ver</a> |
+          <a href="{% url 'cuentas:editar_usuario' usuario.id %}">Editar</a> |
+          <a href="{% url 'cuentas:eliminar_usuario' usuario.id %}">Eliminar</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">No hay usuarios registrados.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-        <h2>📋 Lista de Usuarios</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>CI</th>
-                    <th>Nombres</th>
-                    <th>Apellidos</th>
-                    <th>Email</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for usuario in usuarios %}
-                <tr>
-                    <td>{{ usuario.ci }}</td>
-                    <td>{{ usuario.nombres }}</td>
-                    <td>{{ usuario.apellidos }}</td>
-                    <td>{{ usuario.email }}</td>
-                    <td>{{ usuario.is_activo|yesno:"Activo,Inactivo" }}</td>
-                    <td>
-                        <a href="{% url 'cuentas:ver_usuario' usuario.id %}">Ver</a>
-                        <a href="{% url 'cuentas:editar_usuario' usuario.id %}">Editar</a>
-                        <a href="{% url 'cuentas:eliminar_usuario' usuario.id %}">Eliminar</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-            <h2>📚 Gestionar Cursos</h2>
-        <ul>
-            <li><a href="{% url 'cursos:lista_cursos' %}">Ver/Administrar Cursos</a></li>
-            <li><a href="{% url 'cursos:crear_curso' %}">Registrar Nuevo Curso</a></li>
-        </ul>
+  <h2>Gestionar cursos</h2>
+  <p><a href="{% url 'cursos:lista_cursos' %}">Ver/Administrar cursos</a> | <a href="{% url 'cursos:crear_curso' %}">Nuevo curso</a></p>
 
-        <!-- (Opcional) Mostrar conteo de cursos si lo envía desde la vista -->
-        {% if curso_count is not None %}
-        <p><strong>Total de cursos:</strong> {{ curso_count }}</p>
-        {% endif %}
+  {% if curso_count is not None %}
+    <p><strong>Total de cursos:</strong> {{ curso_count }}</p>
+  {% endif %}
 
-        <!-- (Opcional) Últimos cursos creados si los envía desde la vista -->
-        {% if ultimos_cursos %}
-        <h3>🆕 Cursos recientes</h3>
-        <table border="1" cellpadding="6">
-        <thead>
-            <tr>
-            <th>ID</th>
-            <th>Nivel</th>
-            <th>Paralelo</th>
-            <th>Regente</th>
-            <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for c in ultimos_cursos %}
-            <tr>
-            <td>{{ c.id }}</td>
-            <td>{{ c.nivel }}</td>
-            <td>{{ c.paralelo }}</td>
-            <td>{{ c.regente }}</td>
-            <td>
-                <a href="{% url 'cursos:ver_curso' c.id %}">Ver</a> |
-                <a href="{% url 'cursos:editar_curso' c.id %}">Editar</a> |
-                <a href="{% url 'cursos:eliminar_curso' c.id %}">Eliminar</a>
-            </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-        </table>
-        {% endif %}
-<a href="{% url 'cuentas:logout' %}">Cerrar sesión</a>
-
-</body>
-</html>
+  {% if ultimos_cursos %}
+    <h3>Cursos recientes</h3>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Nivel</th><th>Paralelo</th><th>Regente</th><th>Acciones</th></tr>
+      </thead>
+      <tbody>
+        {% for c in ultimos_cursos %}
+        <tr>
+          <td>{{ c.id }}</td>
+          <td>{{ c.nivel }}</td>
+          <td>{{ c.paralelo }}</td>
+          <td>{{ c.regente }}</td>
+          <td>
+            <a href="{% url 'cursos:ver_curso' c.id %}">Ver</a> |
+            <a href="{% url 'cursos:editar_curso' c.id %}">Editar</a> |
+            <a href="{% url 'cursos:eliminar_curso' c.id %}">Eliminar</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}
