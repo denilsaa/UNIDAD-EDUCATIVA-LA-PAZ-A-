@@ -1,22 +1,15 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Crear curso</title></head>
-<body>
-  <h1>Crear curso</h1>
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Crear curso{% endblock %}
 
-  {% if messages %}
-    <ul>
-      {% for message in messages %}
-        <li>{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+{% block content %}
+<h2>Crear curso</h2>
 
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <p>
     <button type="submit">Guardar</button>
     <a href="{% url 'cursos:lista_cursos' %}">Cancelar</a>
-  </form>
-</body>
-</html>
+  </p>
+</form>
+{% endblock %}

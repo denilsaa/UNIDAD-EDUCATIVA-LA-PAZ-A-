@@ -1,39 +1,39 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Usuarios</title></head>
-{% load static %}
-<link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Usuarios{% endblock %}
 
-<body>
-  <div class="table-container">
-      <h2>Lista de Usuarios</h2>
-  <p><a href="{% url 'cuentas:crear_usuario' %}">+ Crear usuario</a></p>
-  <table border="1" cellpadding="6">
-    <thead>
-      <tr>
-        <th>CI</th><th>Nombres</th><th>Apellidos</th><th>Email</th><th>Estado</th><th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
+{% block content %}
+<h2>Lista de usuarios</h2>
+
+<p><a href="{% url 'cuentas:crear_usuario' %}">+ Crear usuario</a></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>CI</th>
+      <th>Nombres</th>
+      <th>Apellidos</th>
+      <th>Email</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
     {% for u in usuarios %}
-      <tr>
-        <td>{{ u.ci }}</td>
-        <td>{{ u.nombres }}</td>
-        <td>{{ u.apellidos }}</td>
-        <td>{{ u.email }}</td>
-        <td>{{ u.is_activo|yesno:"Activo,Inactivo" }}</td>
-        <td>
-          <a href="{% url 'cuentas:ver_usuario' u.id %}">Ver</a> |
-          <a href="{% url 'cuentas:editar_usuario' u.id %}">Editar</a> |
-          <a href="{% url 'cuentas:eliminar_usuario' u.id %}">Eliminar</a>
-        </td>
-      </tr>
+    <tr>
+      <td>{{ u.ci }}</td>
+      <td>{{ u.nombres }}</td>
+      <td>{{ u.apellidos }}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.is_activo|yesno:"Activo,Inactivo" }}</td>
+      <td>
+        <a href="{% url 'cuentas:ver_usuario' u.id %}">Ver</a> |
+        <a href="{% url 'cuentas:editar_usuario' u.id %}">Editar</a> |
+        <a href="{% url 'cuentas:eliminar_usuario' u.id %}">Eliminar</a>
+      </td>
+    </tr>
     {% empty %}
-      <tr><td colspan="6">Sin usuarios</td></tr>
+    <tr><td colspan="6">Sin usuarios</td></tr>
     {% endfor %}
-    </tbody>
-  </table>
-  </div>
-  
-</body>
-</html>
+  </tbody>
+</table>
+{% endblock %}

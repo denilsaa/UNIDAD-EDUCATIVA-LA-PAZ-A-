@@ -1,26 +1,23 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Detalle Usuario</title></head>
-{% load static %}
-<link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Detalle de usuario{% endblock %}
 
-<body>
-  <div class="detalle-usuario">
-    <h2>Detalle del Usuario</h2>
-  <p><b>CI:</b> {{ usuario.ci }}</p>
-  <p><b>Nombres:</b> {{ usuario.nombres }}</p>
-  <p><b>Apellidos:</b> {{ usuario.apellidos }}</p>
-  <p><b>Email:</b> {{ usuario.email }}</p>
-  <p><b>Teléfono:</b> {{ usuario.telefono }}</p>
-  <p><b>Rol:</b> {{ usuario.rol.nombre }}</p>
-  <p><b>Estado:</b> {{ usuario.is_activo|yesno:"Activo,Inactivo" }}</p>
-  <p><b>Creado:</b> {{ usuario.creado_en }}</p>
-  <p><b>Última actualización:</b> {{ usuario.actualizado_en }}</p>
-  <p>
-    <a href="{% url 'cuentas:editar_usuario' usuario.id %}">Editar</a> |
-    <a href="{% url 'cuentas:lista_usuarios' %}">Volver</a>
-  </p>
-  </div>
-  
-</body>
-</html>
+{% block content %}
+<h2>Detalle del usuario</h2>
+
+<ul>
+  <li><strong>CI:</strong> {{ usuario.ci }}</li>
+  <li><strong>Nombres:</strong> {{ usuario.nombres }}</li>
+  <li><strong>Apellidos:</strong> {{ usuario.apellidos }}</li>
+  <li><strong>Email:</strong> {{ usuario.email }}</li>
+  <li><strong>Teléfono:</strong> {{ usuario.telefono }}</li>
+  <li><strong>Rol:</strong> {{ usuario.rol.nombre }}</li>
+  <li><strong>Estado:</strong> {{ usuario.is_activo|yesno:"Activo,Inactivo" }}</li>
+  <li><strong>Creado:</strong> {{ usuario.creado_en }}</li>
+  <li><strong>Última actualización:</strong> {{ usuario.actualizado_en }}</li>
+</ul>
+
+<p>
+  <a href="{% url 'cuentas:editar_usuario' usuario.id %}">Editar</a> |
+  <a href="{% url 'cuentas:lista_usuarios' %}">Volver</a>
+</p>
+{% endblock %}

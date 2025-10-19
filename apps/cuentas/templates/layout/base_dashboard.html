@@ -7,16 +7,33 @@
   <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
+{# Normalizamos el nombre del rol a minúsculas y manejamos None #}
+{% with role=request.user.rol.nombre|default_if_none:""|default:""|lower %}
 <body class="layout">
 
   <!-- Header -->
   <header class="hdr">
     <div class="hdr-left">
       <h1 class="hdr-title">Unidad Educativa La Paz “A”</h1>
-      <span class="hdr-sub">Dashboard del Director</span>
+      <span class="hdr-sub">
+        {% if "director" in role %}Dashboard del Director
+        {% elif "regente" in role %}Dashboard del Regente
+        {% elif "secretaria" in role or "secretaría" in role %}Dashboard de Secretaría
+        {% elif "padre" in role %}Dashboard de Padre de familia
+        {% else %}Panel{% endif %}
+      </span>
     </div>
     <nav class="hdr-nav">
-      <a href="{% url 'cuentas:director_dashboard' %}">Inicio</a>
+      {% if "director" in role %}
+        <a href="{% url 'cuentas:director_dashboard' %}">Inicio</a>
+      {% elif "regente" in role %}
+        <a href="{% url 'cuentas:regente_dashboard' %}">Inicio</a>
+      {% elif "secretaria" in role or "secretaría" in role %}
+        <a href="{% url 'cuentas:secretaria_dashboard' %}">Inicio</a>
+      {% elif "padre" in role %}
+        <a href="{% url 'cuentas:padre_dashboard' %}">Inicio</a>
+      {% endif %}
       <a href="{% url 'cuentas:logout' %}">Cerrar sesión</a>
     </nav>
   </header>
@@ -27,12 +44,30 @@
       <nav>
         <h2 class="sidenav-title">Secciones</h2>
         <ul class="sidenav-list">
-          <li><a href="{% url 'cuentas:director_dashboard' %}">📊 Resumen</a></li>
-          <li><a href="{% url 'cuentas:lista_usuarios' %}">👤 Usuarios</a></li>
-          <li><a href="{% url 'cursos:lista_cursos' %}">📚 Cursos</a></li>
-          <li><a href="{% url 'cuentas:crear_usuario' %}">➕ Nuevo usuario</a></li>
-          <li><a href="{% url 'cursos:crear_curso' %}">➕ Nuevo curso</a></li>
-          <!-- agrega más enlaces cuando necesites -->
+
+          {# --- Director --- #}
+          {% if "director" in role %}
+            <li><a href="{% url 'cuentas:director_dashboard' %}">📊 Resumen</a></li>
+            <li><a href="{% url 'cuentas:lista_usuarios' %}">👤 Usuarios</a></li>
+            <li><a href="{% url 'cursos:lista_cursos' %}">📚 Cursos</a></li>
+            <li><a href="{% url 'cuentas:crear_usuario' %}">➕ Nuevo usuario</a></li>
+            <li><a href="{% url 'cursos:crear_curso' %}">➕ Nuevo curso</a></li>
+
+          {# --- Regente --- #}
+          {% elif "regente" in role %}
+            <li><a href="{% url 'cuentas:regente_dashboard' %}">📊 Resumen</a></li>
+            <li><a href="{% url 'cursos:lista_cursos' %}">📚 Mis cursos</a></li>
+
+          {# --- Secretaría --- #}
+          {% elif "secretaria" in role or "secretaría" in role %}
+            <li><a href="{% url 'cuentas:secretaria_dashboard' %}">📊 Resumen</a></li>
+            <li><a href="{% url 'cuentas:lista_usuarios' %}">📄 Usuarios</a></li>
+
+          {# --- Padre de familia --- #}
+          {% elif "padre" in role %}
+            <li><a href="{% url 'cuentas:padre_dashboard' %}">🏠 Inicio</a></li>
+          {% endif %}
+
           <li class="sep"></li>
           <li><a href="{% url 'cuentas:logout' %}">🚪 Cerrar sesión</a></li>
         </ul>
@@ -59,4 +94,5 @@
   </footer>
 
 </body>
+{% endwith %}
 </html>
