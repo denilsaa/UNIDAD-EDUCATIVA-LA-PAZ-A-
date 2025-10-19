@@ -1,11 +1,9 @@
-# apps/estudiantes/views/forms_kardex.py
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.utils.timezone import now
-from django.http import HttpResponseForbidden
 
 from apps.estudiantes.models.estudiante import Estudiante
 from apps.estudiantes.models.kardex_registro import KardexRegistro
@@ -53,12 +51,12 @@ def kardex_registro_nuevo(request, estudiante_id: int):
 
     # 🔒 Autorización
     if es_padre(request.user):
-        return HttpResponseForbidden("No autorizado.")
+        return render(request, "403.html", status=403)
     elif es_regente(request.user):
         if getattr(estudiante.curso, "regente_id", None) != request.user.id:
-            return HttpResponseForbidden("No autorizado.")
+            return render(request, "403.html", status=403)
     elif not (es_director(request.user) or es_secretaria(request.user)):
-        return HttpResponseForbidden("No autorizado.")
+        return render(request, "403.html", status=403)
 
     if request.method == "POST":
         form = KardexRegistroForm(request.POST)
@@ -89,12 +87,12 @@ def kardex_registro_listar(request, estudiante_id: int):
     # 🔒 Autorización
     if es_padre(request.user):
         if getattr(estudiante, "padre_id", None) != request.user.id:
-            return HttpResponseForbidden("No autorizado.")
+            return render(request, "403.html", status=403)
     elif es_regente(request.user):
         if getattr(estudiante.curso, "regente_id", None) != request.user.id:
-            return HttpResponseForbidden("No autorizado.")
+            return render(request, "403.html", status=403)
     elif not (es_director(request.user) or es_secretaria(request.user)):
-        return HttpResponseForbidden("No autorizado.")
+        return render(request, "403.html", status=403)
 
     # Columnas por área (orden fijo por ID para alinear filas)
     ser_cols     = list(KardexItem.objects.filter(area="SER").order_by("id"))

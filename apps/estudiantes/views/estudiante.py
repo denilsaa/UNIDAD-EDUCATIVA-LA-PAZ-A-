@@ -2,16 +2,12 @@
 from datetime import date
 
 from django.db.models import Q
-from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 
 from apps.estudiantes.forms import EstudianteForm
-# (Estos imports no se usan en este archivo; puedes borrarlos si quieres)
-# from apps.estudiantes.forms import KardexItemForm
-# from apps.estudiantes.models.kardex_item import KardexItem
-
 from apps.estudiantes.models.estudiante import Estudiante
 from apps.cursos.models.kardex import Kardex
 from apps.cursos.models.curso import Curso
@@ -30,9 +26,7 @@ def trimestre_actual(hoy: date) -> int:
     return 3
 
 
-# ============
-# CRUD GLOBAL (Director / Secretaría)
-# ============
+# ============ CRUD GLOBAL (Director / Secretaría) ============
 
 class EstudianteListView(RoleRequiredMixin, ListView):
     model = Estudiante
@@ -122,9 +116,7 @@ class EstudianteDeleteView(RoleRequiredMixin, DeleteView):
     required_roles = ("director",)  # si prefieres, agrega secretaría aquí
 
 
-# ===========================
-# LISTADO POR CURSO (Dir/Reg/Sec)
-# ===========================
+# =========================== LISTADO POR CURSO (Dir/Reg/Sec) ===========================
 
 class EstudiantesPorCursoListView(RoleRequiredMixin, ListView):
     """
@@ -144,7 +136,8 @@ class EstudiantesPorCursoListView(RoleRequiredMixin, ListView):
         # Si es regente, debe ser regente del curso
         if es_regente(request.user):
             if getattr(self.curso, "regente_id", None) != request.user.id:
-                return HttpResponseForbidden("No autorizado.")
+                # Renderiza 403 con tu plantilla (que vuelve en 5s)
+                return render(request, "403.html", status=403)
 
         # Director / Secretaría pasan sin restricción adicional
         return super().dispatch(request, *args, **kwargs)

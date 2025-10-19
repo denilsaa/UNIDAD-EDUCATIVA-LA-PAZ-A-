@@ -3,7 +3,6 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.http import HttpResponseForbidden
 from django.urls import reverse
 from django.db.models import Q
 
@@ -47,7 +46,7 @@ def ver_curso(request, curso_id):
     """
     Director: puede ver cualquier curso.
     Regente: solo puede ver si es regente del curso.
-    Otros roles: 403.
+    Otros roles: 403 (renderiza plantilla 403.html con contador y auto-retorno).
     """
     curso = get_object_or_404(Curso, id=curso_id)
 
@@ -55,9 +54,9 @@ def ver_curso(request, curso_id):
         pass  # permitido
     elif es_regente(request.user):
         if getattr(curso, "regente_id", None) != request.user.id:
-            return HttpResponseForbidden("No autorizado.")
+            return render(request, "403.html", status=403)
     else:
-        return HttpResponseForbidden("No autorizado.")
+        return render(request, "403.html", status=403)
 
     return render(request, "cursos/ver_curso.html", {"curso": curso})
 

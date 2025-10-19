@@ -1,9 +1,7 @@
-# apps/estudiantes/views/padre.py
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, View
-from django.http import HttpResponseForbidden
 
 from apps.estudiantes.models.estudiante import Estudiante
 from apps.cuentas.roles import es_padre
@@ -34,14 +32,14 @@ class HijoDetalleView(View):
     template_name = "estudiantes/hijo_detalle.html"
 
     def get(self, request, estudiante_id):
-        hijo = get_object_or_404(Estudiante.objects.select_related("curso", "padre"), pk=estudiante_id)
+        hijo = get_object_or_404(
+            Estudiante.objects.select_related("curso", "padre"),
+            pk=estudiante_id
+        )
 
         # 🔒 solo si es su hijo
         if not es_padre(request.user) or hijo.padre_id != request.user.id:
-            return HttpResponseForbidden("No autorizado.")
+            return render(request, "403.html", status=403)
 
-        # (Si en el futuro agregas asistencia, se puede sumar aquí.)
-        contexto = {
-            "hijo": hijo,
-        }
+        contexto = {"hijo": hijo}
         return render(request, self.template_name, contexto)

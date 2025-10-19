@@ -1,15 +1,20 @@
 from functools import wraps
-from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
-from .roles import has_any_role
+from django.shortcuts import render
+# (opcional) también puedes usar: from django.core.exceptions import PermissionDenied
 
 def role_required(*roles):
     def decorator(viewfunc):
         @wraps(viewfunc)
         @login_required
         def _wrapped(request, *args, **kwargs):
-            if has_any_role(request.user, *roles):
+            # get role name safely
+            rol_nombre = (getattr(getattr(request.user, "rol", None), "nombre", "") or "").lower()
+            if any(r in rol_nombre for r in roles):
                 return viewfunc(request, *args, **kwargs)
-            return HttpResponseForbidden("No autorizado.")
+            # ❌ No autorizado -> render 403 con tu template (incluye el JS de 5s)
+            return render(request, "403.html", status=403)
+            # Alternativa:
+            # raise PermissionDenied
         return _wrapped
     return decorator

@@ -1,7 +1,51 @@
 {% extends "layout/base_dashboard.html" %}
 {% block title %}Acceso denegado{% endblock %}
+
 {% block content %}
-  <h2>⚠️ Acceso denegado (403)</h2>
-  <p>No tiene permisos para ver esta página.</p>
-  <p><a href="{% url 'cuentas:logout' %}">Cerrar sesión</a> | <a href="javascript:history.back()">Volver</a></p>
+<h2>⚠️ Acceso denegado (403)</h2>
+<p>No tiene permisos para ver esta página.</p>
+
+<p>
+  Volveremos a la página anterior en <b id="count">5</b> segundos…
+  <br>
+  <a id="backLink" href="javascript:history.back()">Volver ahora</a> |
+  <a href="{% url 'cuentas:logout' %}">Cerrar sesión</a>
+</p>
+
+<script>
+(function () {
+  var secs = 5;
+  var countEl = document.getElementById('count');
+  var backLink = document.getElementById('backLink');
+
+  // Si hay referrer, úsalo; si no, manda al login como respaldo
+  var fallback = "{% url 'cuentas:login' %}";
+  var target = document.referrer && document.referrer !== location.href
+               ? document.referrer
+               : fallback;
+
+  // Por si el usuario hace clic en "Volver ahora"
+  backLink.addEventListener('click', function (e) {
+    // Si no hay historial válido, ve al target directo
+    if (history.length <= 1) {
+      e.preventDefault();
+      window.location.href = target;
+    }
+  });
+
+  var t = setInterval(function () {
+    secs--;
+    if (countEl) countEl.textContent = secs;
+    if (secs <= 0) {
+      clearInterval(t);
+      // Intentar volver; si no hay historial, ir al target calculado
+      if (history.length > 1) {
+        history.back();
+      } else {
+        window.location.href = target;
+      }
+    }
+  }, 1000);
+})();
+</script>
 {% endblock %}
