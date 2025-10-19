@@ -31,6 +31,7 @@
         <a href="{% url 'cursos:ver_curso' curso.id %}">Ver</a> |
         <a href="{% url 'cursos:editar_curso' curso.id %}">Editar</a> |
         <a href="{% url 'cursos:eliminar_curso' curso.id %}">Eliminar</a>
+        <a href="{% url 'estudiantes:por_curso' curso.id %}">Ver estudiantes</a>
       </td>
     </tr>
     {% empty %}

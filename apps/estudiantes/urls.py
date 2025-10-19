@@ -7,6 +7,8 @@ from apps.estudiantes.views.forms_kardex import (
     kardex_registro_nuevo,
     kardex_registro_listar,
 )
+from apps.estudiantes.views.estudiante import EstudiantesPorCursoListView
+
 app_name = "estudiantes"
 
 urlpatterns = [
@@ -16,4 +18,6 @@ urlpatterns = [
     path("<int:pk>/eliminar/", EstudianteDeleteView.as_view(), name="eliminar"),
     path("kardex/<int:estudiante_id>/", kardex_registro_listar, name="kardex_listar"),
     path("kardex/<int:estudiante_id>/nuevo/", kardex_registro_nuevo, name="kardex_nuevo"),
+    path("curso/<int:curso_id>/", EstudiantesPorCursoListView.as_view(), name="por_curso"),
+    
 ]
