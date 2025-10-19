@@ -1,0 +1,100 @@
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Kárdex del estudiante{% endblock %}
+
+{% block content %}
+<h2 style="text-align:center">Kárdex diario del estudiante</h2>
+
+<!-- Cabecera -->
+<div class="card">
+  <p><strong>Estudiante:</strong> {{ estudiante.apellidos }} {{ estudiante.nombres }}</p>
+  <p>
+    <strong>Curso:</strong> {{ estudiante.curso }} |
+    <strong>Nº Lista:</strong> {{ estudiante.nro_lista|default:"—" }} |
+    <strong>Año:</strong> {{ estudiante.anio|default:"—" }}
+  </p>
+  <p>
+    <strong>Padre/Madre/Tutor:</strong> {{ estudiante.padre|default:"—" }} |
+    <strong>Tel./Cel.:</strong> {{ estudiante.tel_celular|default:"—" }}
+  </p>
+</div>
+
+<p>
+  <a href="{% url 'estudiantes:kardex_nuevo' estudiante.id %}">+ Añadir registro</a>
+  &nbsp;|&nbsp;
+  <a href="{% url 'estudiantes:listar' %}">← Volver a estudiantes</a>
+</p>
+
+<!-- Grilla tipo planilla -->
+<div class="tabla-scroll">
+<table class="tabla tabla-kardex">
+  <thead>
+    <tr>
+      <th rowspan="2" style="min-width:40px">Nro.</th>
+      <th rowspan="2" style="min-width:100px">Fecha</th>
+      <th rowspan="2" style="min-width:120px">Sello del maestro</th>
+
+      <!-- Bloques de columnas por dimensión -->
+      <th colspan="{{ ser_cols|length }}">SER</th>
+      <th colspan="{{ saber_cols|length }}">SABER</th>
+      <th colspan="{{ hacer_cols|length }}">HACER</th>
+      <th colspan="{{ decidir_cols|length }}">DECIDIR</th>
+
+      <th rowspan="2" style="min-width:200px">Otras observaciones / acciones tomadas</th>
+      <th rowspan="2" style="min-width:160px">Firma del padre/tutor</th>
+    </tr>
+    <tr>
+      {% for c in ser_cols %}<th class="th-rotado">{{ c.descripcion }}</th>{% endfor %}
+      {% for c in saber_cols %}<th class="th-rotado">{{ c.descripcion }}</th>{% endfor %}
+      {% for c in hacer_cols %}<th class="th-rotado">{{ c.descripcion }}</th>{% endfor %}
+      {% for c in decidir_cols %}<th class="th-rotado">{{ c.descripcion }}</th>{% endfor %}
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for r in filas %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ r.fecha }}{% if r.hora %} {{ r.hora }}{% endif %}</td>
+        <td>{% if r.sello_maestro %}✔{% endif %}</td>
+
+        {# Para cada dimensión, marcamos la columna cuyo c.id coincide con r.kardex_item_id #}
+        {% for c in ser_cols %}<td class="mark">{% if r.kardex_item_id == c.id %}✔{% endif %}</td>{% endfor %}
+        {% for c in saber_cols %}<td class="mark">{% if r.kardex_item_id == c.id %}✔{% endif %}</td>{% endfor %}
+        {% for c in hacer_cols %}<td class="mark">{% if r.kardex_item_id == c.id %}✔{% endif %}</td>{% endfor %}
+        {% for c in decidir_cols %}<td class="mark">{% if r.kardex_item_id == c.id %}✔{% endif %}</td>{% endfor %}
+
+        <td>{{ r.observacion|default:"—" }}</td>
+        <td><!-- firma física --></td>
+      </tr>
+    {% empty %}
+      {% for i in "123456789012345"|make_list %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>—</td>
+        <td></td>
+        {% for c in ser_cols %}<td></td>{% endfor %}
+        {% for c in saber_cols %}<td></td>{% endfor %}
+        {% for c in hacer_cols %}<td></td>{% endfor %}
+        {% for c in decidir_cols %}<td></td>{% endfor %}
+        <td></td><td></td>
+      </tr>
+      {% endfor %}
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<style>
+.tabla { width:100%; border-collapse: collapse; }
+.tabla th, .tabla td { border:1px solid #ddd; padding:6px; text-align:center; vertical-align:middle; }
+.th-rotado { writing-mode: vertical-rl; transform: rotate(180deg); min-width:28px; font-size:12px; }
+.mark { font-weight: bold; font-size: 16px; }
+.tabla-scroll { overflow-x:auto; }
+.card { background:#f7f7f7; padding:10px; border:1px solid #e5e5e5; margin:10px 0; }
+@media print {
+  .hdr, .sidenav, .msgs, a[href], .ftr { display:none !important; }
+  .tabla th, .tabla td { padding:4px;}
+  .th-rotado { font-size:10px; }
+}
+</style>
+{% endblock %}

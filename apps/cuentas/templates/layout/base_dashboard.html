@@ -27,10 +27,18 @@
     <nav class="hdr-nav">
       {% if "director" in role %}
         <a href="{% url 'cuentas:director_dashboard' %}">Inicio</a>
+        <!-- NUEVO -->
+        <a href="{% url 'estudiantes:listar' %}">Estudiantes</a>
       {% elif "regente" in role %}
         <a href="{% url 'cuentas:regente_dashboard' %}">Inicio</a>
+        <!-- Opcional para regente:
+        <a href="{% url 'estudiantes:listar' %}">Estudiantes</a>
+        -->
       {% elif "secretaria" in role or "secretaría" in role %}
         <a href="{% url 'cuentas:secretaria_dashboard' %}">Inicio</a>
+        <!-- Opcional para secretaría:
+        <a href="{% url 'estudiantes:listar' %}">Estudiantes</a>
+        -->
       {% elif "padre" in role %}
         <a href="{% url 'cuentas:padre_dashboard' %}">Inicio</a>
       {% endif %}
@@ -53,15 +61,28 @@
             <li><a href="{% url 'cuentas:crear_usuario' %}">➕ Nuevo usuario</a></li>
             <li><a href="{% url 'cursos:crear_curso' %}">➕ Nuevo curso</a></li>
 
+            <!-- ===== NUEVO: Estudiantes ===== -->
+            <li class="sep"></li>
+            <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
+            <li><a href="{% url 'estudiantes:crear' %}">➕ Nuevo estudiante</a></li>
+            <!-- Para kárdex trabajamos dentro de Estudiantes (ver/añadir registro por alumno) -->
+
           {# --- Regente --- #}
           {% elif "regente" in role %}
             <li><a href="{% url 'cuentas:regente_dashboard' %}">📊 Resumen</a></li>
             <li><a href="{% url 'cursos:lista_cursos' %}">📚 Mis cursos</a></li>
+            <!-- Opcional:
+            <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
+            -->
 
           {# --- Secretaría --- #}
           {% elif "secretaria" in role or "secretaría" in role %}
             <li><a href="{% url 'cuentas:secretaria_dashboard' %}">📊 Resumen</a></li>
             <li><a href="{% url 'cuentas:lista_usuarios' %}">📄 Usuarios</a></li>
+            <!-- Opcional:
+            <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
+            <li><a href="{% url 'estudiantes:crear' %}">➕ Nuevo estudiante</a></li>
+            -->
 
           {# --- Padre de familia --- #}
           {% elif "padre" in role %}
@@ -90,7 +111,7 @@
 
   <!-- Footer -->
   <footer class="ftr">
-    <small>© {{ now|date:"Y" }} Unidad Educativa La Paz “A”. <a href="{% url 'cuentas:logout' %}">Cerrar sesión</a></small>
+    <small>© {% now "Y" %} Unidad Educativa La Paz “A”. <a href="{% url 'cuentas:logout' %}">Cerrar sesión</a></small>
   </footer>
 
 </body>

@@ -1,0 +1,10 @@
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Eliminar Estudiante{% endblock %}
+{% block content %}
+  <h2>Eliminar</h2>
+  <p>¿Eliminar a <strong>{{ object }}</strong>?</p>
+  <form method="post">{% csrf_token %}
+    <button type="submit">Sí, eliminar</button>
+    <a href="{% url 'estudiantes:listar' %}">Cancelar</a>
+  </form>
+{% endblock %}

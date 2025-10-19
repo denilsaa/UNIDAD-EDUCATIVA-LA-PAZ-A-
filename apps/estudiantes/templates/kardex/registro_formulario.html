@@ -1,0 +1,23 @@
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Nuevo registro de kárdex{% endblock %}
+
+{% block content %}
+<h2>Nuevo registro de kárdex</h2>
+<p><strong>Estudiante:</strong> {{ estudiante.apellidos }} {{ estudiante.nombres }}</p>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+
+  <div class="grid">
+    <div>{{ form.fecha.label_tag }} {{ form.fecha }}</div>
+    <div>{{ form.hora.label_tag }} {{ form.hora }}</div>
+    <div class="col-2">{{ form.kardex_item.label_tag }} {{ form.kardex_item }}</div>
+    <div class="col-2">{{ form.observacion.label_tag }} {{ form.observacion }}</div>
+    <div>{{ form.sello_maestro.label_tag }} {{ form.sello_maestro }}</div>
+  </div>
+
+  <button type="submit">Guardar</button>
+  <a href="{% url 'estudiantes:kardex_listar' estudiante.id %}">Cancelar</a>
+</form>
+{% endblock %}

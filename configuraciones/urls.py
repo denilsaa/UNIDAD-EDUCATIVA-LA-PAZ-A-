@@ -23,4 +23,5 @@ urlpatterns = [
     path('dashboard/director/', director_dashboard, name='director_dashboard'),
     path('', include('apps.cuentas.urls')),  # Incluir las URLs de la aplicación 'cuentas'
     path('cursos/', include('apps.cursos.urls')),
+    path("estudiantes/", include("apps.estudiantes.urls")),
 ]

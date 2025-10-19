@@ -38,7 +38,10 @@
   </table>
 
   <h2>Gestionar cursos</h2>
-  <p><a href="{% url 'cursos:lista_cursos' %}">Ver/Administrar cursos</a> | <a href="{% url 'cursos:crear_curso' %}">Nuevo curso</a></p>
+  <p>
+    <a href="{% url 'cursos:lista_cursos' %}">Ver/Administrar cursos</a> |
+    <a href="{% url 'cursos:crear_curso' %}">Nuevo curso</a>
+  </p>
 
   {% if curso_count is not None %}
     <p><strong>Total de cursos:</strong> {{ curso_count }}</p>
@@ -67,4 +70,69 @@
       </tbody>
     </table>
   {% endif %}
+
+  <!-- ===================== NUEVO: Estudiantes ===================== -->
+  <h2>Gestionar estudiantes</h2>
+  <p>
+    <a href="{% url 'estudiantes:listar' %}">Ver/Administrar estudiantes</a> |
+    <a href="{% url 'estudiantes:crear' %}">Nuevo estudiante</a>
+  </p>
+
+  {% if estudiante_count is not None %}
+    <p><strong>Total de estudiantes:</strong> {{ estudiante_count }}</p>
+  {% endif %}
+
+  {% if ultimos_estudiantes %}
+    <h3>Estudiantes recientes</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Apellidos</th><th>Nombres</th><th>CI</th><th>Curso</th><th>Padre/Tutor</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in ultimos_estudiantes %}
+        <tr>
+          <td>{{ e.id }}</td>
+          <td>{{ e.apellidos }}</td>
+          <td>{{ e.nombres }}</td>
+          <td>{{ e.ci }}</td>
+          <td>{{ e.curso }}</td>
+          <td>{{ e.padre }}</td>
+          <td>
+            <a href="{% url 'estudiantes:editar' e.id %}">Editar</a> |
+            <a href="{% url 'estudiantes:eliminar' e.id %}">Eliminar</a> |
+            <a href="{% url 'estudiantes:kardex_listar' e.id %}">Ver kárdex</a> |
+            <a href="{% url 'estudiantes:kardex_nuevo' e.id %}">+ Registro kárdex</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+  <!-- =================== FIN NUEVO: Estudiantes =================== -->
+  {% if ultimos_kardex %}
+    <h2>Registros recientes de kárdex</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Estudiante</th>
+          <th>Ítem</th>
+          <th>Observación</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in ultimos_kardex %}
+        <tr>
+          <td>{{ r.fecha }}{% if r.hora %} {{ r.hora }}{% endif %}</td>
+          <td>{{ r.estudiante }}</td>
+          <td>{{ r.kardex_item }}</td>
+          <td>{{ r.observacion|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
 {% endblock %}
