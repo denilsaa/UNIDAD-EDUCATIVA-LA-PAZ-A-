@@ -5,6 +5,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from apps.estudiantes.forms import EstudianteForm
+from apps.estudiantes.forms import KardexItemForm
+from apps.estudiantes.models.kardex_item import KardexItem
 from apps.estudiantes.models.estudiante import Estudiante
 from apps.cursos.models.kardex import Kardex
 from django.shortcuts import get_object_or_404

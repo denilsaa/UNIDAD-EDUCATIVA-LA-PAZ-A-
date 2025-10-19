@@ -1,0 +1,76 @@
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Catálogo de Ítems de Kárdex{% endblock %}
+
+{% block content %}
+<h2 style="text-align:center">Catálogo de Ítems de Kárdex</h2>
+
+<form method="get" style="margin:12px 0;">
+  <input type="text" name="q" value="{{ q }}" placeholder="Buscar por descripción…" style="width:100%;max-width:1000px">
+
+  <div style="margin:6px 0;">
+    <select name="area">
+      <option value="">— Área —</option>
+      {% for v,label in areas %}
+        <option value="{{ v }}" {% if area_sel == v %}selected{% endif %}>{{ v }}</option>
+      {% endfor %}
+    </select>
+
+    <select name="sentido">
+      <option value="">— Sentido —</option>
+      {% for v,label in sentidos %}
+        <option value="{{ v }}" {% if sentido_sel == v %}selected{% endif %}>{{ v }}</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit">Filtrar</button>
+    <a href="{% url 'estudiantes:kardex_items_nuevo' %}" class="btn">+ Nuevo ítem</a>
+    &nbsp;&nbsp;
+    <!-- Ver todos (sin paginación) conserva filtros actuales -->
+    <a href="?q={{ q }}&area={{ area_sel }}&sentido={{ sentido_sel }}&all=1">Ver todos</a>
+    <!-- Ver paginados (elimina el flag 'all') conserva filtros -->
+    <a href="?q={{ q }}&area={{ area_sel }}&sentido={{ sentido_sel }}">Ver paginados</a>
+  </div>
+</form>
+
+<p style="margin:6px 0;">Total: <b>{{ total }}</b> ítems</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:70px;">ID</th>
+      <th style="width:120px;">Área</th>
+      <th>Descripción</th>
+      <th style="width:120px;">Sentido</th>
+      <th style="width:160px;">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for it in items %}
+    <tr>
+      <td>{{ it.id }}</td>
+      <td>{{ it.area }}</td>
+      <td>{{ it.descripcion }}</td>
+      <td>{{ it.sentido }}</td>
+      <td>
+        <a href="{% url 'estudiantes:kardex_items_editar' it.id %}">Editar</a> |
+        <a href="{% url 'estudiantes:kardex_items_eliminar' it.id %}">Eliminar</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No hay ítems registrados.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+<div class="paginacion" style="margin-top:12px;">
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&area={{ area_sel }}&sentido={{ sentido_sel }}">« Anterior</a>
+  {% endif %}
+  <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&area={{ area_sel }}&sentido={{ sentido_sel }}">Siguiente »</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

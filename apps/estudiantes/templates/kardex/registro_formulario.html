@@ -16,6 +16,9 @@
     <div class="col-2">{{ form.observacion.label_tag }} {{ form.observacion }}</div>
     <div>{{ form.sello_maestro.label_tag }} {{ form.sello_maestro }}</div>
   </div>
+<p style="margin:8px 0;">
+  ¿Falta un ítem? <a href="{% url 'estudiantes:kardex_items_nuevo' %}" target="_blank">Crear ítem de kárdex</a>
+</p>
 
   <button type="submit">Guardar</button>
   <a href="{% url 'estudiantes:kardex_listar' estudiante.id %}">Cancelar</a>

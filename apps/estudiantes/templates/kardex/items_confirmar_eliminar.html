@@ -1,0 +1,13 @@
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Eliminar ítem{% endblock %}
+{% block content %}
+<h2>Eliminar ítem de Kárdex #{{ object.id }}</h2>
+<p><b>Área:</b> {{ object.area }} | <b>Sentido:</b> {{ object.sentido }}</p>
+<p><b>Descripción:</b> {{ object.descripcion }}</p>
+<p>¿Confirma eliminar este ítem? Puede fallar si está referenciado en registros.</p>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit">Sí, eliminar</button>
+  <a href="{% url 'estudiantes:kardex_items_listar' %}">Cancelar</a>
+</form>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "layout/base_dashboard.html" %}
+{% block title %}{% if object %}Editar ítem{% else %}Nuevo ítem{% endif %}{% endblock %}
+{% block content %}
+<h2>{% if object %}Editar ítem #{{ object.id }}{% else %}Nuevo ítem de Kárdex{% endif %}</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <table>
+    <tr><th>{{ form.area.label_tag }}</th><td>{{ form.area }}</td></tr>
+    <tr><th>{{ form.descripcion.label_tag }}</th><td>{{ form.descripcion }}</td></tr>
+    <tr><th>{{ form.sentido.label_tag }}</th><td>{{ form.sentido }}</td></tr>
+  </table>
+  <div style="margin-top:12px;">
+    <button type="submit">Guardar</button>
+    <a href="{% url 'estudiantes:kardex_items_listar' %}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}
