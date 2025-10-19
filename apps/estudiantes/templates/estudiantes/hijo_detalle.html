@@ -1,0 +1,18 @@
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Ficha del estudiante{% endblock %}
+
+{% block content %}
+<h2>Ficha del estudiante</h2>
+
+<div class="card" style="padding:12px; max-width:800px;">
+  <p><b>Apellidos:</b> {{ hijo.apellidos }}</p>
+  <p><b>Nombres:</b> {{ hijo.nombres }}</p>
+  <p><b>CI:</b> {{ hijo.ci|default:"—" }}</p>
+  <p><b>Curso:</b> {{ hijo.curso }}</p>
+</div>
+
+<div style="margin-top:12px;">
+  <a class="btn" href="{% url 'estudiantes:kardex_listar' hijo.id %}">📗 Ver Kárdex</a>
+  {# FUTURO: <a class="btn" href="{% url 'asistencia:por_estudiante' hijo.id %}">🗓️ Ver asistencia</a> #}
+</div>
+{% endblock %}

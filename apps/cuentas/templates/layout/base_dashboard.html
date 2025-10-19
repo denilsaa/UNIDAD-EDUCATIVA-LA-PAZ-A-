@@ -27,20 +27,19 @@
     <nav class="hdr-nav">
       {% if "director" in role %}
         <a href="{% url 'cuentas:director_dashboard' %}">Inicio</a>
-        <!-- NUEVO -->
         <a href="{% url 'estudiantes:listar' %}">Estudiantes</a>
+
       {% elif "regente" in role %}
         <a href="{% url 'cuentas:regente_dashboard' %}">Inicio</a>
-        <!-- Opcional para regente:
-        <a href="{% url 'estudiantes:listar' %}">Estudiantes</a>
-        -->
+        <a href="{% url 'cursos:mis_cursos_regente' %}">Mis cursos</a>
+
       {% elif "secretaria" in role or "secretaría" in role %}
         <a href="{% url 'cuentas:secretaria_dashboard' %}">Inicio</a>
-        <!-- Opcional para secretaría:
         <a href="{% url 'estudiantes:listar' %}">Estudiantes</a>
-        -->
+
       {% elif "padre" in role %}
         <a href="{% url 'cuentas:padre_dashboard' %}">Inicio</a>
+        <a href="{% url 'estudiantes:mis_hijos' %}">Mis hijos</a>
       {% endif %}
       <a href="{% url 'cuentas:logout' %}">Cerrar sesión</a>
     </nav>
@@ -60,35 +59,31 @@
             <li><a href="{% url 'cursos:lista_cursos' %}">📚 Cursos</a></li>
             <li><a href="{% url 'cuentas:crear_usuario' %}">➕ Nuevo usuario</a></li>
             <li><a href="{% url 'cursos:crear_curso' %}">➕ Nuevo curso</a></li>
-            <li><a href="{% url 'estudiantes:kardex_items_listar' %}">Catálogo Kárdex</a></li>
-            <!-- ===== NUEVO: Estudiantes ===== -->
+            <li><a href="{% url 'estudiantes:kardex_items_listar' %}">🗂️ Catálogo Kárdex</a></li>
             <li class="sep"></li>
             <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
             <li><a href="{% url 'estudiantes:crear' %}">➕ Nuevo estudiante</a></li>
-            <!-- Para kárdex trabajamos dentro de Estudiantes (ver/añadir registro por alumno) -->
 
           {# --- Regente --- #}
           {% elif "regente" in role %}
             <li><a href="{% url 'cuentas:regente_dashboard' %}">📊 Resumen</a></li>
-            <li><a href="{% url 'cursos:lista_cursos' %}">📚 Mis cursos</a></li>
-            <li><a href="{% url 'cursos:mis_cursos_regente' %}">Mis cursos</a></li> 
-
-            <!-- Opcional:
-            <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
-            -->
+            <li><a href="{% url 'cursos:mis_cursos_regente' %}">📚 Mis cursos</a></li>
+            {# El CRUD global y el listado general de cursos NO se muestran al regente #}
 
           {# --- Secretaría --- #}
           {% elif "secretaria" in role or "secretaría" in role %}
             <li><a href="{% url 'cuentas:secretaria_dashboard' %}">📊 Resumen</a></li>
             <li><a href="{% url 'cuentas:lista_usuarios' %}">📄 Usuarios</a></li>
-            <!-- Opcional:
+            <li class="sep"></li>
             <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
             <li><a href="{% url 'estudiantes:crear' %}">➕ Nuevo estudiante</a></li>
-            -->
+            <li><a href="{% url 'estudiantes:kardex_items_listar' %}">🗂️ Catálogo Kárdex</a></li>
 
           {# --- Padre de familia --- #}
           {% elif "padre" in role %}
             <li><a href="{% url 'cuentas:padre_dashboard' %}">🏠 Inicio</a></li>
+            <li><a href="{% url 'estudiantes:mis_hijos' %}">👨‍👩‍👧 Mis hijos</a></li>
+            {# Dentro de “Mis hijos” podrá entrar a Ver Kárdex; no se muestra CRUD alguno #}
           {% endif %}
 
           <li class="sep"></li>
@@ -113,7 +108,7 @@
 
   <!-- Footer -->
   <footer class="ftr">
-    <small>© {% now "Y" %} Unidad Educativa La Paz “A”. </small>
+    <small>© {% now "Y" %} Unidad Educativa La Paz “A”.</small>
   </footer>
 
 </body>

@@ -1,0 +1,33 @@
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Mis hijos{% endblock %}
+
+{% block content %}
+<h2>Mis hijos</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Apellidos</th>
+      <th>Nombres</th>
+      <th>Curso</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in hijos %}
+    <tr>
+      <td>{{ e.apellidos }}</td>
+      <td>{{ e.nombres }}</td>
+      <td>{{ e.curso }}</td>
+      <td>
+        <a href="{% url 'estudiantes:hijo_detalle' e.id %}">Ver ficha</a> |
+        <a href="{% url 'estudiantes:kardex_listar' e.id %}">Ver Kárdex</a>
+        {# FUTURO: <a href="{% url 'asistencia:por_estudiante' e.id %}">Ver asistencia</a> #}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No se encontraron hijos asignados a su usuario.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -9,6 +9,7 @@ from apps.estudiantes.views.forms_kardex import (
 from apps.estudiantes.views.kardex_item import (
     KardexItemListView, KardexItemCreateView, KardexItemUpdateView, KardexItemDeleteView,
 )
+from apps.estudiantes.views.padre import MisHijosListView, HijoDetalleView
 
 app_name = "estudiantes"
 
@@ -29,4 +30,7 @@ urlpatterns = [
     path("kardex-items/nuevo/", KardexItemCreateView.as_view(), name="kardex_items_nuevo"),
     path("kardex-items/<int:pk>/editar/", KardexItemUpdateView.as_view(), name="kardex_items_editar"),
     path("kardex-items/<int:pk>/eliminar/", KardexItemDeleteView.as_view(), name="kardex_items_eliminar"),
+
+    path("mis-hijos/", MisHijosListView.as_view(), name="mis_hijos"),
+    path("hijo/<int:estudiante_id>/", HijoDetalleView.as_view(), name="hijo_detalle"),
 ]
