@@ -4,12 +4,13 @@
 {% block content %}
 <h2 style="text-align:center">Estudiantes de {{ curso }}</h2>
 
+{% with role=request.user.rol.nombre|default_if_none:""|default:""|lower %}
 <form method="get" class="mb-3">
   <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por apellidos, nombres o CI">
   <button type="submit">Buscar</button>
   <span style="margin-left:1rem">Total: {{ total }}</span>
   <span style="float:right">
-    <a href="{% url 'cursos:lista_cursos' %}">← Volver a cursos</a>
+    <a href="{% if 'regente' in role %}{% url 'cursos:mis_cursos_regente' %}{% else %}{% url 'cursos:lista_cursos' %}{% endif %}">← Volver a cursos</a>
   </span>
 </form>
 
@@ -35,9 +36,17 @@
       <td>{{ e.padre|default:"—" }}</td>
       <td>{% if e.kardex_id %}Asignado{% else %}—{% endif %}</td>
       <td>
-        <a href="{% url 'estudiantes:editar' e.pk %}">Editar</a> |
-        <a href="{% url 'estudiantes:kardex_listar' e.pk %}">Ver kárdex</a> |
-        <a href="{% url 'estudiantes:kardex_nuevo' e.pk %}">+ Registro</a>
+        {# Solo Director/Secretaría ven "Editar" #}
+        {% if "director" in role or "secretaria" in role or "secretaría" in role %}
+          <a href="{% url 'estudiantes:editar' e.pk %}">Editar</a> |
+        {% endif %}
+
+        <a href="{% url 'estudiantes:kardex_listar' e.pk %}">Ver kárdex</a>
+
+        {# Director/Regente/Secretaría pueden agregar registro de kárdex #}
+        {% if "director" in role or "regente" in role or "secretaria" in role or "secretaría" in role %}
+          | <a href="{% url 'estudiantes:kardex_nuevo' e.pk %}">+ Registro</a>
+        {% endif %}
       </td>
     </tr>
     {% empty %}
@@ -45,4 +54,5 @@
     {% endfor %}
   </tbody>
 </table>
+{% endwith %}
 {% endblock %}
