@@ -71,6 +71,8 @@
           {% elif "regente" in role %}
             <li><a href="{% url 'cuentas:regente_dashboard' %}">📊 Resumen</a></li>
             <li><a href="{% url 'cursos:lista_cursos' %}">📚 Mis cursos</a></li>
+            <li><a href="{% url 'cursos:mis_cursos_regente' %}">Mis cursos</a></li> 
+
             <!-- Opcional:
             <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
             -->

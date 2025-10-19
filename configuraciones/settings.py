@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "apps.estudiantes.apps.EstudiantesConfig",
     "apps.citaciones.apps.CitacionesConfig",      
     "apps.notificaciones.apps.NotificacionesConfig",
+    "django_extensions",
 ]
 
 AUTHENTICATION_BACKENDS = [

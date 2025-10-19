@@ -24,4 +24,6 @@ urlpatterns = [
     path('', include('apps.cuentas.urls')),  # Incluir las URLs de la aplicación 'cuentas'
     path('cursos/', include('apps.cursos.urls')),
     path("estudiantes/", include("apps.estudiantes.urls")),
+    
 ]
+handler403 = "apps.cuentas.views.errors.error_403"

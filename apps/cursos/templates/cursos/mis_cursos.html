@@ -1,0 +1,16 @@
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Mis cursos{% endblock %}
+{% block content %}
+<h2>Mis cursos (Regente)</h2>
+<ul>
+  {% for c in cursos %}
+    <li>
+      {{ c.nivel }} {{ c.paralelo }} —
+      <a href="{% url 'estudiantes:por_curso' c.id %}">Ver estudiantes</a>
+      {# opcional: <a href="{% url 'cursos:ver_curso' c.id %}">Ver curso</a> #}
+    </li>
+  {% empty %}
+    <li>No tiene cursos asignados.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

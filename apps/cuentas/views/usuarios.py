@@ -1,9 +1,28 @@
 # apps/cuentas/views/usuarios.py
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.views.decorators.http import require_POST
+
 from apps.cuentas.models import Usuario
 from apps.cuentas.forms import UsuarioCreateForm, UsuarioUpdateForm
-from django.contrib import messages
 
+# ⬇️ Decorador que exige login y rol == director
+from apps.cuentas.decorators import role_required
+
+
+@role_required("director")
+def lista_usuarios(request):
+    usuarios = Usuario.objects.all().order_by("-id")
+    return render(request, "cuentas/lista_usuarios.html", {"usuarios": usuarios})
+
+
+@role_required("director")
+def ver_usuario(request, user_id):
+    usuario = get_object_or_404(Usuario, id=user_id)
+    return render(request, "cuentas/ver_usuario.html", {"usuario": usuario})
+
+
+@role_required("director")
 def crear_usuario(request):
     if request.method == "POST":
         form = UsuarioCreateForm(request.POST)
@@ -15,14 +34,8 @@ def crear_usuario(request):
         form = UsuarioCreateForm()
     return render(request, "cuentas/crear_usuario.html", {"form": form})
 
-def lista_usuarios(request):
-    usuarios = Usuario.objects.all().order_by("-id")
-    return render(request, "cuentas/lista_usuarios.html", {"usuarios": usuarios})
 
-def ver_usuario(request, user_id):
-    usuario = get_object_or_404(Usuario, id=user_id)
-    return render(request, "cuentas/ver_usuario.html", {"usuario": usuario})
-
+@role_required("director")
 def editar_usuario(request, user_id):
     usuario = get_object_or_404(Usuario, id=user_id)
     if request.method == "POST":
@@ -35,8 +48,11 @@ def editar_usuario(request, user_id):
         form = UsuarioUpdateForm(instance=usuario)
     return render(request, "cuentas/editar_usuario.html", {"form": form, "usuario": usuario})
 
+
+@role_required("director")
+@require_POST
 def eliminar_usuario(request, user_id):
-    # borrado lógico
+    # Borrado lógico
     usuario = get_object_or_404(Usuario, id=user_id)
     usuario.is_activo = False
     usuario.save()

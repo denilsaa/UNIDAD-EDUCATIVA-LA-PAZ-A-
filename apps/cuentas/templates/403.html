@@ -1,0 +1,7 @@
+{% extends "layout/base_dashboard.html" %}
+{% block title %}Acceso denegado{% endblock %}
+{% block content %}
+  <h2>⚠️ Acceso denegado (403)</h2>
+  <p>No tiene permisos para ver esta página.</p>
+  <p><a href="{% url 'cuentas:logout' %}">Cerrar sesión</a> | <a href="javascript:history.back()">Volver</a></p>
+{% endblock %}

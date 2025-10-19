@@ -5,6 +5,11 @@ from apps.cursos.models import Curso
 from apps.estudiantes.models.estudiante import Estudiante
 from apps.estudiantes.models.kardex_registro import KardexRegistro
 
+# ⬇️ IMPORTA EL DECORADOR DE ROL
+from apps.cuentas.decorators import role_required
+
+
+@role_required("director")  # ⬅️ SOLO DIRECTOR ENTRA AQUÍ
 def director_dashboard(request):
     usuarios = Usuario.objects.all()
 
@@ -16,23 +21,20 @@ def director_dashboard(request):
 
     # Cursos
     curso_count = Curso.objects.count()
-    # Ajusta el campo si tu modelo usa otro timestamp (p. ej. created_at)
     try:
         ultimos_cursos = Curso.objects.order_by("-creado_en")[:5]
     except Exception:
         ultimos_cursos = Curso.objects.order_by("-id")[:5]
 
-    # ===== NUEVO: Estudiantes =====
+    # Estudiantes
     estudiante_count = Estudiante.objects.count()
-    # Trae curso y padre para mostrar en la tabla sin consultas extra
     ultimos_estudiantes = (
         Estudiante.objects
         .select_related("curso", "padre")
         .order_by("-id")[:10]
     )
 
-    # ===== NUEVO (opcional): Últimos registros de Kárdex) =====
-    # Si quieres también mostrarlos en el dashboard, añade el bloque en la plantilla.
+    # Últimos Kárdex (opcional mostrar en plantilla)
     ultimos_kardex = (
         KardexRegistro.objects
         .select_related("estudiante", "kardex_item")
@@ -47,10 +49,8 @@ def director_dashboard(request):
         "padre_count": padre_count,
         "curso_count": curso_count,
         "ultimos_cursos": ultimos_cursos,
-
-        # nuevos:
         "estudiante_count": estudiante_count,
         "ultimos_estudiantes": ultimos_estudiantes,
-        "ultimos_kardex": ultimos_kardex,  # usar solo si lo muestras en la plantilla
+        "ultimos_kardex": ultimos_kardex,
     }
     return render(request, "dashboard/director_dashboard.html", context)
