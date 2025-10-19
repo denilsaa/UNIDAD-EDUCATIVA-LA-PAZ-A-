@@ -1,15 +1,14 @@
 # apps/estudiantes/views/estudiante.py
 from datetime import date
-
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-
 from apps.estudiantes.forms import EstudianteForm
 from apps.estudiantes.models.estudiante import Estudiante
 from apps.cursos.models.kardex import Kardex
-
+from django.shortcuts import get_object_or_404
+from apps.cursos.models.curso import Curso
 
 def trimestre_actual(hoy: date) -> int:
     """Devuelve el trimestre actual (ajusta si tu calendario es distinto)."""
@@ -106,3 +105,29 @@ class EstudianteDeleteView(DeleteView):
     model = Estudiante
     template_name = "estudiantes/confirmar_eliminacion_estudiante.html"
     success_url = reverse_lazy("estudiantes:listar")
+    
+class EstudiantesPorCursoListView(ListView):
+    model = Estudiante
+    template_name = "estudiantes/estudiantes_por_curso.html"
+    paginate_by = 30
+
+    def get_queryset(self):
+        self.curso = get_object_or_404(Curso, pk=self.kwargs["curso_id"])
+        q = self.request.GET.get("q", "")
+        qs = (Estudiante.objects
+              .filter(curso=self.curso)
+              .select_related("curso", "padre")
+              .order_by("apellidos", "nombres"))
+        if q:
+            qs = qs.filter(
+                Q(apellidos__icontains=q) |
+                Q(nombres__icontains=q) |
+                Q(ci__icontains=q)
+            )
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["curso"] = self.curso
+        ctx["total"] = self.get_queryset().count()
+        return ctx
