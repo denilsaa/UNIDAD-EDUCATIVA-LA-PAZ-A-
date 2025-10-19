@@ -1,0 +1,50 @@
+{% extends "layout/base_dashboard.html" %}
+{% load static %}
+{% block title %}No encontrado (404){% endblock %}
+
+{% block content %}
+<section class="card" style="max-width:760px;margin:6vh auto;padding:24px;text-align:center;">
+  <h1 style="font-size:48px;margin:0;">404</h1>
+  <p style="margin:8px 0 16px;">La URL que ha solicitado no existe.</p>
+  <p>Volveremos automáticamente en <strong id="secs">{{ seconds }}</strong> s…</p>
+
+  <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+    <a id="btn-volver" class="btn" href="{{ previous_url|default:'/' }}">Volver ahora</a>
+    <a class="btn" href="{% url 'cuentas:director_dashboard' %}">Ir al inicio</a>
+  </div>
+</section>
+
+<script>
+(function(){
+  const secsEl = document.getElementById("secs");
+  const btn = document.getElementById("btn-volver");
+  const tplPrev = btn ? btn.getAttribute("href") : "/";
+  let secs = parseInt(secsEl ? secsEl.textContent : "5", 10) || 5;
+
+  function goBack(){
+    if (tplPrev && tplPrev !== window.location.href) {
+      window.location.replace(tplPrev);               // última OK guardada
+    } else if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Fallback al dashboard de cuentas (ajuste el name si es otro)
+      window.location.replace("{% url 'cuentas:director_dashboard' %}");
+    }
+  }
+
+  const timer = setInterval(function(){
+    secs--;
+    if (secsEl) secsEl.textContent = String(secs);
+    if (secs <= 0){
+      clearInterval(timer);
+      goBack();
+    }
+  }, 1000);
+
+  btn && btn.addEventListener("click", function(e){
+    e.preventDefault();
+    goBack();
+  });
+})();
+</script>
+{% endblock %}

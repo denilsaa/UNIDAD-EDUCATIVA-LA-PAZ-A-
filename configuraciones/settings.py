@@ -29,10 +29,8 @@ STATICFILES_DIRS = [
 SECRET_KEY = 'django-insecure-if^n0ab85w_-8nsbz5!o^t=dk4%+ml^v&72vpez383d_ohdncf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-# --- Autenticación / Login ---
+DEBUG = False
+ALLOWED_HOSTS = ["localhost","127.0.0.1"]
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/director/'
 LOGOUT_REDIRECT_URL = '/login/'
@@ -76,6 +74,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'apps.cuentas.middleware.DisableClientCacheMiddleware',
     'apps.cuentas.middleware.AuthRequiredMiddleware',   
+    "apps.cuentas.middleware.LastOKURLMiddleware",
 ]
 
 

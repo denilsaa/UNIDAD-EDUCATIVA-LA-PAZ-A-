@@ -1,4 +1,5 @@
 /* ========== LOGIN SPLIT DESIGN (Mejorado) ========== */
+
 body.login-split {
     margin: 0;
     font-family: 'Poppins', sans-serif;
@@ -182,8 +183,6 @@ input:focus {
     }
 }
 
-
-/*base_dashboard*/
 /* Reset mínimo */
 * { box-sizing: border-box; }
 body { margin: 0; font-family: system-ui, Arial, sans-serif; }

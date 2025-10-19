@@ -17,13 +17,15 @@ Including another URLconf
 from django.urls import path, include
 from apps.cuentas.views.login import login_view  # Importa la vista de login
 from apps.cuentas.views.director_dashboard import director_dashboard  # Importa la vista del dashboard
-
+from apps.cuentas.views_dev import dev_404 
 urlpatterns = [
     path('login/', login_view, name='login'),
     path('dashboard/director/', director_dashboard, name='director_dashboard'),
     path('', include('apps.cuentas.urls')),  # Incluir las URLs de la aplicación 'cuentas'
     path('cursos/', include('apps.cursos.urls')),
     path("estudiantes/", include("apps.estudiantes.urls")),
-    
+    path("cuentas/", include(("apps.cuentas.urls", "cuentas"), namespace="cuentas")),
+    path("dev/404/", dev_404, name="dev_404"),  
 ]
 handler403 = "apps.cuentas.views.errors.error_403"
+handler404 = "apps.cuentas.handlers.error_404"
