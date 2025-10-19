@@ -7,6 +7,7 @@ from .views.director_dashboard import director_dashboard
 from .views.usuarios import (
     crear_usuario, lista_usuarios, ver_usuario, editar_usuario, eliminar_usuario
 )
+from apps.cuentas.views.dashboards import padre_dashboard, regente_dashboard, secretaria_dashboard
 
 app_name = "cuentas"
 
@@ -44,4 +45,7 @@ urlpatterns = [
     path("usuarios/<int:user_id>/", ver_usuario, name="ver_usuario"),
     path("usuarios/<int:user_id>/editar/", editar_usuario, name="editar_usuario"),
     path("usuarios/<int:user_id>/eliminar/", eliminar_usuario, name="eliminar_usuario"),
+    path("dashboard/padre/", padre_dashboard, name="padre_dashboard"),
+    path("dashboard/regente/", regente_dashboard, name="regente_dashboard"),
+    path("dashboard/secretaria/", secretaria_dashboard, name="secretaria_dashboard"),
 ]

@@ -1,13 +1,19 @@
 # apps/estudiantes/views/forms_kardex.py
 from django import forms
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
-from django.contrib import messages
 from django.utils.timezone import now
+from django.http import HttpResponseForbidden
 
 from apps.estudiantes.models.estudiante import Estudiante
 from apps.estudiantes.models.kardex_registro import KardexRegistro
 from apps.estudiantes.models.kardex_item import KardexItem
+
+# 🔒 roles
+from apps.cuentas.roles import es_director, es_regente, es_secretaria, es_padre
+
 
 # ---------- FORMULARIO ----------
 class KardexRegistroForm(forms.ModelForm):
@@ -32,10 +38,27 @@ class KardexRegistroForm(forms.ModelForm):
         # Ordenar por área y descripción para que sea más fácil encontrar el ítem
         self.fields["kardex_item"].queryset = KardexItem.objects.order_by("area", "descripcion")
 
+
 # ---------- VISTAS ----------
+@login_required
 def kardex_registro_nuevo(request, estudiante_id: int):
-    """Crear un registro (fila) del kárdex para un estudiante."""
+    """
+    Crear un registro (fila) del kárdex para un estudiante.
+    Autorización:
+      - Padre: NO puede crear.
+      - Regente: solo si el estudiante pertenece a su curso.
+      - Director/Secretaría: permitido.
+    """
     estudiante = get_object_or_404(Estudiante, pk=estudiante_id)
+
+    # 🔒 Autorización
+    if es_padre(request.user):
+        return HttpResponseForbidden("No autorizado.")
+    elif es_regente(request.user):
+        if getattr(estudiante.curso, "regente_id", None) != request.user.id:
+            return HttpResponseForbidden("No autorizado.")
+    elif not (es_director(request.user) or es_secretaria(request.user)):
+        return HttpResponseForbidden("No autorizado.")
 
     if request.method == "POST":
         form = KardexRegistroForm(request.POST)
@@ -45,20 +68,35 @@ def kardex_registro_nuevo(request, estudiante_id: int):
             reg.save()
             messages.success(request, "Registro de kárdex añadido.")
             return redirect(reverse("estudiantes:kardex_listar", args=[estudiante.pk]))
+        messages.error(request, "Por favor corrija los errores del formulario.")
     else:
         form = KardexRegistroForm(initial={"fecha": now().date()})
 
     return render(request, "kardex/registro_formulario.html", {"form": form, "estudiante": estudiante})
 
 
+@login_required
 def kardex_registro_listar(request, estudiante_id: int):
     """
     Muestra la planilla estilo papel: cabecera y grilla SER / SABER / HACER / DECIDIR.
-    Cada registro ocupa una fila y se marca con ✔ en la columna del ítem elegido.
+    Autorización:
+      - Padre: solo si el estudiante es su hijo.
+      - Regente: solo si es regente del curso del estudiante.
+      - Director/Secretaría: permitido.
     """
     estudiante = get_object_or_404(Estudiante, pk=estudiante_id)
 
-    # ⚠️ Usar 'area' (no 'dimension')
+    # 🔒 Autorización
+    if es_padre(request.user):
+        if getattr(estudiante, "padre_id", None) != request.user.id:
+            return HttpResponseForbidden("No autorizado.")
+    elif es_regente(request.user):
+        if getattr(estudiante.curso, "regente_id", None) != request.user.id:
+            return HttpResponseForbidden("No autorizado.")
+    elif not (es_director(request.user) or es_secretaria(request.user)):
+        return HttpResponseForbidden("No autorizado.")
+
+    # Columnas por área (orden fijo por ID para alinear filas)
     ser_cols     = list(KardexItem.objects.filter(area="SER").order_by("id"))
     saber_cols   = list(KardexItem.objects.filter(area="SABER").order_by("id"))
     hacer_cols   = list(KardexItem.objects.filter(area="HACER").order_by("id"))
