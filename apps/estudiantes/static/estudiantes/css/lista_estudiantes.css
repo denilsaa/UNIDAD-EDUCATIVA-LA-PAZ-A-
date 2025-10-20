@@ -1,0 +1,249 @@
+/* ================== FORMULARIO DE BÚSQUEDA ================== */
+form.mb-3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0;
+  max-width: 1000px;
+}
+
+form.mb-3 input[type="text"] {
+  flex: 1 1 250px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  min-width: 150px;
+  box-sizing: border-box;
+}
+
+form.mb-3 button,
+form.mb-3 a {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 1rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  flex: 0 0 auto;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+/* Botón Buscar */
+form.mb-3 button {
+  background-color: #28a745;
+  color: #fff;
+  border-color: #28a745;
+}
+
+form.mb-3 button:hover {
+  background-color: #19692c;
+  border-color: #19692c;
+  transform: translateY(-1px);
+}
+
+/* Botón Nuevo */
+form.mb-3 a {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+form.mb-3 a:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+  transform: translateY(-1px);
+}
+
+/* ================== TITULO ================== */
+h2 {
+  color: #004a99;
+  text-align: center;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 6px;
+}
+
+/* ================== TABLA ================== */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background-color: #fff;
+  margin-top: 12px;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.tabla th, .tabla td {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.tabla thead th {
+  background-color: #d0e7ff;
+  color: #004a99;
+  font-weight: 600;
+}
+
+.tabla tbody tr:nth-child(even) {
+  background: #f6f9ff;
+}
+
+.tabla tbody tr:hover {
+  background: #dbe7ff;
+}
+
+/* ================== ENLACES DENTRO DE LA TABLA ================== */
+/* Contenedor con scroll horizontal si la tabla es muy ancha */
+.table-wrapper {
+  overflow-x: auto;      /* Habilita scroll horizontal */
+  width: 100%;           /* Ocupa todo el ancho disponible */
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background-color: #fff;
+  margin-top: 12px;
+}
+
+/* Tabla */
+.tabla {
+  width: 100%;
+  min-width: 700px;      /* Asegura ancho mínimo */
+  border-collapse: collapse;
+}
+
+.tabla th, .tabla td {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;   /* Evita que el contenido se rompa */
+}
+
+.tabla thead th {
+  background-color: #d0e7ff;
+  color: #004a99;
+  font-weight: 600;
+}
+
+.tabla tbody tr:nth-child(even) {
+  background: #f6f9ff;
+}
+
+.tabla tbody tr:hover {
+  background: #dbe7ff;
+}
+
+/* Enlaces dentro de la tabla */
+.tabla a {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 2px 2px 2px 0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  text-decoration: none;
+}
+
+/* Colores para acciones */
+.tabla a[href*="editar"] { background-color:#17a2b8; color:#fff; border-color:#17a2b8; }
+.tabla a[href*="editar"]:hover { background-color:#0d6771; border-color:#0d6771; transform:translateY(-1px); }
+
+.tabla a[href*="eliminar"] { background-color:#dc3545; color:#fff; border-color:#dc3545; }
+.tabla a[href*="eliminar"]:hover { background-color:#a71d2a; border-color:#a71d2a; transform:translateY(-1px); }
+
+.tabla a[href*="kardex_listar"] { background-color:#ffc107; color:#fff; border-color:#ffc107; }
+.tabla a[href*="kardex_listar"]:hover { background-color:#cc9a06; border-color:#cc9a06; transform:translateY(-1px); }
+
+.tabla a[href*="kardex_nuevo"] { background-color:#28a745; color:#fff; border-color:#28a745; }
+.tabla a[href*="kardex_nuevo"]:hover { background-color:#19692c; border-color:#19692c; transform:translateY(-1px); }
+
+/* Botón Ver kárdex */
+.btn-kardex {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 2px 2px 2px 0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  background-color: #ffc107;  /* color amarillo */
+  color: #fff;
+  border: 1px solid #ffc107;
+  transition: all 0.2s ease;
+}
+
+.btn-kardex:hover {
+  background-color: #cc9a06;
+  border-color: #cc9a06;
+  transform: translateY(-1px);
+}
+
+/* Botón + Registro */
+.btn-registro {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 2px 2px 2px 0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  background-color: #28a745;  /* color verde */
+  color: #fff;
+  border: 1px solid #28a745;
+  transition: all 0.2s ease;
+}
+
+.btn-registro:hover {
+  background-color: #19692c;
+  border-color: #19692c;
+  transform: translateY(-1px);
+}
+
+/* Responsive: scroll horizontal en pantallas pequeñas */
+@media (max-width: 900px) {
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  .tabla th, .tabla td {
+    padding: 8px 10px;
+  }
+}
+
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 900px) {
+  form.mb-3 {
+    flex-direction: column;
+  }
+
+  form.mb-3 input[type="text"],
+  form.mb-3 button,
+  form.mb-3 a {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  .tabla th, .tabla td {
+    padding: 8px 10px;
+  }
+}
