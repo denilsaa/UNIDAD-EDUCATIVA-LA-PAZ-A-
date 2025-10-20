@@ -1,25 +1,67 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Crear usuario{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cuentas/css/crear_usuario.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>Registrar nuevo usuario</h2>
 
-<form method="post">
+<form method="post" class="form-usuario">
+  <h2 class="titulo-form">Registrar nuevo usuario</h2>
   {% csrf_token %}
-  <p>CI (opcional): {{ form.ci }}</p>
-  <p>Nombres: {{ form.nombres }}</p>
-  <p>Apellidos: {{ form.apellidos }}</p>
-  <p>Email (opcional): {{ form.email }}</p>
-  <p>Teléfono: {{ form.telefono }}</p>
-  <p>Rol: {{ form.rol }}</p>
-  <p>Activo: {{ form.is_activo }}</p>
-  <hr>
-  <p>Contraseña: {{ form.password1 }}</p>
-  <p>Confirmar contraseña: {{ form.password2 }}</p>
 
-  <p>
-    <button type="submit">Guardar</button>
-    <a href="{% url 'cuentas:lista_usuarios' %}">Volver a la lista</a>
-  </p>
+  <div class="form-group">
+    <label for="{{ form.ci.id_for_label }}">CI</label>
+    {{ form.ci }}
+  </div>
+
+  <div class="form-group">
+    <label for="{{ form.nombres.id_for_label }}">Nombres</label>
+    {{ form.nombres }}
+  </div>
+
+  <div class="form-group">
+    <label for="{{ form.apellidos.id_for_label }}">Apellidos</label>
+    {{ form.apellidos }}
+  </div>
+
+  <div class="form-group">
+    <label for="{{ form.email.id_for_label }}">Gmail (opcional)</label>
+    {{ form.email }}
+  </div>
+
+  <div class="form-group">
+    <label for="{{ form.telefono.id_for_label }}">Teléfono</label>
+    {{ form.telefono }}
+  </div>
+
+  <div class="form-group">
+    <label for="{{ form.rol.id_for_label }}">Rol</label>
+    {{ form.rol }}
+  </div>
+
+  <div class="form-group checkbox-group">
+    {{ form.is_activo }} <label for="{{ form.is_activo.id_for_label }}">Activo</label>
+  </div>
+
+  <hr>
+
+  <div class="form-group">
+    <label for="{{ form.password1.id_for_label }}">Contraseña</label>
+    {{ form.password1 }}
+  </div>
+
+  <div class="form-group">
+    <label for="{{ form.password2.id_for_label }}">Confirmar contraseña</label>
+    {{ form.password2 }}
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn-guardar">Guardar</button>
+    <a href="{% url 'cuentas:lista_usuarios' %}" class="btn-volver">Volver a la lista</a>
+  </div>
 </form>
 {% endblock %}
