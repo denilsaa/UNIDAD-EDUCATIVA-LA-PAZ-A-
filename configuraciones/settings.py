@@ -18,10 +18,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 STATIC_URL = '/static/'
 
-# Ruta adicional donde Django buscará archivos estáticos
+# Carpeta global opcional para recursos comunes
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'static'),  # opcional
 ]
+
+# Carpeta donde collectstatic recopilará todos los archivos para producción
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -29,8 +33,8 @@ STATICFILES_DIRS = [
 SECRET_KEY = 'django-insecure-if^n0ab85w_-8nsbz5!o^t=dk4%+ml^v&72vpez383d_ohdncf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-ALLOWED_HOSTS = ["localhost","127.0.0.1"]
+DEBUG = True
+#ALLOWED_HOSTS = ["localhost","127.0.0.1"]
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/director/'
 LOGOUT_REDIRECT_URL = '/login/'
