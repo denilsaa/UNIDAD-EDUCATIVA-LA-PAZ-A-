@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}Panel{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'cuentas/css/dashboard.css' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 
 {# Normalizamos el nombre del rol a minúsculas y manejamos None #}
@@ -24,6 +24,8 @@
         {% else %}Panel{% endif %}
       </span>
     </div>
+    <!-- BOTÓN DEL MENU MÓVIL -->
+    <span class="menu-toggle" onclick="toggleSidebar()">☰</span>
     <nav class="hdr-nav">
       {% if "director" in role %}
         <a href="{% url 'cuentas:director_dashboard' %}">Inicio</a>
@@ -110,6 +112,12 @@
   <footer class="ftr">
     <small>© {% now "Y" %} Unidad Educativa La Paz “A”.</small>
   </footer>
+<script>
+function toggleSidebar() {
+  const sidenav = document.querySelector('.sidenav');
+  sidenav.classList.toggle('open');
+}
+</script>
 
 </body>
 {% endwith %}
