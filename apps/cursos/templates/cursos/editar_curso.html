@@ -1,15 +1,24 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
 {% block title %}Editar curso{% endblock %}
 
-{% block content %}
-<h2>Editar curso</h2>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cursos/css/editar_curso.css' %}">
+{% endblock %}
 
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <p>
-    <button type="submit">Guardar cambios</button>
-    <a href="{% url 'cursos:ver_curso' curso.id %}">Cancelar</a>
-  </p>
-</form>
+{% block content %}
+<div class="detalle-curso">
+  <h2 class="titulo-detalle">Editar curso</h2>
+
+  <div class="card-detalle">
+    <form method="post" class="form-detalle">
+      {% csrf_token %}
+      {{ form.as_p }}
+    </form>
+  </div>
+  <div class="acciones-detalle">
+    <button type="submit" class="btn-editar">Guardar cambios</button>
+    <a href="{% url 'cursos:ver_curso' curso.id %}" class="btn-volver">Cancelar</a>
+  </div>
+</div>
 {% endblock %}
