@@ -1,19 +1,37 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}{{ view.object|default_if_none:"Nuevo estudiante" }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'estudiantes/css/formulario_estudiante.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>{{ view.object|default_if_none:"Nuevo estudiante" }}</h2>
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" class="form-estudiante">
+  <h2 class="titulo-form">{{ view.object|default_if_none:"Nuevo estudiante" }}</h2>
   {% csrf_token %}
   {{ form.non_field_errors }}
-  <div class="grid">
-    <div>{{ form.nombres.label_tag }} {{ form.nombres }}</div>
-    <div>{{ form.apellidos.label_tag }} {{ form.apellidos }}</div>
-    <div>{{ form.ci.label_tag }} {{ form.ci }}</div>
-    <div>{{ form.curso.label_tag }} {{ form.curso }}</div>
-    <div>{{ form.padre.label_tag }} {{ form.padre }}</div>
+
+  <div class="form-group">
+    {{ form.nombres.label_tag }} {{ form.nombres }}
   </div>
-  <button type="submit">Guardar</button>
-  <a href="{% url 'estudiantes:listar' %}">Cancelar</a>
+  <div class="form-group">
+    {{ form.apellidos.label_tag }} {{ form.apellidos }}
+  </div>
+  <div class="form-group">
+    {{ form.ci.label_tag }} {{ form.ci }}
+  </div>
+  <div class="form-group">
+    {{ form.curso.label_tag }} {{ form.curso }}
+  </div>
+  <div class="form-group">
+    {{ form.padre.label_tag }} {{ form.padre }}
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn-guardar">Guardar</button>
+    <a href="{% url 'estudiantes:listar' %}" class="btn-volver">Cancelar</a>
+  </div>
 </form>
 {% endblock %}
