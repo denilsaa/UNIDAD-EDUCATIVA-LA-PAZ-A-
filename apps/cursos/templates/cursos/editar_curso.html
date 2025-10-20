@@ -14,11 +14,12 @@
     <form method="post" class="form-detalle">
       {% csrf_token %}
       {{ form.as_p }}
+
+      <div class="acciones-detalle">
+        <button type="submit" class="btn-editar">Guardar cambios</button>
+        <a href="{% url 'cursos:ver_curso' curso.id %}" class="btn-volver">Cancelar</a>
+      </div>
     </form>
-  </div>
-  <div class="acciones-detalle">
-    <button type="submit" class="btn-editar">Guardar cambios</button>
-    <a href="{% url 'cursos:ver_curso' curso.id %}" class="btn-volver">Cancelar</a>
   </div>
 </div>
 {% endblock %}
