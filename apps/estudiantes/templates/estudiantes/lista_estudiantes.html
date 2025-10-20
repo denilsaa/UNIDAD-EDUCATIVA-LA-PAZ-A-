@@ -1,5 +1,11 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Estudiantes{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'estudiantes/css/lista_estudiantes.css' %}">
+{% endblock %}
 
 {% block content %}
 <h2>Estudiantes</h2>
@@ -10,32 +16,34 @@
   <a href="{% url 'estudiantes:crear' %}">+ Nuevo</a>
 </form>
 
-<table class="tabla">
-  <thead>
-    <tr>
-      <th>#</th><th>Apellidos</th><th>Nombres</th><th>CI</th><th>Curso</th><th>Padre/Tutor</th><th>Kardex</th><th></th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for e in object_list %}
-    <tr>
-      <td>{{ forloop.counter }}</td>
-      <td>{{ e.apellidos }}</td>
-      <td>{{ e.nombres }}</td>
-      <td>{{ e.ci }}</td>
-      <td>{{ e.curso }}</td>
-      <td>{{ e.padre }}</td>
-      <td>{% if e.kardex_id %}Asignado{% else %}-{% endif %}</td>
-      <td>
-        <a href="{% url 'estudiantes:editar' e.pk %}">Editar</a> |
-        <a href="{% url 'estudiantes:eliminar' e.pk %}">Eliminar</a>
-        <a href="{% url 'estudiantes:kardex_listar' e.pk %}">Ver kárdex</a> |
-        <a href="{% url 'estudiantes:kardex_nuevo' e.pk %}">+ Registro</a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="8">Sin registros.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="table-wrapper">
+  <table class="tabla">
+    <thead>
+      <tr>
+        <th>#</th><th>Apellidos</th><th>Nombres</th><th>CI</th><th>Curso</th><th>Padre/Tutor</th><th>Kardex</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in object_list %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ e.apellidos }}</td>
+        <td>{{ e.nombres }}</td>
+        <td>{{ e.ci }}</td>
+        <td>{{ e.curso }}</td>
+        <td>{{ e.padre }}</td>
+        <td>{% if e.kardex_id %}Asignado{% else %}-{% endif %}</td>
+        <td>
+          <a href="{% url 'estudiantes:editar' e.pk %}">Editar</a>
+          <a href="{% url 'estudiantes:eliminar' e.pk %}">Eliminar</a>
+          <a href="{% url 'estudiantes:kardex_listar' e.pk %}" class="btn-kardex">Ver Kárdex</a>
+          <a href="{% url 'estudiantes:kardex_nuevo' e.pk %}" class="btn-registro">Registro</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8">Sin registros.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}
