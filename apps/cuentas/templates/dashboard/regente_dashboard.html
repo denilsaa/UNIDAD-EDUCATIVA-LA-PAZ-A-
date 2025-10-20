@@ -1,6 +1,41 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Dashboard del Regente{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cuentas/css/regente_dashboard.css' %}">
+{% endblock %}
+
 {% block content %}
+<div class="dashboard-header">
   <h2>Resumen del Regente</h2>
-  <p>Aquí puedes listar tus cursos, próximos eventos, etc.</p>
+  <p>Bienvenido al panel principal. Aquí podrás acceder a tus cursos, eventos y reportes.</p>
+</div>
+
+<div class="dashboard-cards">
+  <div class="dashboard-card">
+    <div class="icon">📚</div>
+    <h3>Cursos a tu cargo</h3>
+    <p>Gestiona y revisa los cursos que tienes asignados.</p>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="icon">📅</div>
+    <h3>Próximos eventos</h3>
+    <p>Consulta las actividades o reuniones programadas.</p>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="icon">📊</div>
+    <h3>Reportes y asistencia</h3>
+    <p>Visualiza estadísticas de asistencia y comportamiento.</p>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="icon">👥</div>
+    <h3>Estudiantes</h3>
+    <p>Explora la lista de estudiantes bajo tu supervisión.</p>
+  </div>
+</div>
 {% endblock %}
