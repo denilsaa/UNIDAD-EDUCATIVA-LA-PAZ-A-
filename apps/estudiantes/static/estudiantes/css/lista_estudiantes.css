@@ -65,6 +65,89 @@ h2 {
   border-bottom: 2px solid #007bff;
   padding-bottom: 6px;
 }
+/* ================== FORMULARIO ESTUDIANTES ================== */
+/* Contenedor del formulario */
+.form-estudiantes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Input de búsqueda */
+.form-estudiantes .input-busqueda {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  min-height: 44px;
+  transition: all 0.2s ease;
+}
+
+.form-estudiantes .input-busqueda:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0,123,255,0.5);
+}
+
+/* Botones */
+.form-estudiantes .btn-buscar,
+.form-estudiantes .btn-nuevo {
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  flex-shrink: 0;
+  text-decoration: none;
+  color: #fff;
+  border: 1px solid transparent;
+}
+
+/* Botón Buscar */
+.form-estudiantes .btn-buscar {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.form-estudiantes .btn-buscar:hover {
+  background-color: #19692c;
+  border-color: #19692c;
+  transform: translateY(-1px);
+}
+
+/* Botón Nuevo estudiante */
+.form-estudiantes .btn-nuevo {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.form-estudiantes .btn-nuevo:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+  transform: translateY(-1px);
+}
+
+/* Responsive: apilar en móviles */
+@media (max-width: 700px) {
+  .form-estudiantes {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-estudiantes .input-busqueda,
+  .form-estudiantes .btn-buscar,
+  .form-estudiantes .btn-nuevo {
+    width: 100%;
+  }
+}
 
 /* ================== TABLA ================== */
 .table-wrapper {
