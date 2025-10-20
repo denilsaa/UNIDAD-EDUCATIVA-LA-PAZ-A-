@@ -317,3 +317,17 @@ table a[href*="eliminar"]:hover {
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   font-size: 0.95rem;
 }
+
+.table-wrapper {
+  overflow-x: auto; /* scroll horizontal si es necesario */
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background-color: #fff;
+  margin-top: 12px;
+}
+
+/* Asegura que la tabla ocupe su ancho natural */
+.table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+}
