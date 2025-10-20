@@ -1,6 +1,35 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Dashboard de Padre de familia{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cuentas/css/padre_dashboard.css' %}">
+{% endblock %}
+
 {% block content %}
-  <h2>Bienvenido</h2>
-  <p>Secciones para ver calificaciones, citaciones, etc.</p>
+<div class="dashboard-header">
+  <h2>Bienvenido, {{ user.first_name }}!</h2>
+  <p>Explora las secciones para ver calificaciones, citaciones y más.</p>
+</div>
+
+<div class="dashboard-cards">
+  <div class="dashboard-card">
+    <div class="icon">📄</div>
+    <h3>Citaciones</h3>
+    <p>Visualiza las citaciones enviadas por la institución.</p>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="icon">📝</div>
+    <h3>Asistencia</h3>
+    <p>Consulta el registro de asistencia de tus hijos.</p>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="icon">📚</div>
+    <h3>Kárdex</h3>
+    <p>Accede a los registros académicos históricos.</p>
+  </div>
+</div>
 {% endblock %}
