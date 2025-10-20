@@ -1,0 +1,167 @@
+/* ================== CONTENEDOR DEL FORMULARIO ================== */
+.form-usuario {
+  background-color: #fff;
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 700px;
+  margin: 0 auto;
+  border-top: 6px solid #007bff;
+}
+
+/* ================== TITULO ================== */
+.titulo-form {
+  text-align: center;
+  color: #004a99;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.titulo-form::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 4px;
+  background-color: #007bff;
+  margin: 8px auto 0 auto;
+  border-radius: 2px;
+}
+
+/* ================== FORMULARIO ================== */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-grid p {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.form-grid label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #004a99;
+}
+
+.form-grid input,
+.form-grid select {
+  padding: 8px 12px;
+  border: 1px solid #cdd4e0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-grid input:focus,
+.form-grid select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0,123,255,0.3);
+  outline: none;
+}
+
+/* ================== CAMBIO DE CONTRASEÑA ================== */
+.fieldset-password {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 24px;
+  background-color: #f8fafc;
+}
+
+.fieldset-password legend {
+  font-weight: 600;
+  color: #004a99;
+  padding: 0 8px;
+}
+
+.fieldset-password .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.fieldset-password label {
+  font-weight: 600;
+  color: #004a99;
+  margin-bottom: 6px;
+}
+
+.fieldset-password input {
+  padding: 8px 12px;
+  border: 1px solid #cdd4e0;
+  border-radius: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.fieldset-password input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0,123,255,0.3);
+  outline: none;
+}
+
+/* ================== BOTONES ================== */
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.btn-guardar {
+  background-color: #28a745;
+  color: #fff;
+  border: 1px solid #28a745;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-guardar:hover {
+  background-color: #19692c;
+  border-color: #19692c;
+}
+
+.btn-volver {
+  background-color: #007bff;
+  color: #fff;
+  border: 1px solid #007bff;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-volver:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-usuario {
+    padding: 20px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-guardar,
+  .btn-volver {
+    text-align: center;
+  }
+}
