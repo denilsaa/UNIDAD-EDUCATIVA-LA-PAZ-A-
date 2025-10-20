@@ -1,51 +1,64 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Nuevo registro de kárdex{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'estudiantes/css/registro_kardex.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2 style="text-align:center">Nuevo registro de kárdex</h2>
+<div class="kardex-form-dashboard">
 
-<p><b>Estudiante:</b> {{ estudiante.apellidos }} {{ estudiante.nombres }}</p>
+  <form method="post" class="form-usuario">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
 
-<form method="post">
-  {% csrf_token %}
-  {{ form.non_field_errors }}
+    <div class="titulo-form">Nuevo registro de kárdex</div>
 
-  <table>
-    <tr>
-      <th>{{ form.fecha.label_tag }}</th>
-      <td>{{ form.fecha }}</td>
-    </tr>
-    <tr>
-      <th>{{ form.hora.label_tag }}</th>
-      <td>{{ form.hora }}</td>
-    </tr>
-    <tr>
-      <th>{{ form.kardex_item.label_tag }}</th>
-      <td>{{ form.kardex_item }}</td>
-    </tr>
-    <tr>
-      <th>{{ form.observacion.label_tag }}</th>
-      <td>{{ form.observacion }}</td>
-    </tr>
-    <tr>
-      <th>{{ form.sello_maestro.label_tag }}</th>
-      <td>{{ form.sello_maestro }}</td>
-    </tr>
-  </table>
+    <div class="estudiante-info">
+      <span>Estudiante:</span> {{ estudiante.apellidos }} {{ estudiante.nombres }}
+    </div>
 
-  {# Mostrar el link "Crear ítem de kárdex" SOLO para Director/Secretaría #}
-  {% with role=request.user.rol.nombre|default_if_none:""|default:""|lower %}
-    {% if "director" in role or "secretaria" in role or "secretaría" in role %}
-      <p style="margin-top:8px">
-        ¿Falta un ítem?
-        <a href="{% url 'estudiantes:kardex_items_nuevo' %}">Crear ítem de kárdex</a>
-      </p>
-    {% endif %}
-  {% endwith %}
+    <div class="form-group">
+      {{ form.fecha.label_tag }}
+      {{ form.fecha }}
+    </div>
 
-  <div style="margin-top:12px">
-    <button type="submit">Guardar</button>
-    <a href="{% url 'estudiantes:kardex_listar' estudiante.id %}">Cancelar</a>
-  </div>
-</form>
+    <div class="form-group">
+      {{ form.hora.label_tag }}
+      {{ form.hora }}
+    </div>
+
+    <div class="form-group">
+      {{ form.kardex_item.label_tag }}
+      {{ form.kardex_item }}
+    </div>
+
+    <div class="form-group">
+      {{ form.observacion.label_tag }}
+      {{ form.observacion }}
+    </div>
+
+    <div class="form-group">
+      {{ form.sello_maestro.label_tag }}
+      {{ form.sello_maestro }}
+    </div>
+
+    {% with role=request.user.rol.nombre|default_if_none:""|default:""|lower %}
+      {% if "director" in role or "secretaria" in role or "secretaría" in role %}
+        <p style="margin-top:8px">
+          ¿Falta un ítem?
+          <a href="{% url 'estudiantes:kardex_items_nuevo' %}">Crear ítem de kárdex</a>
+        </p>
+      {% endif %}
+    {% endwith %}
+
+    <div class="form-actions">
+      <button type="submit" class="btn-guardar">Guardar</button>
+      <a href="{% url 'estudiantes:kardex_listar' estudiante.id %}" class="btn-volver">Cancelar</a>
+    </div>
+
+  </form>
+</div>
 {% endblock %}
