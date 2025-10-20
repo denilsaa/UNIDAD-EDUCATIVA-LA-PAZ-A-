@@ -36,8 +36,8 @@
           <td>{{ curso.paralelo }}</td>
           <td>{{ curso.regente }}</td>
           <td>
-            <a href="{% url 'cursos:ver_curso' curso.id %}" class="btn-ver">Ver</a> |
-            <a href="{% url 'cursos:editar_curso' curso.id %}" class="btn-editar">Editar</a> |
+            <a href="{% url 'cursos:ver_curso' curso.id %}" class="btn-ver">Ver</a> 
+            <a href="{% url 'cursos:editar_curso' curso.id %}" class="btn-editar">Editar</a> 
             <a href="{% url 'cursos:eliminar_curso' curso.id %}" class="btn-eliminar">Eliminar</a>
             <a href="{% url 'estudiantes:por_curso' curso.id %}" class="btn-estudiantes">Ver estudiantes</a>
           </td>
