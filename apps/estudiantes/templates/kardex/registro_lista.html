@@ -1,28 +1,42 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Kárdex del estudiante{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'estudiantes/css/registro_diario.css' %}">
+{% endblock %}
 
 {% block content %}
 <h2 style="text-align:center">Kárdex diario del estudiante</h2>
 
 <!-- Cabecera -->
-<div class="card">
-  <p><strong>Estudiante:</strong> {{ estudiante.apellidos }} {{ estudiante.nombres }}</p>
-  <p>
-    <strong>Curso:</strong> {{ estudiante.curso }} |
-    <strong>Nº Lista:</strong> {{ estudiante.nro_lista|default:"—" }} |
-    <strong>Año:</strong> {{ estudiante.anio|default:"—" }}
-  </p>
-  <p>
-    <strong>Padre/Madre/Tutor:</strong> {{ estudiante.padre|default:"—" }} |
-    <strong>Tel./Cel.:</strong> {{ estudiante.tel_celular|default:"—" }}
-  </p>
+<div class="card-info">
+  <div class="card-row">
+    <span class="label">Estudiante:</span>
+    <span class="value">{{ estudiante.apellidos }} {{ estudiante.nombres }}</span>
+  </div>
+  <div class="card-row">
+    <span class="label">Curso:</span>
+    <span class="value">{{ estudiante.curso }}</span>
+    <span class="label">Nº Lista:</span>
+    <span class="value">{{ estudiante.nro_lista|default:"—" }}</span>
+    <span class="label">Año:</span>
+    <span class="value">{{ estudiante.anio|default:"—" }}</span>
+  </div>
+  <div class="card-row">
+    <span class="label">Padre/Madre/Tutor:</span>
+    <span class="value">{{ estudiante.padre|default:"—" }}</span>
+    <span class="label">Tel./Cel.:</span>
+    <span class="value">{{ estudiante.tel_celular|default:"—" }}</span>
+  </div>
 </div>
 
-<p>
-  <a href="{% url 'estudiantes:kardex_nuevo' estudiante.id %}">+ Añadir registro</a>
-  &nbsp;|&nbsp;
-  <a href="{% url 'estudiantes:listar' %}">← Volver a estudiantes</a>
-</p>
+<div class="action-buttons">
+  <a href="{% url 'estudiantes:kardex_nuevo' estudiante.id %}" class="btn-registro">Añadir registro</a>
+  <a href="{% url 'estudiantes:listar' %}" class="btn-volver">Volver a estudiantes</a>
+</div>
+
 
 <!-- Grilla tipo planilla -->
 <div class="tabla-scroll">
@@ -63,7 +77,7 @@
         {% for c in hacer_cols %}<td class="mark">{% if r.kardex_item_id == c.id %}✔{% endif %}</td>{% endfor %}
         {% for c in decidir_cols %}<td class="mark">{% if r.kardex_item_id == c.id %}✔{% endif %}</td>{% endfor %}
 
-        <td>{{ r.observacion|default:"—" }}</td>
+        <td class="col-observaciones">{{ r.observacion|default:"—" }}</td>
         <td><!-- firma física --></td>
       </tr>
     {% empty %}
@@ -83,18 +97,4 @@
   </tbody>
 </table>
 </div>
-
-<style>
-.tabla { width:100%; border-collapse: collapse; }
-.tabla th, .tabla td { border:1px solid #ddd; padding:6px; text-align:center; vertical-align:middle; }
-.th-rotado { writing-mode: vertical-rl; transform: rotate(180deg); min-width:28px; font-size:12px; }
-.mark { font-weight: bold; font-size: 16px; }
-.tabla-scroll { overflow-x:auto; }
-.card { background:#f7f7f7; padding:10px; border:1px solid #e5e5e5; margin:10px 0; }
-@media print {
-  .hdr, .sidenav, .msgs, a[href], .ftr { display:none !important; }
-  .tabla th, .tabla td { padding:4px;}
-  .th-rotado { font-size:10px; }
-}
-</style>
 {% endblock %}

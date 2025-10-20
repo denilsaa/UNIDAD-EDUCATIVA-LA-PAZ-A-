@@ -1,0 +1,212 @@
+/* ================== TITULO ================== */
+h2 {
+  color: #004a99;
+  text-align: center;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 6px;
+}
+
+/* ================== TARJETA ESTUDIANTE ================== */
+.card-info {
+  background-color: #f6f9ff; /* azul muy suave */
+  border: 1px solid #d0e7ff; /* borde azul suave */
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #004a99;
+}
+
+.card-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.card-row:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.value {
+  font-weight: 400;
+  color: #222;
+}
+
+/* Responsive: que se vea bien en móviles */
+@media (max-width: 600px) {
+  .card-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+/* ================== TABLA KÁRDEX ================== */
+.tabla-scroll {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background-color: #fff;
+  margin-top: 12px;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.tabla th, .tabla td {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Encabezados principales */
+.tabla thead th {
+  background-color: #d0e7ff; /* azul claro */
+  color: #004a99; /* azul oscuro */
+  font-weight: 600;
+}
+
+/* Encabezados rotados */
+.th-rotado {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  min-width: 28px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #004a99;
+}
+
+/* Filas alternadas */
+.tabla tbody tr:nth-child(even) {
+  background-color: #f6f9ff;
+}
+
+/* Hover sobre filas */
+.tabla tbody tr:hover {
+  background-color: #dbe7ff;
+}
+
+/* ✔ de marcas */
+.mark {
+  font-weight: bold;
+  font-size: 16px;
+  color: black; /* negro */
+}
+/* Columna de observaciones: se adapta al ancho disponible y permite saltos de línea */
+.tabla td.col-observaciones {
+  width: 100%;           /* Ocupa todo el espacio restante de la tabla */
+  max-width: 400px;      /* Ancho máximo opcional */
+  word-wrap: break-word; /* Permite dividir palabras largas */
+  white-space: normal;   /* Permite saltos de línea automáticos */
+  text-align: center;      /* Mejor lectura para párrafos largos */
+}
+
+/* Responsive: en pantallas pequeñas reducimos el ancho máximo */
+@media (max-width: 900px) {
+  .tabla td.col-observaciones {
+    max-width: 200px;
+  }
+}
+
+/* ================== ENLACES Y BOTONES ================== */
+a[href*="kardex_nuevo"] {
+  background-color: #28a745;
+  color: #fff;
+  border: 1px solid #28a745;
+  border-radius: 6px;
+  padding: 4px 10px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+a[href*="kardex_nuevo"]:hover {
+  background-color: #19692c;
+  border-color: #19692c;
+  transform: translateY(-1px);
+}
+.action-buttons {
+  margin: 16px 0;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Botón Añadir registro (verde) */
+.btn-registro {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  background-color: #28a745;
+  color: #fff;
+  border: 1px solid #28a745;
+  transition: all 0.2s ease;
+}
+
+.btn-registro:hover {
+  background-color: #19692c;
+  border-color: #19692c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Botón Volver (azul) */
+.btn-volver {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  background-color: #007bff;
+  color: #fff;
+  border: 1px solid #007bff;
+  transition: all 0.2s ease;
+}
+
+.btn-volver:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Responsive: se ajusta en móviles */
+@media (max-width: 600px) {
+  .action-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* ================== PRINT ================== */
+@media print {
+  .hdr, .sidenav, .msgs, a[href], .ftr { display:none !important; }
+  .tabla th, .tabla td { padding: 4px; }
+  .th-rotado { font-size: 10px; }
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 900px) {
+  .tabla th, .tabla td {
+    padding: 8px 10px;
+  }
+
+  .tabla-scroll {
+    overflow-x: auto;
+  }
+}
