@@ -1,15 +1,51 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Crear curso{% endblock %}
 
-{% block content %}
-<h2>Crear curso</h2>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cursos/css/crear_curso.css' %}">
+{% endblock %}
 
-<form method="post">
+{% block content %}
+
+<form method="post" class="form-curso">
+  <h2 class="titulo-form">Crear nuevo curso</h2>
   {% csrf_token %}
-  {{ form.as_p }}
-  <p>
-    <button type="submit">Guardar</button>
-    <a href="{% url 'cursos:lista_cursos' %}">Cancelar</a>
-  </p>
+
+  <div class="form-group">
+    <label for="nivel">Nivel</label>
+    <select name="nivel" id="nivel" class="form-control">
+      <option value="Primero">Primero</option>
+      <option value="Segundo">Segundo</option>
+      <option value="Tercero">Tercero</option>
+      <option value="Cuarto">Cuarto</option>
+      <option value="Quinto">Quinto</option>
+      <option value="Sexto">Sexto</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="paralelo">Paralelo</label>
+    <select name="paralelo" id="paralelo" class="form-control">
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+      <option value="E">E</option>
+      <option value="F">F</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="{{ form.regente.id_for_label }}">Regente</label>
+    {{ form.regente }}
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn-guardar">Guardar</button>
+    <a href="{% url 'cursos:lista_cursos' %}" class="btn-volver">Cancelar</a>
+  </div>
 </form>
+
 {% endblock %}
