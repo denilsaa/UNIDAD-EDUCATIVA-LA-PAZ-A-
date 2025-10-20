@@ -1,0 +1,139 @@
+/* ================== TITULO ================== */
+h2 {
+  color: #004a99;
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 6px;
+  font-size: 1.8rem;
+}
+/* ================== BOTONES DE ACCIONES ================== */
+.table-btn {
+  display: inline-block;
+  padding: 6px 14px;
+  margin: 2px 4px 2px 0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+/* Botón Ver ficha */
+.table-btn-ficha {
+  background-color: #17a2b8;
+  color: #fff;
+  border-color: #17a2b8;
+}
+
+.table-btn-ficha:hover {
+  background-color: #0d6771;
+  border-color: #0d6771;
+  transform: translateY(-2px);
+}
+
+/* Botón Ver Kárdex */
+.table-btn-kardex {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.table-btn-kardex:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+  transform: translateY(-2px);
+}
+
+/* ================== TABLA ================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+th, td {
+  padding: 12px 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+thead th {
+  background-color: #d0e7ff;
+  color: #004a99;
+  font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f6f9ff;
+}
+
+tbody tr:hover {
+  background-color: #dbe7ff;
+  transition: background-color 0.2s ease;
+}
+
+/* ================== LINKS / BOTONES DENTRO DE TABLA ================== */
+table a {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 2px 2px 2px 0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+/* Ver ficha */
+table a[href*="hijo_detalle"] {
+  background-color: #17a2b8;
+  color: #fff;
+  border-color: #17a2b8;
+}
+
+table a[href*="hijo_detalle"]:hover {
+  background-color: #0d6771;
+  border-color: #0d6771;
+  transform: translateY(-1px);
+}
+
+/* Ver Kárdex */
+table a[href*="kardex_listar"] {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+table a[href*="kardex_listar"]:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+  transform: translateY(-1px);
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 900px) {
+  table, th, td {
+    font-size: 0.875rem;
+  }
+
+  th, td {
+    padding: 8px 6px;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
