@@ -1,5 +1,5 @@
 /* ================== CONTENEDOR PRINCIPAL ================== */
-.detalle-usuario {
+.detalle-curso {
   background-color: #fff;
   padding: 28px;
   border-radius: 12px;
@@ -80,17 +80,6 @@
   color: #222;
 }
 
-/* ================== ESTADO DE USUARIO ================== */
-.estado.activo {
-  color: #28a745;
-  font-weight: 600;
-}
-
-.estado.inactivo {
-  color: #dc3545;
-  font-weight: 600;
-}
-
 /* ================== ACCIONES ================== */
 .acciones-detalle {
   display: flex;
@@ -139,7 +128,7 @@
 
 /* ================== RESPONSIVE ================== */
 @media (max-width: 640px) {
-  .detalle-usuario {
+  .detalle-curso {
     padding: 20px;
   }
 
