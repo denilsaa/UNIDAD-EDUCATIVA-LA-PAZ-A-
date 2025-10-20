@@ -1,9 +1,16 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Dashboard del Director{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cuentas/css/dashboard_director.css' %}">
+{% endblock %}
+
 {% block content %}
+<div class="director-dashboard">
   <h2>Usuarios por rol</h2>
-  <ul>
+  <ul class="rol-list">
     <li><strong>Directores:</strong> {{ director_count }}</li>
     <li><strong>Regentes:</strong> {{ regente_count }}</li>
     <li><strong>Secretarias:</strong> {{ secretaria_count }}</li>
@@ -11,128 +18,127 @@
   </ul>
 
   <h2>Lista de usuarios</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>CI</th><th>Nombres</th><th>Apellidos</th><th>Email</th><th>Estado</th><th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for usuario in usuarios %}
-      <tr>
-        <td>{{ usuario.ci }}</td>
-        <td>{{ usuario.nombres }}</td>
-        <td>{{ usuario.apellidos }}</td>
-        <td>{{ usuario.email }}</td>
-        <td>{{ usuario.is_activo|yesno:"Activo,Inactivo" }}</td>
-        <td>
-          <a href="{% url 'cuentas:ver_usuario' usuario.id %}">Ver</a> |
-          <a href="{% url 'cuentas:editar_usuario' usuario.id %}">Editar</a> |
-          <a href="{% url 'cuentas:eliminar_usuario' usuario.id %}">Eliminar</a>
-        </td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="6">No hay usuarios registrados.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
+  <div class="tabla-wrapper">
+    <table class="tabla usuarios-tabla">
+      <thead>
+        <tr>
+          <th>CI</th><th>Nombres</th><th>Apellidos</th><th>Email</th><th>Estado</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+          <td>{{ usuario.ci }}</td>
+          <td>{{ usuario.nombres }}</td>
+          <td>{{ usuario.apellidos }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>{{ usuario.is_activo|yesno:"Activo,Inactivo" }}</td>
+          <td>
+            <a href="{% url 'cuentas:ver_usuario' usuario.id %}" class="btn-ver">Ver</a>
+            <a href="{% url 'cuentas:editar_usuario' usuario.id %}" class="btn-editar">Editar</a>
+            <a href="{% url 'cuentas:eliminar_usuario' usuario.id %}" class="btn-eliminar">Eliminar</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No hay usuarios registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
   <h2>Gestionar cursos</h2>
-  <p>
-    <a href="{% url 'cursos:lista_cursos' %}">Ver/Administrar cursos</a> |
-    <a href="{% url 'cursos:crear_curso' %}">Nuevo curso</a>
-  </p>
+  <div class="gestion-cursos">
+    <a href="{% url 'cursos:lista_cursos' %}" class="btn-ver">Ver / Administrar cursos</a>
+    <a href="{% url 'cursos:crear_curso' %}" class="btn-nuevo">Nuevo curso</a>
+  </div>
 
-  {% if curso_count is not None %}
+  {% if curso_count %}
     <p><strong>Total de cursos:</strong> {{ curso_count }}</p>
   {% endif %}
 
   {% if ultimos_cursos %}
     <h3>Cursos recientes</h3>
-    <table>
-      <thead>
-        <tr><th>ID</th><th>Nivel</th><th>Paralelo</th><th>Regente</th><th>Acciones</th></tr>
-      </thead>
-      <tbody>
-        {% for c in ultimos_cursos %}
-        <tr>
-          <td>{{ c.id }}</td>
-          <td>{{ c.nivel }}</td>
-          <td>{{ c.paralelo }}</td>
-          <td>{{ c.regente }}</td>
-          <td>
-            <a href="{% url 'cursos:ver_curso' c.id %}">Ver</a> |
-            <a href="{% url 'cursos:editar_curso' c.id %}">Editar</a> |
-            <a href="{% url 'cursos:eliminar_curso' c.id %}">Eliminar</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="tabla-wrapper">
+      <table class="tabla cursos-tabla">
+        <thead>
+          <tr><th>ID</th><th>Nivel</th><th>Paralelo</th><th>Regente</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          {% for c in ultimos_cursos %}
+          <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.nivel }}</td>
+            <td>{{ c.paralelo }}</td>
+            <td>{{ c.regente }}</td>
+            <td>
+              <a href="{% url 'cursos:ver_curso' c.id %}" class="btn-ver">Ver</a>
+              <a href="{% url 'cursos:editar_curso' c.id %}" class="btn-editar">Editar</a>
+              <a href="{% url 'cursos:eliminar_curso' c.id %}" class="btn-eliminar">Eliminar</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% endif %}
 
-  <!-- ===================== NUEVO: Estudiantes ===================== -->
   <h2>Gestionar estudiantes</h2>
-  <p>
-    <a href="{% url 'estudiantes:listar' %}">Ver/Administrar estudiantes</a> |
-    <a href="{% url 'estudiantes:crear' %}">Nuevo estudiante</a>
-  </p>
+  <div class="gestion-estudiantes">
+    <a href="{% url 'estudiantes:listar' %}" class="btn-ver">Ver / Administrar estudiantes</a>
+    <a href="{% url 'estudiantes:crear' %}" class="btn-nuevo">Nuevo estudiante</a>
+  </div>
 
-  {% if estudiante_count is not None %}
+  {% if estudiante_count %}
     <p><strong>Total de estudiantes:</strong> {{ estudiante_count }}</p>
   {% endif %}
 
   {% if ultimos_estudiantes %}
     <h3>Estudiantes recientes</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th><th>Apellidos</th><th>Nombres</th><th>CI</th><th>Curso</th><th>Padre/Tutor</th><th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for e in ultimos_estudiantes %}
-        <tr>
-          <td>{{ e.id }}</td>
-          <td>{{ e.apellidos }}</td>
-          <td>{{ e.nombres }}</td>
-          <td>{{ e.ci }}</td>
-          <td>{{ e.curso }}</td>
-          <td>{{ e.padre }}</td>
-          <td>
-            <a href="{% url 'estudiantes:editar' e.id %}">Editar</a> |
-            <a href="{% url 'estudiantes:eliminar' e.id %}">Eliminar</a> |
-            <a href="{% url 'estudiantes:kardex_listar' e.id %}">Ver kárdex</a> |
-            <a href="{% url 'estudiantes:kardex_nuevo' e.id %}">+ Registro kárdex</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% endif %}
-  <!-- =================== FIN NUEVO: Estudiantes =================== -->
-  {% if ultimos_kardex %}
-    <h2>Registros recientes de kárdex</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Estudiante</th>
-          <th>Ítem</th>
-          <th>Observación</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for r in ultimos_kardex %}
-        <tr>
-          <td>{{ r.fecha }}{% if r.hora %} {{ r.hora }}{% endif %}</td>
-          <td>{{ r.estudiante }}</td>
-          <td>{{ r.kardex_item }}</td>
-          <td>{{ r.observacion|default:"—" }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="tabla-wrapper">
+      <table class="tabla estudiantes-tabla">
+        <thead>
+          <tr><th>ID</th><th>Apellidos</th><th>Nombres</th><th>CI</th><th>Curso</th><th>Padre/Tutor</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          {% for e in ultimos_estudiantes %}
+          <tr>
+            <td>{{ e.id }}</td>
+            <td>{{ e.apellidos }}</td>
+            <td>{{ e.nombres }}</td>
+            <td>{{ e.ci }}</td>
+            <td>{{ e.curso }}</td>
+            <td>{{ e.padre }}</td>
+            <td>
+              <a href="{% url 'estudiantes:editar' e.id %}" class="btn-editar">Editar</a>
+              <a href="{% url 'estudiantes:eliminar' e.id %}" class="btn-eliminar">Eliminar</a>
+              <a href="{% url 'estudiantes:kardex_listar' e.id %}" class="btn-ver">Ver kárdex</a>
+              <a href="{% url 'estudiantes:kardex_nuevo' e.id %}" class="btn-nuevo">+ Registro kárdex</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% endif %}
 
+  {% if ultimos_kardex %}
+    <h2>Registros recientes de kárdex</h2>
+    <div class="tabla-wrapper">
+      <table class="tabla kardex-tabla">
+        <thead>
+          <tr><th>Fecha</th><th>Estudiante</th><th>Ítem</th><th>Observación</th></tr>
+        </thead>
+        <tbody>
+          {% for r in ultimos_kardex %}
+          <tr>
+            <td>{{ r.fecha }}{% if r.hora %} {{ r.hora }}{% endif %}</td>
+            <td>{{ r.estudiante }}</td>
+            <td>{{ r.kardex_item }}</td>
+            <td>{{ r.observacion|default:"—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</div>
 {% endblock %}
