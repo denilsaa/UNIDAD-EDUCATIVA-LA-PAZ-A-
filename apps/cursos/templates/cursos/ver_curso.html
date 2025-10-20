@@ -1,19 +1,28 @@
 {% extends "layout/base_dashboard.html" %}
-{% block title %}Detalle del curso{% endblock %}
+{% load static %}
+{% block title %}Detalle del Curso{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cursos/css/ver_curso.css' %}">
+{% endblock %}
 
 {% block content %}
-<h2>Detalle del curso</h2>
+<div class="detalle-curso">
+  <h2 class="titulo-detalle">Detalle del Curso</h2>
 
-<ul>
-  <li><strong>Nivel:</strong> {{ curso.nivel }}</li>
-  <li><strong>Paralelo:</strong> {{ curso.paralelo }}</li>
-  <li><strong>Regente:</strong> {{ curso.regente }}</li>
-  <li><strong>Creado en:</strong> {{ curso.creado_en }}</li>
-  <li><strong>Actualizado en:</strong> {{ curso.actualizado_en }}</li>
-</ul>
+  <div class="card-detalle">
+    <ul class="lista-detalle">
+      <li><span class="label">Nivel:</span> <span class="valor">{{ curso.nivel }}</span></li>
+      <li><span class="label">Paralelo:</span> <span class="valor">{{ curso.paralelo }}</span></li>
+      <li><span class="label">Regente:</span> <span class="valor">{{ curso.regente }}</span></li>
+      <li><span class="label">Creado en:</span> <span class="valor">{{ curso.creado_en|date:"d/m/Y H:i" }}</span></li>
+      <li><span class="label">Actualizado en:</span> <span class="valor">{{ curso.actualizado_en|date:"d/m/Y H:i" }}</span></li>
+    </ul>
+  </div>
 
-<p>
-  <a href="{% url 'cursos:editar_curso' curso.id %}">Editar</a> |
-  <a href="{% url 'cursos:lista_cursos' %}">Volver a la lista</a>
-</p>
+  <div class="acciones-detalle">
+    <a href="{% url 'cursos:editar_curso' curso.id %}" class="btn-editar">Editar</a>
+    <a href="{% url 'cursos:lista_cursos' %}" class="btn-volver">Volver a la lista</a>
+  </div>
+</div>
 {% endblock %}
