@@ -1,0 +1,155 @@
+/* ================== CONTENEDOR PRINCIPAL ================== */
+.director-dashboard {
+  padding: 16px;
+  background: #f9fafe;
+}
+
+/* ================== TITULOS ================== */
+.director-dashboard h2 {
+  color: #004a99;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 4px;
+}
+
+/* ================== GESTION DE ACCIONES ================== */
+.gestion-acciones {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 12px 0 20px 0;
+}
+
+.gestion-acciones a.btn-nuevo {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  text-align: center;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  background-color: #28a745;
+  color: #fff;
+  border: 1px solid #28a745;
+  text-decoration: none;
+}
+
+.gestion-acciones a.btn-nuevo:hover {
+  background-color: #19692c;
+  border-color: #19692c;
+  transform: translateY(-1px);
+}
+
+/* ================== TABLAS ================== */
+.table-wrapper {
+  overflow-x: auto; /* scroll horizontal si es necesario */
+  margin-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background: #fff;
+}
+
+.table-wrapper table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+}
+
+.table-wrapper th,
+.table-wrapper td {
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table-wrapper thead th {
+  background-color: #cce0ff; /* usuarios */
+  color: #004a99;
+  font-weight: 600;
+}
+
+.table-wrapper tbody tr:nth-child(even) {
+  background: #f6f9ff;
+}
+
+.table-wrapper tbody tr:hover {
+  background: #dbe7ff;
+}
+
+/* ================== LINKS DENTRO DE TABLAS ================== */
+.table-wrapper a {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 2px 2px 2px 0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  text-decoration: none;
+}
+
+/* Botón Ver */
+.table-wrapper a.btn-ver {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.table-wrapper a.btn-ver:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+  transform: translateY(-1px);
+}
+
+/* Botón Editar */
+.table-wrapper a.btn-editar {
+  background-color: #17a2b8;
+  color: #fff;
+  border-color: #17a2b8;
+}
+
+.table-wrapper a.btn-editar:hover {
+  background-color: #0d6771;
+  border-color: #0d6771;
+  transform: translateY(-1px);
+}
+
+/* Botón Eliminar */
+.table-wrapper a.btn-eliminar {
+  background-color: #dc3545;
+  color: #fff;
+  border-color: #dc3545;
+}
+
+.table-wrapper a.btn-eliminar:hover {
+  background-color: #a71d2a;
+  border-color: #a71d2a;
+  transform: translateY(-1px);
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 900px) {
+  .table-wrapper {
+    max-width: 100%;
+  }
+
+  .table-wrapper th,
+  .table-wrapper td {
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .gestion-acciones {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .gestion-acciones a {
+    flex: 0 0 auto;
+  }
+}
