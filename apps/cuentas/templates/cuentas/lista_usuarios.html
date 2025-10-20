@@ -1,39 +1,49 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Usuarios{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cuentas/css/dashboard_director_listas_usuarios.css' %}">
+{% endblock %}
 
 {% block content %}
 <h2>Lista de usuarios</h2>
 
-<p><a href="{% url 'cuentas:crear_usuario' %}">+ Crear usuario</a></p>
+<div class="gestion-acciones">
+  <a href="{% url 'cuentas:crear_usuario' %}" class="btn-nuevo">+ Crear usuario</a>
+</div>
 
-<table>
-  <thead>
-    <tr>
-      <th>CI</th>
-      <th>Nombres</th>
-      <th>Apellidos</th>
-      <th>Email</th>
-      <th>Estado</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for u in usuarios %}
-    <tr>
-      <td>{{ u.ci }}</td>
-      <td>{{ u.nombres }}</td>
-      <td>{{ u.apellidos }}</td>
-      <td>{{ u.email }}</td>
-      <td>{{ u.is_activo|yesno:"Activo,Inactivo" }}</td>
-      <td>
-        <a href="{% url 'cuentas:ver_usuario' u.id %}">Ver</a> |
-        <a href="{% url 'cuentas:editar_usuario' u.id %}">Editar</a> |
-        <a href="{% url 'cuentas:eliminar_usuario' u.id %}">Eliminar</a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="6">Sin usuarios</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>CI</th>
+        <th>Nombres</th>
+        <th>Apellidos</th>
+        <th>Email</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in usuarios %}
+      <tr>
+        <td>{{ u.ci }}</td>
+        <td>{{ u.nombres }}</td>
+        <td>{{ u.apellidos }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.is_activo|yesno:"Activo,Inactivo" }}</td>
+        <td>
+          <a href="{% url 'cuentas:ver_usuario' u.id %}" class="btn-ver">Ver</a>
+          <a href="{% url 'cuentas:editar_usuario' u.id %}" class="btn-editar">Editar</a>
+          <a href="{% url 'cuentas:eliminar_usuario' u.id %}" class="btn-eliminar">Eliminar</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">Sin usuarios</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}
