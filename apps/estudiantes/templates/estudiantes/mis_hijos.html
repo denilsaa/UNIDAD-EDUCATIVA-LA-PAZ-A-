@@ -1,5 +1,11 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Mis hijos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'estudiantes/css/mis_hijos.css' %}">
+{% endblock %}
 
 {% block content %}
 <h2>Mis hijos</h2>
@@ -20,8 +26,8 @@
       <td>{{ e.nombres }}</td>
       <td>{{ e.curso }}</td>
       <td>
-        <a href="{% url 'estudiantes:hijo_detalle' e.id %}">Ver ficha</a> |
-        <a href="{% url 'estudiantes:kardex_listar' e.id %}">Ver Kárdex</a>
+        <a href="{% url 'estudiantes:hijo_detalle' e.id %}" class="table-btn table-btn-ficha">Ver ficha</a>
+        <a href="{% url 'estudiantes:kardex_listar' e.id %}" class="table-btn table-btn-kardex">Ver Kárdex</a>
         {# FUTURO: <a href="{% url 'asistencia:por_estudiante' e.id %}">Ver asistencia</a> #}
       </td>
     </tr>
