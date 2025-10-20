@@ -231,7 +231,7 @@ thead { background: #f0f0f0; }
     width: 220px;
     transform: translateX(-100%);
     padding: 12px;
-    overflow: hidden; /* 🔥 sin scroll en móvil */
+    overflow: hidden;
     z-index: 1000;
     transition: transform 0.3s ease;
   }
