@@ -1,42 +1,52 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Cursos{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cursos/css/curso_listar.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>Cursos</h2>
+<div class="cursos-dashboard">
+  <h2>Cursos</h2>
 
-<form method="get">
-  <input type="text" name="q" value="{{ q }}" placeholder="Buscar por nivel o paralelo">
-  <button type="submit">Buscar</button>
-  <a href="{% url 'cursos:crear_curso' %}">Nuevo curso</a>
-</form>
+  <form method="get" class="form-cursos">
+    <input type="text" name="q" value="{{ q }}" placeholder="Buscar por nivel o paralelo" class="input-busqueda">
+    <button type="submit" class="btn-buscar">Buscar</button>
+    <a href="{% url 'cursos:crear_curso' %}" class="btn-nuevo">+ Nuevo curso</a>
+  </form>
 
-<table>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Nivel</th>
-      <th>Paralelo</th>
-      <th>Regente</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for curso in cursos %}
-    <tr>
-      <td>{{ curso.id }}</td>
-      <td>{{ curso.nivel }}</td>
-      <td>{{ curso.paralelo }}</td>
-      <td>{{ curso.regente }}</td>
-      <td>
-        <a href="{% url 'cursos:ver_curso' curso.id %}">Ver</a> |
-        <a href="{% url 'cursos:editar_curso' curso.id %}">Editar</a> |
-        <a href="{% url 'cursos:eliminar_curso' curso.id %}">Eliminar</a>
-        <a href="{% url 'estudiantes:por_curso' curso.id %}">Ver estudiantes</a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="5">No hay cursos registrados.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nivel</th>
+          <th>Paralelo</th>
+          <th>Regente</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for curso in cursos %}
+        <tr>
+          <td>{{ curso.id }}</td>
+          <td>{{ curso.nivel }}</td>
+          <td>{{ curso.paralelo }}</td>
+          <td>{{ curso.regente }}</td>
+          <td>
+            <a href="{% url 'cursos:ver_curso' curso.id %}" class="btn-ver">Ver</a> |
+            <a href="{% url 'cursos:editar_curso' curso.id %}" class="btn-editar">Editar</a> |
+            <a href="{% url 'cursos:eliminar_curso' curso.id %}" class="btn-eliminar">Eliminar</a>
+            <a href="{% url 'estudiantes:por_curso' curso.id %}" class="btn-estudiantes">Ver estudiantes</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No hay cursos registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}
