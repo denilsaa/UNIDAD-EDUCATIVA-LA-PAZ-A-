@@ -1,4 +1,4 @@
-/* Reset mínimo */
+/* ================== RESET Y BASE ================== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -8,54 +8,73 @@
 html, body {
   height: 100%;
   font-family: system-ui, Arial, sans-serif;
+  overflow-x: hidden; /* evita scroll lateral */
 }
 
 a {
   text-decoration: none;
   color: inherit;
 }
-/* Reset mínimo */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: system-ui, Arial, sans-serif; }
 
-/* Layout */
+/* ================== LAYOUT PRINCIPAL ================== */
 .layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
+/* ================== HEADER ================== */
 .hdr {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid #e3e3e3;
-  background: #fafafa;
-  flex-wrap: wrap; /* evita que títulos largos rompan el layout */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(90deg, #004a99, #007BFF);
+  color: #fff;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+  z-index: 1001;
 }
 
-.wrap {
-  display: grid;
-  grid-template-columns: 240px 1fr; /* sidebar + contenido */
-  flex: 1;
-  min-height: 0;
+/* Fondo animado de puntitos en el header */
+.hdr::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background-image: radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: moveDots 10s linear infinite;
+  z-index: 0;
+  opacity: 0.4;
 }
 
-.sidenav {
-  border-right: 1px solid #e3e3e3;
-  background: #f7f7f7;
-  padding: 16px;
-  overflow-y: auto; /* scroll si hay muchos items */
+@keyframes moveDots {
+  from { background-position: 0 0; }
+  to { background-position: 40px 40px; }
 }
 
-.main {
-  padding: 16px;
-  overflow: auto;
+.hdr * {
+  position: relative;
+  z-index: 1;
 }
 
-.hdr-title { font-size: 18px; }
-.hdr-sub { color: #666; font-size: 12px; flex-basis: 100%; margin-top: 4px; }
+.hdr-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.hdr-sub {
+  color: #dce6ff;
+  font-size: 12px;
+  flex-basis: 100%;
+  margin-top: 4px;
+}
+
 .hdr-nav {
   display: flex;
   gap: 8px;
@@ -65,41 +84,120 @@ body { font-family: system-ui, Arial, sans-serif; }
   padding: 6px 8px;
   border-radius: 4px;
   transition: background 0.2s;
+  color: #fff;
 }
 
 .hdr-nav a:hover {
-  background: #ececec;
+  background: rgba(255,255,255,0.15);
 }
 
-/* Botón para menú móvil */
+/* Botón de menú móvil */
 .menu-toggle {
   display: none;
   font-size: 24px;
   cursor: pointer;
   user-select: none;
   margin-left: auto;
+  color: #fff;
 }
 
-.sidenav-title { font-size: 14px; color: #333; margin-bottom: 8px; }
-.sidenav-list { list-style: none; padding: 0; margin: 0; }
+/* ================== WRAP ================== */
+.wrap {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ================== SIDEBAR ================== */
+.sidenav {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  bottom: 0;
+  width: 240px;
+  background: linear-gradient(180deg, #004a99, #007BFF);
+  color: #fff;
+  padding: 16px;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+  overflow: hidden; /* 🔥 elimina scroll vertical y horizontal */
+  -webkit-overflow-scrolling: touch;
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+/* Fondo animado de puntitos en sidebar */
+.sidenav::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px);
+  background-size: 18px 18px;
+  animation: moveDots 12s linear infinite;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+.sidenav nav {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  overflow: hidden; /* evita scroll interno innecesario */
+}
+
+/* Título del sidebar */
+.sidenav-title {
+  font-size: 16px;
+  color: #eaf1ff;
+  margin-bottom: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Lista de enlaces */
+.sidenav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .sidenav-list li { margin: 6px 0; }
+
 .sidenav-list a {
   display: block;
-  padding: 6px 8px;
+  padding: 8px 10px;
   border-radius: 6px;
-  transition: background 0.2s;
-  word-break: break-word; /* evita que textos largos salgan del sidebar */
+  color: #fff;
+  transition: background 0.3s, transform 0.2s;
+  word-break: break-word;
 }
 
 .sidenav-list a:hover {
-  background: #ececec;
+  background: rgba(255,255,255,0.15);
+  transform: translateX(2px);
 }
-.sidenav-list .sep { margin: 12px 0; border-top: 1px dashed #ccc; height: 1px; }
 
-/* Contenido */
+.sidenav-list .sep {
+  margin: 12px 0;
+  border-top: 1px solid rgba(255,255,255,0.3);
+}
+
+/* ================== CONTENIDO PRINCIPAL ================== */
+.main {
+  flex: 1;
+  padding: 20px;
+  background-color: #f5f7fb;
+  color: #333;
+  overflow-y: auto;
+  margin-left: 240px;
+}
+
 .main h1, .main h2, .main h3 { margin-top: 0; }
 
-/* Tablas simples */
+/* Tablas */
 table { border-collapse: collapse; width: 100%; }
 th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
 thead { background: #f0f0f0; }
@@ -117,52 +215,40 @@ thead { background: #f0f0f0; }
   background: #fafafa;
   padding: 10px 16px;
   text-align: center;
+  margin-left: 240px;
 }
 
-/* Responsive para pantallas menores a 900px */
+/* ================== RESPONSIVE MENOR A 900px ================== */
 @media (max-width: 900px) {
-  /* Layout principal: sidebar oculto inicialmente */
-  .wrap {
-    grid-template-columns: 1fr; /* el contenido ocupa todo el ancho */
-  }
+  .wrap { flex-direction: column; }
+  .main, .ftr { margin-left: 0; }
 
-  /* Sidebar */
   .sidenav {
-    position: absolute;
-    top: 60px; /* debajo del header */
+    position: fixed;
+    top: 60px;
     left: 0;
-    width: 240px;
-    height: calc(100% - 60px);
-    background: #f7f7f7;
-    transform: translateX(-100%); /* oculto inicialmente */
-    transition: transform 0.3s ease;
+    bottom: 0;
+    width: 220px;
+    transform: translateX(-100%);
+    padding: 12px;
+    overflow: hidden; /* 🔥 sin scroll en móvil */
     z-index: 1000;
-    overflow-y: auto; /* scroll si hay muchas opciones */
-    -webkit-overflow-scrolling: touch; /* suaviza scroll en iOS */
+    transition: transform 0.3s ease;
   }
 
-  /* Sidebar abierto */
-  .sidenav.open {
-    transform: translateX(0);
+  .sidenav.open { transform: translateX(0); }
+
+  .hdr-nav { display: none; }
+  .menu-toggle { display: block; }
+
+  /* Evita scroll innecesario */
+  body {
+    overflow-x: hidden;
   }
 
-  /* Menu toggle (hamburguesa) */
-  .menu-toggle {
-    display: block;
-    font-size: 24px;
-    cursor: pointer;
-    color: #333;
-    user-select: none;
-  }
-
-  /* Oculta los links del header en móviles */
-  .hdr-nav {
-    display: none;
-  }
-
-  /* Ajuste de listas para que no desborden */
+  /* Ajuste enlaces */
   .sidenav-list a {
-    white-space: normal;   /* permite quiebre de palabras */
+    white-space: normal;
     word-break: break-word;
   }
 }
