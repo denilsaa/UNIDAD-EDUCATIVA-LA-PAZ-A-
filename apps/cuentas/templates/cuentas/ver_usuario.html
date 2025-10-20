@@ -1,23 +1,30 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
 {% block title %}Detalle de usuario{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cuentas/css/ver_usuario.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>Detalle del usuario</h2>
+<div class="detalle-usuario">
+  <h2>Detalle del usuario</h2>
 
-<ul>
-  <li><strong>CI:</strong> {{ usuario.ci }}</li>
-  <li><strong>Nombres:</strong> {{ usuario.nombres }}</li>
-  <li><strong>Apellidos:</strong> {{ usuario.apellidos }}</li>
-  <li><strong>Email:</strong> {{ usuario.email }}</li>
-  <li><strong>Teléfono:</strong> {{ usuario.telefono }}</li>
-  <li><strong>Rol:</strong> {{ usuario.rol.nombre }}</li>
-  <li><strong>Estado:</strong> {{ usuario.is_activo|yesno:"Activo,Inactivo" }}</li>
-  <li><strong>Creado:</strong> {{ usuario.creado_en }}</li>
-  <li><strong>Última actualización:</strong> {{ usuario.actualizado_en }}</li>
-</ul>
+  <ul>
+    <li><strong>CI:</strong> {{ usuario.ci }}</li>
+    <li><strong>Nombres:</strong> {{ usuario.nombres }}</li>
+    <li><strong>Apellidos:</strong> {{ usuario.apellidos }}</li>
+    <li><strong>Email:</strong> {{ usuario.email }}</li>
+    <li><strong>Teléfono:</strong> {{ usuario.telefono }}</li>
+    <li><strong>Rol:</strong> {{ usuario.rol.nombre }}</li>
+    <li><strong>Estado:</strong> {{ usuario.is_activo|yesno:"Activo,Inactivo" }}</li>
+    <li><strong>Creado:</strong> {{ usuario.creado_en }}</li>
+    <li><strong>Última actualización:</strong> {{ usuario.actualizado_en }}</li>
+  </ul>
 
-<p>
-  <a href="{% url 'cuentas:editar_usuario' usuario.id %}">Editar</a> |
-  <a href="{% url 'cuentas:lista_usuarios' %}">Volver</a>
-</p>
+  <div class="acciones">
+    <a href="{% url 'cuentas:editar_usuario' usuario.id %}" class="btn-editar">Editar</a>
+    <a href="{% url 'cuentas:lista_usuarios' %}" class="btn-volver">Volver</a>
+  </div>
+</div>
 {% endblock %}

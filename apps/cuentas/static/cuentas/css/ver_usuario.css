@@ -1,0 +1,111 @@
+/* ================== CONTENEDOR PRINCIPAL ================== */
+.detalle-usuario {
+  background-color: #fff;
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 600px;
+  margin: 0 auto;
+  border-top: 6px solid #007bff;
+}
+
+/* ================== HEADER ================== */
+.detalle-usuario h2 {
+  text-align: center;
+  color: #004a99;
+  font-size: 1.8rem;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.detalle-usuario h2::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 4px;
+  background-color: #007bff;
+  margin: 8px auto 0 auto;
+  border-radius: 2px;
+}
+
+/* ================== LISTA DE DATOS ================== */
+.detalle-usuario ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+}
+
+.detalle-usuario li {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.detalle-usuario li strong {
+  color: #004a99;
+  font-weight: 600;
+}
+
+/* ================== ACCIONES ================== */
+.detalle-usuario .acciones {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.detalle-usuario .btn-editar,
+.detalle-usuario .btn-volver {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.detalle-usuario .btn-editar {
+  background-color: #28a745;
+  color: #fff;
+  border: 1px solid #28a745;
+}
+
+.detalle-usuario .btn-editar:hover {
+  background-color: #1e7e34;
+  border-color: #1e7e34;
+}
+
+.detalle-usuario .btn-volver {
+  background-color: #007bff;
+  color: #fff;
+  border: 1px solid #007bff;
+}
+
+.detalle-usuario .btn-volver:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 640px) {
+  .detalle-usuario {
+    padding: 20px;
+  }
+
+  .detalle-usuario li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .detalle-usuario li strong {
+    margin-bottom: 4px;
+  }
+
+  .detalle-usuario .acciones {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
