@@ -1,5 +1,6 @@
 {% extends "layout/base_dashboard.html" %}
 {% load static %}
+
 {% block title %}Editar curso{% endblock %}
 
 {% block extra_css %}
@@ -13,7 +14,43 @@
   <div class="card-detalle">
     <form method="post" class="form-detalle">
       {% csrf_token %}
-      {{ form.as_p }}
+
+      <!-- Nivel -->
+      <div class="form-group">
+        <label for="nivel">Nivel</label>
+        <select name="nivel" id="nivel" class="form-control">
+          <option value="">Seleccionar nivel</option>
+          <option value="Primero" {% if form.nivel.value == 'Primero' %}selected{% endif %}>Primero</option>
+          <option value="Segundo" {% if form.nivel.value == 'Segundo' %}selected{% endif %}>Segundo</option>
+          <option value="Tercero" {% if form.nivel.value == 'Tercero' %}selected{% endif %}>Tercero</option>
+          <option value="Cuarto" {% if form.nivel.value == 'Cuarto' %}selected{% endif %}>Cuarto</option>
+          <option value="Quinto" {% if form.nivel.value == 'Quinto' %}selected{% endif %}>Quinto</option>
+          <option value="Sexto" {% if form.nivel.value == 'Sexto' %}selected{% endif %}>Sexto</option>
+        </select>
+        <span id="nivel-error"></span>
+      </div>
+
+      <!-- Paralelo -->
+      <div class="form-group">
+        <label for="paralelo">Paralelo</label>
+        <select name="paralelo" id="paralelo" class="form-control">
+          <option value="">Seleccionar paralelo</option>
+          <option value="A" {% if form.paralelo.value == 'A' %}selected{% endif %}>A</option>
+          <option value="B" {% if form.paralelo.value == 'B' %}selected{% endif %}>B</option>
+          <option value="C" {% if form.paralelo.value == 'C' %}selected{% endif %}>C</option>
+          <option value="D" {% if form.paralelo.value == 'D' %}selected{% endif %}>D</option>
+          <option value="E" {% if form.paralelo.value == 'E' %}selected{% endif %}>E</option>
+          <option value="F" {% if form.paralelo.value == 'F' %}selected{% endif %}>F</option>
+        </select>
+        <span id="paralelo-error"></span>
+      </div>
+
+      <!-- Regente -->
+      <div class="form-group">
+        <label for="{{ form.regente.id_for_label }}">Regente</label>
+        {{ form.regente }}
+        <span id="regente-error"></span>
+      </div>
 
       <div class="acciones-detalle">
         <button type="submit" class="btn-editar">Guardar cambios</button>
@@ -22,4 +59,8 @@
     </form>
   </div>
 </div>
+{% block scripts %}
+<script src="{% static 'cursos/js/editar_curso.js' %}"></script>
+{% endblock %}
+
 {% endblock %}
