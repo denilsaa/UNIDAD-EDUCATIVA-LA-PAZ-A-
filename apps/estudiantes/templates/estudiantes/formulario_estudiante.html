@@ -34,4 +34,7 @@
     <a href="{% url 'estudiantes:listar' %}" class="btn-volver">Cancelar</a>
   </div>
 </form>
+{% block scripts %}
+<script src="{% static 'estudiantes/js/estudiante.js' %}"></script>
+{% endblock %}
 {% endblock %}
