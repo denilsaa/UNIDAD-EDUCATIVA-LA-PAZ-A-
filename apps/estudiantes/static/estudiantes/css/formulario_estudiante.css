@@ -110,3 +110,9 @@
     gap: 8px;
   }
 }
+.form-estudiante #nombres-error {
+    color: #e74c3c !important; /* forzamos rojo */
+    font-size: 0.9rem;
+    margin-top: 4px;
+    display: block;
+}
