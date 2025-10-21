@@ -5,7 +5,7 @@ from django.views.generic import TemplateView, RedirectView
 from .views.login import login_view, logout_view
 from .views.director_dashboard import director_dashboard
 from .views.usuarios import (
-    crear_usuario, lista_usuarios, ver_usuario, editar_usuario, eliminar_usuario
+    crear_usuario, lista_usuarios, ver_usuario, editar_usuario, eliminar_usuario, verificar_ci
 )
 from apps.cuentas.views.dashboards import padre_dashboard, regente_dashboard, secretaria_dashboard
 
@@ -48,4 +48,7 @@ urlpatterns = [
     path("dashboard/padre/", padre_dashboard, name="padre_dashboard"),
     path("dashboard/regente/", regente_dashboard, name="regente_dashboard"),
     path("dashboard/secretaria/", secretaria_dashboard, name="secretaria_dashboard"),
+
+    # NUEVA RUTA para validación AJAX
+    path("verificar-ci/", verificar_ci, name="verificar_ci"),
 ]

@@ -16,6 +16,7 @@
   <div class="form-group">
     <label for="{{ form.ci.id_for_label }}">CI</label>
     {{ form.ci }}
+    <small id="ci-error" style="color:red; display:none;"></small>
   </div>
 
   <div class="form-group">
@@ -64,4 +65,7 @@
     <a href="{% url 'cuentas:lista_usuarios' %}" class="btn-volver">Volver a la lista</a>
   </div>
 </form>
+{% block scripts %}
+<script src="{% static 'cuentas/js/usuario.js' %}"></script>
+{% endblock %}
 {% endblock %}

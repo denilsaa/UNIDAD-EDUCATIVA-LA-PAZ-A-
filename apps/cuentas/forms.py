@@ -9,25 +9,35 @@ class UsuarioCreateForm(forms.ModelForm):
         model = Usuario
         fields = ["ci", "nombres", "apellidos", "email", "telefono", "rol", "is_activo"]
 
+    def clean_ci(self):
+        ci = self.cleaned_data.get("ci")
+        
+        if not ci.isdigit():
+            raise forms.ValidationError("El CI solo debe contener números.")
+        
+        if len(ci) < 6 or len(ci) > 8:
+            raise forms.ValidationError("El CI debe tener entre 6 y 8 números.")
+        
+        if Usuario.objects.filter(ci=ci).exists():
+            raise forms.ValidationError("Este CI ya está registrado.")
+        
+        return ci
+
     def clean(self):
         cleaned = super().clean()
         p1 = cleaned.get("password1")
         p2 = cleaned.get("password2")
 
-        # Verificar si las contraseñas coinciden
         if not p1 or not p2 or p1 != p2:
             raise forms.ValidationError("Las contraseñas no coinciden.")
         return cleaned
 
     def save(self, commit=True):
         usuario = super().save(commit=False)
-        # Guardar el hash de la contraseña en password_hash
-        usuario.set_password(self.cleaned_data["password1"])  # Esto genera el hash
+        usuario.set_password(self.cleaned_data["password1"])
         if commit:
             usuario.save()
         return usuario
-
-
 
 
 class UsuarioUpdateForm(forms.ModelForm):
