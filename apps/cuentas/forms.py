@@ -6,8 +6,23 @@ import re
 class UsuarioCreateForm(forms.ModelForm):
     nombres = forms.CharField(max_length=100)
     apellidos = forms.CharField(max_length=100)
-    password1 = forms.CharField(label="Contraseña", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="Confirmar contraseña", widget=forms.PasswordInput)
+    # Contraseña por defecto
+    password1 = forms.CharField(
+        label="Contraseña",
+        widget=forms.PasswordInput(attrs={
+            "readonly": "readonly",  # No se puede modificar
+            "value": "123456789"
+        }),
+        initial="123456789"
+    )
+    password2 = forms.CharField(
+        label="Confirmar contraseña",
+        widget=forms.PasswordInput(attrs={
+            "readonly": "readonly",
+            "value": "123456789"
+        }),
+        initial="123456789"
+    )
 
     class Meta:
         model = Usuario
@@ -125,13 +140,15 @@ class UsuarioCreateForm(forms.ModelForm):
         cleaned = super().clean()
         p1 = cleaned.get("password1")
         p2 = cleaned.get("password2")
-
-        if not p1 or not p2 or p1 != p2:
+        if not p1 or not p2:
+            raise forms.ValidationError("Las contraseñas son obligatorias.")
+        if p1 != p2:
             raise forms.ValidationError("Las contraseñas no coinciden.")
         return cleaned
 
     def save(self, commit=True):
         usuario = super().save(commit=False)
+        # Setear la contraseña por defecto
         usuario.set_password(self.cleaned_data["password1"])
         if commit:
             usuario.save()
