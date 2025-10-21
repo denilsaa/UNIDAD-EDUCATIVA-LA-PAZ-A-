@@ -7,34 +7,94 @@
 {% endblock %}
 
 {% block content %}
-<div class="form-usuario">
-  <h2 class="titulo-form">Editar Usuario</h2>
 
-  <form method="post">
+  <form id="editar-usuario-form" method="post" class="form-usuario">
+    <h2 class="titulo-form">Editar Usuario</h2>
     {% csrf_token %}
-    {{ form.non_field_errors }}
 
-    <div class="form-grid">
-      {{ form.as_p }}
+    <!-- CI -->
+    <div class="form-group">
+      <label for="id_ci">CI:</label>
+      <input type="text" id="id_ci" name="ci" class="form-control" value="{{ usuario.ci }}">
+      <span id="ci-error"></span>
     </div>
 
+    <!-- NOMBRES -->
+    <div class="form-group">
+      <label for="id_nombres">Nombres:</label>
+      <input type="text" id="id_nombres" name="nombres" class="form-control" value="{{ usuario.nombres }}">
+      <span id="nombres-error"></span>
+    </div>
+
+    <!-- APELLIDOS -->
+    <div class="form-group">
+      <label for="id_apellidos">Apellidos:</label>
+      <input type="text" id="id_apellidos" name="apellidos" class="form-control" value="{{ usuario.apellidos }}">
+      <span id="error-apellidos"></span>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="form-group">
+      <label for="id_email">Correo electrónico:</label>
+      <input type="text" id="id_email" name="email" class="form-control" value="{{ usuario.email }}">
+      <span id="error-email"></span>
+    </div>
+
+    <!-- TELÉFONO -->
+    <div class="form-group">
+      <label for="id_telefono">Teléfono:</label>
+      <input type="text" id="id_telefono" name="telefono" class="form-control" value="{{ usuario.telefono }}">
+      <span id="error-telefono"></span>
+    </div>
+
+    <!-- ROL -->
+    <div class="form-group">
+      <label for="id_rol">Rol:</label>
+      <select id="id_rol" name="rol" class="form-control">
+        <option value="">Seleccionar rol</option>
+        <option value="admin" {% if usuario.rol == 'admin' %}selected{% endif %}>Administrador</option>
+        <option value="counter" {% if usuario.rol == 'counter' %}selected{% endif %}>Counter</option>
+        <option value="gerente" {% if usuario.rol == 'gerente' %}selected{% endif %}>Gerente</option>
+      </select>
+      <span id="error-rol"></span>
+    </div>
+
+    <!-- ACTIVO -->
+    <div class="form-group">
+      <label>
+        <input type="checkbox" id="id_is_activo" name="is_activo" class="checkbox-input" {% if usuario.is_activo %}checked{% endif %}>
+        Usuario activo
+      </label>
+    </div>
+
+    <!-- CAMBIO DE CONTRASEÑA -->
     <fieldset class="fieldset-password">
       <legend>Nueva contraseña (opcional)</legend>
+
+      <!-- Nueva contraseña -->
       <div class="form-group">
         <label for="new_password1">Nueva contraseña:</label>
-        <input type="password" name="new_password1" id="new_password1">
+        <input type="password" id="new_password1" name="new_password1" class="form-control">
+        <!-- Bloque donde se insertarán los requisitos -->
+        <div id="pass-msg"></div>
       </div>
+
+      <!-- Confirmación -->
       <div class="form-group">
         <label for="new_password2">Confirmar nueva contraseña:</label>
-        <input type="password" name="new_password2" id="new_password2">
+        <input type="password" id="new_password2" name="new_password2" class="form-control">
       </div>
     </fieldset>
 
+    <!-- BOTONES -->
     <div class="form-actions">
       <button type="submit" class="btn-guardar">Guardar</button>
       <a href="{% url 'cuentas:ver_usuario' usuario.id %}" class="btn-volver">Ver</a>
       <a href="{% url 'cuentas:lista_usuarios' %}" class="btn-volver">Volver</a>
     </div>
   </form>
-</div>
+
+{% block scripts %}
+<script src="{% static 'cuentas/js/editar_usuario.js' %}"></script>
+{% endblock %}
 {% endblock %}

@@ -30,38 +30,38 @@
 }
 
 /* ================== FORMULARIO ================== */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+#editar-usuario-form .form-group {
+  margin-bottom: 16px;
 }
 
-.form-grid p {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-}
-
-.form-grid label {
+#editar-usuario-form label {
   font-weight: 600;
-  margin-bottom: 6px;
   color: #004a99;
+  margin-bottom: 6px;
+  display: block;
 }
 
-.form-grid input,
-.form-grid select {
-  padding: 8px 12px;
+#editar-usuario-form input.form-control,
+#editar-usuario-form select.form-control {
+  width: 100%;
+  padding: 10px 14px;
   border: 1px solid #cdd4e0;
   border-radius: 6px;
   font-size: 0.95rem;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-grid input:focus,
-.form-grid select:focus {
+#editar-usuario-form input.form-control:focus,
+#editar-usuario-form select.form-control:focus {
   border-color: #007bff;
   box-shadow: 0 0 4px rgba(0,123,255,0.3);
   outline: none;
+}
+
+/* ================== CHECKBOX ================== */
+#editar-usuario-form .checkbox-input {
+  margin-right: 6px;
+  transform: scale(1.2);
 }
 
 /* ================== CAMBIO DE CONTRASEÑA ================== */
@@ -79,31 +79,6 @@
   padding: 0 8px;
 }
 
-.fieldset-password .form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 12px;
-}
-
-.fieldset-password label {
-  font-weight: 600;
-  color: #004a99;
-  margin-bottom: 6px;
-}
-
-.fieldset-password input {
-  padding: 8px 12px;
-  border: 1px solid #cdd4e0;
-  border-radius: 6px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.fieldset-password input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 4px rgba(0,123,255,0.3);
-  outline: none;
-}
-
 /* ================== BOTONES ================== */
 .form-actions {
   display: flex;
@@ -117,7 +92,7 @@
   background-color: #28a745;
   color: #fff;
   border: 1px solid #28a745;
-  padding: 8px 18px;
+  padding: 10px 20px;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
@@ -133,7 +108,7 @@
   background-color: #007bff;
   color: #fff;
   border: 1px solid #007bff;
-  padding: 8px 18px;
+  padding: 10px 20px;
   border-radius: 6px;
   font-weight: 600;
   text-decoration: none;
@@ -147,12 +122,9 @@
 
 /* ================== RESPONSIVE ================== */
 @media (max-width: 640px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .form-usuario {
-    padding: 20px;
+  #editar-usuario-form {
+    display: grid;
+    gap: 14px;
   }
 
   .form-actions {
@@ -164,4 +136,24 @@
   .btn-volver {
     text-align: center;
   }
+}
+
+/* ================== ERRORES ================== */
+#ci-error,
+#nombres-error, 
+#error-apellidos, 
+#error-email, 
+#error-telefono,
+#error-rol,
+#pass-error
+{
+  color: #dc3545;
+  font-size: 0.85rem;
+  display: block;
+  margin-top: 4px;
+}
+.pass-req {
+  color: #dc3545;
+  margin: 2px 0;
+  transition: color 0.2s ease;
 }
