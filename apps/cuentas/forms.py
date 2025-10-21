@@ -110,6 +110,12 @@ class UsuarioCreateForm(forms.ModelForm):
             raise ValidationError("El teléfono debe empezar con 6 o 7.")
 
         return telefono
+    # Dentro de tu UsuarioCreateForm o UsuarioUpdateForm
+    def clean_rol(self):
+        rol = self.cleaned_data.get("rol")
+        if not rol:
+            raise ValidationError("Debes seleccionar un rol.")
+        return rol
 
     def clean(self):
         cleaned = super().clean()

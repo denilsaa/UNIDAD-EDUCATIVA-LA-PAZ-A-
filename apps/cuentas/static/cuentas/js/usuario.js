@@ -242,3 +242,19 @@ document.addEventListener('DOMContentLoaded', () => {
         telefonoError.style.display = 'none';
     });
 });
+// =====================
+// Validación: Rol
+// =====================
+document.addEventListener('DOMContentLoaded', () => {
+    const rolSelect = document.getElementById('id_rol');
+    const rolError = document.getElementById('error-rol');
+
+    rolSelect.addEventListener('change', () => {
+        if (!rolSelect.value) {
+            rolError.textContent = "Debes seleccionar un rol.";
+            rolError.style.display = 'block';
+        } else {
+            rolError.style.display = 'none';
+        }
+    });
+});

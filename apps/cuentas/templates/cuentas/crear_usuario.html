@@ -44,9 +44,11 @@
   </div>
 
   <div class="form-group">
-    <label for="{{ form.rol.id_for_label }}">Rol</label>
-    {{ form.rol }}
+      <label for="{{ form.rol.id_for_label }}">Rol</label>
+      {{ form.rol }}
+      <small id="error-rol" style="color:red; display:none;"></small>
   </div>
+
 
   <div class="form-group checkbox-group">
     {{ form.is_activo }} <label for="{{ form.is_activo.id_for_label }}">Activo</label>
