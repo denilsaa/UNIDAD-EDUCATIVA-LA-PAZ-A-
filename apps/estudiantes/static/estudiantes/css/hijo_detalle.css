@@ -1,3 +1,27 @@
+/* ================== CONTENEDOR PRINCIPAL ================== */
+.detalle-curso {
+  background-color: #fff;
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 600px;
+  margin: 0 auto;
+  border-top: 6px solid #007bff;
+  animation: fadeIn 0.4s ease-in-out;
+  font-family: Arial, sans-serif;
+}
+
+/* ================== ANIMACIÓN DE ENTRADA ================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* ================== TÍTULO ================== */
 .titulo-detalle {
