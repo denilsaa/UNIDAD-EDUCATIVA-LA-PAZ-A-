@@ -48,24 +48,21 @@
     </div>
 
     <!-- ROL -->
-    <div class="form-group">
-      <label for="id_rol">Rol:</label>
-      <select id="id_rol" name="rol" class="form-control">
-        <option value="">Seleccionar rol</option>
-        <option value="admin" {% if usuario.rol == 'admin' %}selected{% endif %}>Administrador</option>
-        <option value="counter" {% if usuario.rol == 'counter' %}selected{% endif %}>Counter</option>
-        <option value="gerente" {% if usuario.rol == 'gerente' %}selected{% endif %}>Gerente</option>
-      </select>
-      <span id="error-rol"></span>
-    </div>
+    <p>{{ form.rol.label_tag }} {{ form.rol }}</p>
+
 
     <!-- ACTIVO -->
     <div class="form-group">
-      <label>
-        <input type="checkbox" id="id_is_activo" name="is_activo" class="checkbox-input" {% if usuario.is_activo %}checked{% endif %}>
-        Usuario activo
-      </label>
+      <label for="id_is_activo" class="form-check-label">Estado del usuario:</label>
+      <div>
+        <input type="checkbox" id="id_is_activo" name="is_activo" class="checkbox-input"
+          {% if usuario.is_activo %}checked{% endif %}>
+        <span id="estado-texto">
+          {% if usuario.is_activo %}Activo{% else %}Inactivo{% endif %}
+        </span>
+      </div>
     </div>
+
 
     <!-- CAMBIO DE CONTRASEÑA -->
     <fieldset class="fieldset-password">
@@ -87,11 +84,11 @@
     </fieldset>
 
     <!-- BOTONES -->
-    <div class="form-actions">
-      <button type="submit" class="btn-guardar">Guardar</button>
-      <a href="{% url 'cuentas:ver_usuario' usuario.id %}" class="btn-volver">Ver</a>
-      <a href="{% url 'cuentas:lista_usuarios' %}" class="btn-volver">Volver</a>
-    </div>
+    <p class="form-actions">
+      <button type="submit">Guardar</button>
+      <a href="{% url 'cuentas:ver_usuario' usuario.id %}">Ver</a>
+      <a href="{% url 'cuentas:lista_usuarios' %}">Volver</a>
+    </p>
   </form>
 
 {% block scripts %}

@@ -166,10 +166,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =====================
-    // Activo
+    //        Activo
     // =====================
     const activoInput = document.getElementById('id_is_activo');
-    activoInput.checked = true;
+    const estadoTexto = document.getElementById('estado-texto');
+
+    // Mostrar texto según estado inicial
+    estadoTexto.textContent = activoInput.checked ? "Activo" : "Inactivo";
+
+    // Permitir modificar y actualizar el texto
+    activoInput.addEventListener('change', () => {
+        estadoTexto.textContent = activoInput.checked ? "Activo" : "Inactivo";
+    });
+
     // =====================
     // Validación de Contraseña (funcional y probada)
     // =====================
