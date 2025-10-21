@@ -12,20 +12,3 @@
   <p>Consulta y gestiona los cursos bajo tu supervisión.</p>
 </div>
 
-<div class="cursos-grid">
-  {% for c in cursos %}
-    <div class="curso-card">
-      <div class="curso-icon">🏫</div>
-      <h3>{{ c.nivel }} {{ c.paralelo }}</h3>
-      <p>Curso asignado al regente actual.</p>
-      <div class="curso-actions">
-        <a href="{% url 'estudiantes:por_curso' c.id %}" class="btn-ver">Ver estudiantes</a>
-      </div>
-    </div>
-  {% empty %}
-    <div class="curso-empty">
-      <p>No tiene cursos asignados.</p>
-    </div>
-  {% endfor %}
-</div>
-{% endblock %}
