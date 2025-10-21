@@ -76,7 +76,24 @@ class UsuarioCreateForm(forms.ModelForm):
             raise ValidationError("Cada apellido debe tener al menos 3 letras.")
 
         return apellidos
-
+    def clean_email(self):
+        email = self.cleaned_data.get("email", "").strip()
+        
+        # Campo opcional
+        if email == "":
+            return email
+        
+        # Validar formato general de email
+        email_regex = r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, email):
+            raise ValidationError("Correo inválido. Debe tener formato ejemplo@gmail.com")
+        
+        # limitamos solo a Gmail????
+        # if not email.lower().endswith("@gmail.com"):
+        #     raise ValidationError("Solo se permiten correos @gmail.com")
+        
+        return email
+    
     def clean(self):
         cleaned = super().clean()
         p1 = cleaned.get("password1")
