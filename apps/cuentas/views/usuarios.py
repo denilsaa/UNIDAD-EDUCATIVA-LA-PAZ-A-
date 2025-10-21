@@ -58,3 +58,12 @@ def eliminar_usuario(request, user_id):
     usuario.save()
     messages.info(request, "Usuario marcado como inactivo.")
     return redirect("cuentas:lista_usuarios")
+
+from django.http import JsonResponse
+
+#  Nueva vista para verificar CI en tiempo real
+@role_required("director")
+def verificar_ci(request):
+    ci = request.GET.get("ci", "")
+    existe = Usuario.objects.filter(ci=ci).exists()
+    return JsonResponse({"existe": existe})
