@@ -57,6 +57,28 @@
   box-shadow: 0 0 4px rgba(0,123,255,0.3);
   outline: none;
 }
+/* ======== ESTILOS PARA EL CAMPO ROL (predeterminado pero uniforme) ======== */
+p label[for="id_rol"] {
+  font-weight: 600;
+  color: #004a99;
+  display: block;
+  margin-bottom: 6px;
+}
+
+p select#id_rol {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cdd4e0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+p select#id_rol:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0,123,255,0.3);
+  outline: none;
+}
 
 /* ================== CHECKBOX ================== */
 #editar-usuario-form .checkbox-input {
@@ -79,43 +101,46 @@
   padding: 0 8px;
 }
 
-/* ================== BOTONES ================== */
-.form-actions {
+/* ================== BOTONES DEL FORMULARIO ================== */
+p.form-actions {
+  margin-top: 24px; /* separa los botones del resto del formulario */
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 24px;
+  gap: 12px; /* espacio entre botones */
+  justify-content: flex-end; /* alinea los botones a la derecha */
 }
 
-.btn-guardar {
+
+/* Botón Guardar */
+p.form-actions button[type="submit"] {
   background-color: #28a745;
   color: #fff;
   border: 1px solid #28a745;
-  padding: 10px 20px;
   border-radius: 6px;
   font-weight: 600;
+  padding: 10px 20px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.btn-guardar:hover {
+p.form-actions button[type="submit"]:hover {
   background-color: #19692c;
   border-color: #19692c;
 }
 
-.btn-volver {
+/* Botones Ver y Volver */
+p.form-actions a {
   background-color: #007bff;
   color: #fff;
   border: 1px solid #007bff;
-  padding: 10px 20px;
   border-radius: 6px;
   font-weight: 600;
+  padding: 10px 18px;
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
-.btn-volver:hover {
+p.form-actions a:hover {
   background-color: #004a99;
   border-color: #004a99;
 }
