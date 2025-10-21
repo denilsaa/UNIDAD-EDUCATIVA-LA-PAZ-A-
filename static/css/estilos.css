@@ -24,7 +24,7 @@ body.login-split {
     overflow: hidden;
 }
 
-/* Fondo animado sutil */
+/* Fondo animado */
 .login-left::before {
     content: "";
     position: absolute;
