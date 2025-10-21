@@ -61,7 +61,11 @@ const nombresError = document.getElementById('nombres-error');
 
 nombresInput.addEventListener('input', () => {
     let value = nombresInput.value;
-
+    if (value.length === 0) {
+        nombresError.textContent = "El nombre es obligatorio.";
+        nombresError.style.display = 'block';
+        return;
+    }
     // Eliminar espacios múltiples o al inicio/final
     value = value.replace(/\s+/g, ' ').trimStart();
     
@@ -113,7 +117,11 @@ const apellidosError = document.getElementById('error-apellidos');
 
 apellidosInput.addEventListener('input', () => {
     let value = apellidosInput.value;
-
+    if (value.length === 0) {
+        apellidosError.textContent = "El apellido es obligatorio.";
+        apellidosError.style.display = 'block';
+        return;
+    }
     // Eliminar espacios múltiples o al inicio/final
     value = value.replace(/\s+/g, ' ').trimStart();
     
@@ -165,7 +173,7 @@ const emailError = document.getElementById('error-email');
 
 emailInput.addEventListener('input', () => {
     let value = emailInput.value;
-
+    
     // Limpiar caracteres no permitidos (solo letras, números, guiones y guion bajo antes de @)
     const partes = value.split('@');
     if (partes.length > 1) {
@@ -194,4 +202,43 @@ emailInput.addEventListener('input', () => {
     } else {
         emailError.style.display = 'none';
     }
+});
+// =====================
+// Validación: Teléfono
+// =====================
+document.addEventListener('DOMContentLoaded', () => {
+    const telefonoInput = document.getElementById('id_telefono');
+    const telefonoError = document.getElementById('error-telefono');
+
+    telefonoInput.addEventListener('input', () => {
+        let value = telefonoInput.value.replace(/[^0-9]/g, ''); // Solo números
+        telefonoInput.value = value;
+
+        if (value.length === 0) {
+            telefonoError.textContent = "El teléfono es obligatorio.";
+            telefonoError.style.display = 'block';
+            return;
+        }
+
+        if (value.length > 8) {
+            telefonoError.textContent = "El teléfono debe tener exactamente 8 números.";
+            telefonoInput.value = value.slice(0, 8);
+            return;
+        }
+
+        if (value.length === 8 && !["6", "7"].includes(value[0])) {
+            telefonoError.textContent = "El teléfono debe empezar con 6 o 7.";
+            telefonoError.style.display = 'block';
+            return;
+        }
+
+        if (value.length < 8) {
+            telefonoError.textContent = "El teléfono debe tener exactamente 8 números.";
+            telefonoError.style.display = 'block';
+            return;
+        }
+
+        // Todo correcto
+        telefonoError.style.display = 'none';
+    });
 });

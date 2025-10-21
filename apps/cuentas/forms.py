@@ -93,7 +93,24 @@ class UsuarioCreateForm(forms.ModelForm):
         #     raise ValidationError("Solo se permiten correos @gmail.com")
         
         return email
-    
+    # Dentro de tu UsuarioCreateForm o UsuarioUpdateForm
+    def clean_telefono(self):
+        telefono = self.cleaned_data.get("telefono", "").strip()
+
+        if not telefono:
+            raise ValidationError("El teléfono es obligatorio.")
+
+        if not telefono.isdigit():
+            raise ValidationError("El teléfono solo debe contener números.")
+
+        if len(telefono) != 8:
+            raise ValidationError("El teléfono debe tener exactamente 8 números.")
+
+        if telefono[0] not in ("6", "7"):
+            raise ValidationError("El teléfono debe empezar con 6 o 7.")
+
+        return telefono
+
     def clean(self):
         cleaned = super().clean()
         p1 = cleaned.get("password1")
