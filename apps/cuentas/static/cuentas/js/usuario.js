@@ -52,3 +52,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// ============================
+// VALIDACIÓN EN TIEMPO REAL: NOMBRES
+// ============================
+const nombresInput = document.getElementById('id_nombres');
+const nombresError = document.getElementById('nombres-error');
+
+nombresInput.addEventListener('input', () => {
+    let value = nombresInput.value;
+
+    // Eliminar espacios múltiples o al inicio/final
+    value = value.replace(/\s+/g, ' ').trimStart();
+    
+    // Solo permitir letras y espacios
+    if (/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(value)) {
+        nombresError.textContent = "Solo se permiten letras y espacios.";
+        nombresError.style.display = 'block';
+        nombresInput.value = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+        return;
+    }
+
+    // Separar palabras
+    const palabras = value.trim().split(' ').filter(p => p.length > 0);
+
+    // Máximo 3 palabras
+    if (palabras.length > 3) {
+        nombresError.textContent = "Solo se permiten hasta 3 palabras.";
+        nombresError.style.display = 'block';
+        nombresInput.value = palabras.slice(0, 3).join(' ');
+        return;
+    }
+
+    // Verificar longitud mínima de cada palabra
+    const palabraCorta = palabras.find(p => p.length < 3);
+    if (palabraCorta) {
+        nombresError.textContent = "Cada palabra debe tener al menos 3 letras.";
+        nombresError.style.display = 'block';
+        nombresInput.value = value;
+        return;
+    }
+
+    // Bloquear espacio adicional si ya tiene 3 palabras
+    if (palabras.length === 3 && value.endsWith(' ')) {
+        nombresError.textContent = "Ya no puedes añadir más palabras.";
+        nombresError.style.display = 'block';
+        nombresInput.value = value.trim();
+        return;
+    }
+
+    // Sin errores
+    nombresError.style.display = 'none';
+    nombresInput.value = value;
+});
