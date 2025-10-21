@@ -1,7 +1,11 @@
 from django import forms
 from apps.cuentas.models import Usuario
+from django.core.exceptions import ValidationError
+import re
 
 class UsuarioCreateForm(forms.ModelForm):
+    nombres = forms.CharField(max_length=100)
+    apellidos = forms.CharField(max_length=100)
     password1 = forms.CharField(label="Contraseña", widget=forms.PasswordInput)
     password2 = forms.CharField(label="Confirmar contraseña", widget=forms.PasswordInput)
 
@@ -30,7 +34,6 @@ class UsuarioCreateForm(forms.ModelForm):
             raise forms.ValidationError("El campo Nombres es obligatorio.")
 
         # Solo letras y espacios
-        import re
         if not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$', nombres):
             raise forms.ValidationError("Solo se permiten letras y espacios.")
 
@@ -53,6 +56,26 @@ class UsuarioCreateForm(forms.ModelForm):
         # Reconstruir el valor limpio (sin dobles espacios)
         nombres_limpios = " ".join(palabras)
         return nombres_limpios
+    
+    def clean_apellidos(self):
+        apellidos = self.cleaned_data['apellidos'].strip()
+
+        # Validar solo letras y espacios
+        if not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$', apellidos):
+            raise ValidationError("Solo se permiten letras y espacios.")
+
+        # Dividir en palabras
+        palabras = apellidos.split()
+
+        # Mínimo 1 palabra, máximo 2
+        if len(palabras) < 1 or len(palabras) > 2:
+            raise ValidationError("Debes ingresar uno o dos apellidos.")
+
+        # Cada palabra debe tener al menos 3 letras
+        if any(len(p) < 3 for p in palabras):
+            raise ValidationError("Cada apellido debe tener al menos 3 letras.")
+
+        return apellidos
 
     def clean(self):
         cleaned = super().clean()
