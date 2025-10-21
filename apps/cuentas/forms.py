@@ -12,7 +12,11 @@ class UsuarioCreateForm(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = ["ci", "nombres", "apellidos", "email", "telefono", "rol", "is_activo"]
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Hacer que is_activo esté siempre True y no se muestre
+        self.fields['is_activo'].initial = True
+        self.fields['is_activo'].widget = forms.HiddenInput()
     def clean_ci(self):
         ci = self.cleaned_data.get("ci")
         
