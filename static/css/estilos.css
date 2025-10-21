@@ -164,7 +164,7 @@ input:focus {
     to { transform: translateY(0); opacity: 1; }
 }
 
-/* ===== Responsive ===== */
+/* ===== Responsives ===== */
 @media (max-width: 850px) {
     .login-split {
         flex-direction: column;
