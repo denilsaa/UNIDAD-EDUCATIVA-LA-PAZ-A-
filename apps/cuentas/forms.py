@@ -22,6 +22,37 @@ class UsuarioCreateForm(forms.ModelForm):
             raise forms.ValidationError("Este CI ya está registrado.")
         
         return ci
+    def clean_nombres(self):
+        nombres = self.cleaned_data.get("nombres", "").strip()
+
+        # No puede estar vacío
+        if not nombres:
+            raise forms.ValidationError("El campo Nombres es obligatorio.")
+
+        # Solo letras y espacios
+        import re
+        if not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$', nombres):
+            raise forms.ValidationError("Solo se permiten letras y espacios.")
+
+        # Quitar espacios múltiples y validar estructura
+        palabras = [p for p in nombres.split(" ") if p]  # Eliminar dobles espacios
+
+        # Mínimo 1 palabra, máximo 3
+        if len(palabras) < 1 or len(palabras) > 3:
+            raise forms.ValidationError("Debes ingresar entre 1 y 3 palabras.")
+
+        # Cada palabra debe tener al menos 3 letras
+        for palabra in palabras:
+            if len(palabra) < 3:
+                raise forms.ValidationError("Cada palabra debe tener al menos 3 letras.")
+
+        # Verificar que no haya espacios al inicio o final
+        if nombres != nombres.strip():
+            raise forms.ValidationError("No se permiten espacios al inicio o al final.")
+
+        # Reconstruir el valor limpio (sin dobles espacios)
+        nombres_limpios = " ".join(palabras)
+        return nombres_limpios
 
     def clean(self):
         cleaned = super().clean()
