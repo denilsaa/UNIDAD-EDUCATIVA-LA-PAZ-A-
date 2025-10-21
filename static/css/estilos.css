@@ -10,7 +10,7 @@ body.login-split {
     background-color: #f5f7fb;
 }
 
-/* ===== LEFT SIDE ===== */
+/* ===== Lado Izquierdo ===== */
 .login-left {
     flex: 1;
     background: linear-gradient(135deg, #004a99, #007BFF);
