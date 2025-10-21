@@ -157,3 +157,41 @@ apellidosInput.addEventListener('input', () => {
     apellidosError.style.display = 'none';
     apellidosInput.value = value;
 });
+// =====================
+// Validación: Gmail
+// =====================
+const emailInput = document.getElementById('id_email');
+const emailError = document.getElementById('error-email');
+
+emailInput.addEventListener('input', () => {
+    let value = emailInput.value;
+
+    // Limpiar caracteres no permitidos (solo letras, números, guiones y guion bajo antes de @)
+    const partes = value.split('@');
+    if (partes.length > 1) {
+        // Solo limpiar la parte antes de @
+        partes[0] = partes[0].replace(/[^a-zA-Z0-9._-]/g, '');
+        value = partes.join('@');
+    } else {
+        // Sin @ todavía
+        value = value.replace(/[^a-zA-Z0-9._-]/g, '');
+    }
+
+    emailInput.value = value;
+
+    // Si está vacío, no mostrar error (campo opcional)
+    if (value === '') {
+        emailError.style.display = 'none';
+        return;
+    }
+
+    // Regex simple para validar Gmail u otros correos comunes
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailRegex.test(value)) {
+        emailError.textContent = 'Correo inválido. Debe tener formato ejemplo@gmail.com';
+        emailError.style.display = 'block';
+    } else {
+        emailError.style.display = 'none';
+    }
+});
