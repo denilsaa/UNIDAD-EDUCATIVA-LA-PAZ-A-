@@ -8,6 +8,7 @@ from apps.cuentas.forms import UsuarioCreateForm, UsuarioUpdateForm
 
 # ⬇️ Decorador que exige login y rol == director
 from apps.cuentas.decorators import role_required
+from apps.estudiantes.models.estudiante import Estudiante
 
 
 @role_required("director")
@@ -37,6 +38,9 @@ def crear_usuario(request):
 
 @role_required("director")
 def editar_usuario(request, user_id):
+    """
+    Vista que permite al director editar un usuario.
+    """
     usuario = get_object_or_404(Usuario, id=user_id)
     if request.method == "POST":
         form = UsuarioUpdateForm(request.POST, instance=usuario)
@@ -50,14 +54,49 @@ def editar_usuario(request, user_id):
 
 
 @role_required("director")
-@require_POST
 def eliminar_usuario(request, user_id):
-    # Borrado lógico
+    """
+    Vista que permite eliminar completamente un usuario.
+    Si el usuario tiene estudiantes asignados (como padre o regente), se pide confirmación adicional.
+    """
     usuario = get_object_or_404(Usuario, id=user_id)
-    usuario.is_activo = False
-    usuario.save()
-    messages.info(request, "Usuario marcado como inactivo.")
-    return redirect("cuentas:lista_usuarios")
+
+    # 🔹 Estudiantes asociados si es padre
+    estudiantes_padre = Estudiante.objects.filter(padre=usuario)
+
+    # 🔹 Estudiantes asociados si es regente
+    estudiantes_regente = Estudiante.objects.filter(curso__regente=usuario)
+
+    # 🔹 Combinar ambos QuerySets en uno solo (sin duplicados)
+    estudiantes_asociados = (estudiantes_padre | estudiantes_regente).distinct()
+
+    if request.method == "POST":
+        if "eliminar_todo" in request.POST:
+            estudiantes_asociados.delete()
+            usuario.delete()
+            messages.success(
+                request,
+                f"🗑️ El usuario {usuario} y sus estudiantes fueron eliminados permanentemente."
+            )
+            return redirect("cuentas:lista_usuarios")
+
+        elif not estudiantes_asociados.exists():
+            usuario.delete()
+            messages.success(
+                request,
+                f"🗑️ El usuario {usuario} fue eliminado permanentemente."
+            )
+            return redirect("cuentas:lista_usuarios")
+
+        return redirect("cuentas:lista_usuarios")
+
+    # Si es GET, mostrar la confirmación
+    return render(
+        request,
+        "cuentas/eliminar_usuario.html",
+        {"usuario": usuario, "estudiantes": estudiantes_asociados}
+    )
+
 
 from django.http import JsonResponse
 
