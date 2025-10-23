@@ -77,12 +77,16 @@ def editar_curso(request, curso_id):
 
 
 @role_required("director")
-@require_POST
 def eliminar_curso(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    curso.delete()
-    messages.success(request, "Curso eliminado correctamente.")
-    return redirect(reverse("cursos:lista_cursos"))
+
+    if request.method == "POST":
+        curso.delete()
+        messages.success(request, "Curso eliminado correctamente.")
+        return redirect(reverse("cursos:lista_cursos"))
+
+    return render(request, "cursos/eliminar_curso.html", {"curso": curso})
+
 
 
 # ============================
