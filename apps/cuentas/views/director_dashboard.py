@@ -98,10 +98,10 @@ def director_dashboard(request):
 
     # Usuarios por rol actuales (tus nombres reales)
     roles_counts = {
-        "Directivo":          Usuario.objects.filter(rol__nombre__iexact="Directivo").count(),
-        "Secretaría":         Usuario.objects.filter(rol__nombre__iexact="Secretaria").count(),
-        "Regentes":           Usuario.objects.filter(rol__nombre__iexact="Regentes").count(),
-        "Padres de Familia":  Usuario.objects.filter(rol__nombre__iexact="Padres de Familia").count(),
+        "Director": Usuario.objects.filter(rol__nombre__iexact="Director").count(),
+        "Regente": Usuario.objects.filter(rol__nombre__iexact="Regente").count(),
+        "Secretaría": Usuario.objects.filter(rol__nombre__iexact="Secretaria").count(),
+        "Padre": Usuario.objects.filter(rol__nombre__iexact="Padre").count(),
     }
 
     context = {

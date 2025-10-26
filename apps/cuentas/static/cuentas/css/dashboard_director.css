@@ -1,45 +1,185 @@
-:root{
-  --azul:#0c2a57; --azul-soft:#13386f; --metal:#c7cdd6; --borde:#e6e8ee;
-  --bg:#f6f8fb; --ink:#0f172a; --muted:#667085; --card:#fff;
+/* === RESET Y CONTENEDOR PRINCIPAL === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
-/* contenedor general */
-.director-dashboard{display:flex; flex-direction:column; gap:18px}
-
-/* KPIs */
-.kpis{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px}
-.kpi{background:var(--card); border:1px solid var(--borde); border-radius:18px; padding:14px;
-     box-shadow:0 6px 16px rgba(12,42,87,.06); text-align:center}
-.kpi h3{margin:2px 0 8px; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px}
-.kpi .kpi-big{font-size:38px; font-weight:800; color:var(--azul)}
-.kpi .kpi-val{font-weight:800; color:var(--azul)}
-.kpi .kpi-sub{color:var(--muted)}
-.kpi.actions .btns{display:flex; gap:8px; justify-content:center; margin-top:8px}
-.btn-azul{background:linear-gradient(180deg,var(--azul-soft),var(--azul)); color:#fff; border-radius:12px; padding:.5rem .9rem; text-decoration:none; font-weight:700}
-.btn-azul-outline{background:#f2f5fa; color:var(--azul); border:1px solid var(--metal); border-radius:12px; padding:.5rem .9rem; text-decoration:none; font-weight:700}
-
-/* Gráficas */
-.charts{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px}
-.card{background:var(--card); border:1px solid var(--borde); border-radius:20px; padding:14px; box-shadow:0 6px 16px rgba(12,42,87,.06)}
-.card-title{font-weight:700; color:var(--azul); margin-bottom:8px}
-
-/* Dejo tus tablas tal cual; solo mínimos retoques opcionales */
-.tabla-wrapper{overflow:auto}
-.tabla{width:100%; border-collapse:separate; border-spacing:0; font-size:14px}
-.tabla thead th{background:#f3f6fb; color:var(--azul); font-weight:700; padding:10px 12px; text-align:left}
-.tabla tbody td{padding:10px 12px; border-top:1px solid var(--borde)}
-.btn-ver,.btn-editar,.btn-eliminar,.btn-nuevo{
-  display:inline-block; padding:.35rem .6rem; border-radius:10px; text-decoration:none; font-weight:600; border:1px solid transparent;
+/* === CONTENEDOR DASHBOARD === */
+.dashboard-container {
+  width: 100%;
+  height: 100vh; /* pantalla completa */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #f8fafc;
 }
-.btn-ver{ background:#f2f5fa; color:var(--azul) }
-.btn-editar{ background:#ecf2ff; color:var(--azul) }
-.btn-eliminar{ background:#fee2e2; color:#9f1d1d }
-.btn-nuevo{ background:#e6f0ff; color:var(--azul-soft) }
 
-@media (max-width:1100px){
-  .kpis{grid-template-columns:repeat(2,1fr)}
-  .charts{grid-template-columns:repeat(2,1fr)}
+/* === ENCABEZADO === */
+.dashboard-header {
+  padding: 1.5rem 2rem;
+  background: #f8fafc;
 }
-@media (max-width:720px){
-  .kpis,.charts{grid-template-columns:1fr}
+.dashboard-header h2 {
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #0c2a57;
+  margin-bottom: 0.3rem;
+}
+.dashboard-header p {
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+/* === GRID PRINCIPAL === */
+.dashboard-main-grid {
+  display: flex;
+  flex: 1; /* ocupa todo el espacio restante */
+  gap: 1rem;
+  padding: 0 2rem 1rem 2rem; /* padding horizontal, vertical mínimo */
+}
+
+/* === COLUMNAS === */
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+/* === FILAS === */
+.row {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+}
+
+/* === PROPORCIONES EXACTAS === */
+.left-column .top-row { flex: 7; } /* Asistencia hoy más grande */
+.left-column .bottom-row { flex: 4; }
+.right-column .top-row { flex: 4; }
+.right-column .bottom-row { flex: 7; } /* Usuarios por rol más grande */
+
+/* === TARJETAS === */
+.chart-card, .kpi-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  transition: transform 0.2s ease;
+  flex: 1;
+}
+.chart-card:hover, .kpi-card:hover { transform: translateY(-3px); }
+
+/* === TARJETAS GRANDES DESTACADAS === */
+.large-card, /* Asistencia hoy */
+.right-column .bottom-row .chart-card { /* Usuarios por rol */
+  flex: 1.3; /* 30% más grande que otras tarjetas dentro de la fila */
+}
+
+/* Tarjetas normales dentro de filas */
+.left-column .bottom-row .chart-card,
+.right-column .top-row .chart-card,
+.right-column .top-row .kpi-card { flex: 1; }
+.right-column .bottom-row .chart-card { width: 100%; height: 100%; }
+
+/* === KPI CIRCULAR === */
+.kpi-chart-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.kpi-canvas-wrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+.kpi-canvas-wrapper canvas { width: 100% !important; height: 100% !important; }
+.kpi-canvas-wrapper .kpi-value {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #0c2a57;
+}
+
+/* === BOTONES === */
+.btn-azul, .btn-outline {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: 0.2s;
+}
+.btn-azul { background: #0c2a57; color: white; }
+.btn-azul:hover { background: #13386f; }
+.btn-outline { background: white; border: 1px solid #0c2a57; color: #0c2a57; }
+.btn-outline:hover { background: #0c2a57; color: white; }
+
+/* Accesos rápidos */
+.kpi-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+/* === CHARTS === */
+.chart-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.5rem 0.8rem;
+}
+.chart-header {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.4rem;
+  text-align: center;
+}
+.chart-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+.chart-body, .pie-chart-body {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.pie-chart-body canvas {
+  width: 100%;
+  height: auto;
+  max-width: 90%;
+  max-height: 90%;
+  aspect-ratio: 1/1;
+}
+
+/* === RESPONSIVO === */
+@media (max-width: 1300px) {
+  .dashboard-main-grid { flex-direction: column; }
+  .row { flex-direction: column; }
+  .row .chart-card, .row .kpi-card { width: 100%; }
+}
+@media (max-width: 900px) {
+  .dashboard-container { padding: 0.5rem; }
+  .chart-card { height: 300px; }
 }

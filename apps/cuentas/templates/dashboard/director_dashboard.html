@@ -8,248 +8,112 @@
 {% endblock %}
 
 {% block content %}
-<div class="director-dashboard">
-  <!-- === KPIs === -->
-  <section class="kpis">
-    <article class="kpi">
-      <h3>Asistencia hoy</h3>
-      <canvas id="asistenciaHoyChart" height="110"></canvas>
-      <div class="kpi-val">{{ asistencia_hoy|default:0 }}%</div>
-    </article>
-    <article class="kpi">
-      <h3>Estudiantes en riesgo</h3>
-      <div class="kpi-big">{{ estudiantes_en_riesgo|default:"—" }}</div>
-      <small class="kpi-sub">{{ pct_riesgo|default:"0" }}%</small>
-    </article>
-    <article class="kpi">
-      <h3>Kárdex negativo (7 días)</h3>
-      <canvas id="negativosSemana" height="110"></canvas>
-    </article>
-    <article class="kpi actions">
-      <h3>Accesos rápidos</h3>
-      <div class="btns">
-        <a href="{% url 'cursos:lista_cursos' %}" class="btn-azul">Cursos</a>
-        <a href="{% url 'estudiantes:listar' %}" class="btn-azul-outline">Estudiantes</a>
+  <!-- === ENCABEZADO === -->
+  <div class="dashboard-header">
+    <h2>Dashboard del Director</h2>
+    <p>Resumen general de asistencia, comportamiento y roles</p>
+  </div>
+
+<!-- === SECCIÓN: KPIs Y GRÁFICAS REORDENADAS === -->
+<section class="dashboard-main-grid">
+
+  <!-- === COLUMNA IZQUIERDA === -->
+  <div class="column left-column">
+    <!-- Fila superior (60%) -->
+    <div class="row top-row">
+      <div class="chart-card large-card">
+        <div class="chart-container">
+          <div class="chart-header">
+            <h4>Asistencia hoy</h4>
+          </div>
+          <div class="chart-body kpi-chart-body">
+            <div class="kpi-canvas-wrapper">
+              <canvas id="asistenciaHoyChart"></canvas>
+              <div class="kpi-value">{{ asistencia_hoy|default:0 }}%</div>
+            </div>
+          </div>
+        </div>
       </div>
-    </article>
-  </section>
+    </div>
+    <!-- Fila inferior (40%) -->
+    <div class="row bottom-row">
+      <div class="chart-card">
+        <div class="chart-container">
+          <div class="chart-header">
+            <h4>Asistencia por mes</h4>
+          </div>
+          <div class="chart-body">
+            <canvas id="asistenciaMeses"></canvas>
+          </div>
+        </div>
+      </div>
 
-  <!-- === GRÁFICAS === -->
-  <section class="charts">
-    <article class="card">
-      <div class="card-title">Asistencia por mes</div>
-      <canvas id="asistenciaMeses" height="160"></canvas>
-    </article>
-    <article class="card">
-      <div class="card-title">Kárdex negativo por área</div>
-      <canvas id="kardexArea" height="160"></canvas>
-    </article>
-    <article class="card">
-      <div class="card-title">Usuarios por rol</div>
-      <canvas id="rolesPie" height="160"></canvas>
-    </article>
-  </section>
-
-  <h2>Usuarios por rol</h2>
-  <ul class="rol-list">
-    <li><strong>Directores:</strong> {{ director_count }}</li>
-    <li><strong>Regentes:</strong> {{ regente_count }}</li>
-    <li><strong>Secretarias:</strong> {{ secretaria_count }}</li>
-    <li><strong>Padres de familia:</strong> {{ padre_count }}</li>
-  </ul>
-
-  <h2>Lista de usuarios</h2>
-  <div class="tabla-wrapper">
-    <table class="tabla usuarios-tabla">
-      <thead>
-        <tr>
-          <th>CI</th><th>Nombres</th><th>Apellidos</th><th>Email</th><th>Estado</th><th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for usuario in usuarios %}
-        <tr>
-          <td>{{ usuario.ci }}</td>
-          <td>{{ usuario.nombres }}</td>
-          <td>{{ usuario.apellidos }}</td>
-          <td>{{ usuario.email }}</td>
-          <td>{{ usuario.is_activo|yesno:"Activo,Inactivo" }}</td>
-          <td>
-            <a href="{% url 'cuentas:ver_usuario' usuario.id %}" class="btn-ver">Ver</a>
-            <a href="{% url 'cuentas:editar_usuario' usuario.id %}" class="btn-editar">Editar</a>
-            <a href="{% url 'cuentas:eliminar_usuario' usuario.id %}" class="btn-eliminar">Eliminar</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="6">No hay usuarios registrados.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+      <div class="chart-card">
+        <div class="chart-container">
+          <div class="chart-header">
+            <h4>Kárdex negativo por área</h4>
+          </div>
+          <div class="chart-body">
+            <canvas id="kardexArea"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <h2>Gestionar cursos</h2>
-  <div class="gestion-cursos">
-    <a href="{% url 'cursos:lista_cursos' %}" class="btn-ver">Ver / Administrar cursos</a>
-    <a href="{% url 'cursos:crear_curso' %}" class="btn-nuevo">Nuevo curso</a>
+  <!-- === COLUMNA DERECHA === -->
+  <div class="column right-column">
+    <!-- Fila superior (40%) -->
+    <div class="row top-row">
+      <div class="chart-card">
+        <div class="chart-container">
+          <div class="chart-header">
+            <h4>Kárdex negativo (7 días)</h4>
+          </div>
+          <div class="chart-body">
+            <canvas id="negativosSemana"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <h3>Accesos rápidos</h3>
+        <div class="kpi-actions">
+          <a href="" class="btn-azul">Crear Curso</a>
+          <a href="" class="btn-azul">Crear Usuario</a>
+          <a href="" class="btn-azul">Crear Estudiante</a>
+          <a href="" class="btn-outline">Listado Cursos</a>
+          <a href="" class="btn-outline">Listado Usuarios</a>
+          <a href="" class="btn-outline">Listado Estudiantes</a>
+        </div>
+      </div>
+    </div>
+    <!-- Fila inferior (60%) -->
+    <div class="row bottom-row">
+      <div class="chart-card">
+        <div class="chart-container">
+          <div class="chart-header">
+            <h4>Usuarios por rol</h4>
+          </div>
+          <div class="chart-body pie-chart-body">
+            <canvas id="rolesPie"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  {% if curso_count %}
-    <p><strong>Total de cursos:</strong> {{ curso_count }}</p>
-  {% endif %}
-
-  {% if ultimos_cursos %}
-    <h3>Cursos recientes</h3>
-    <div class="tabla-wrapper">
-      <table class="tabla cursos-tabla">
-        <thead>
-          <tr><th>ID</th><th>Nivel</th><th>Paralelo</th><th>Regente</th><th>Acciones</th></tr>
-        </thead>
-        <tbody>
-          {% for c in ultimos_cursos %}
-          <tr>
-            <td>{{ c.id }}</td>
-            <td>{{ c.nivel }}</td>
-            <td>{{ c.paralelo }}</td>
-            <td>{{ c.regente }}</td>
-            <td>
-              <a href="{% url 'cursos:ver_curso' c.id %}" class="btn-ver">Ver</a>
-              <a href="{% url 'cursos:editar_curso' c.id %}" class="btn-editar">Editar</a>
-              <a href="{% url 'cursos:eliminar_curso' c.id %}" class="btn-eliminar">Eliminar</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% endif %}
-
-  <h2>Gestionar estudiantes</h2>
-  <div class="gestion-estudiantes">
-    <a href="{% url 'estudiantes:listar' %}" class="btn-ver">Ver / Administrar estudiantes</a>
-    <a href="{% url 'estudiantes:crear' %}" class="btn-nuevo">Nuevo estudiante</a>
-  </div>
-
-  {% if estudiante_count %}
-    <p><strong>Total de estudiantes:</strong> {{ estudiante_count }}</p>
-  {% endif %}
-
-  {% if ultimos_estudiantes %}
-    <h3>Estudiantes recientes</h3>
-    <div class="tabla-wrapper">
-      <table class="tabla estudiantes-tabla">
-        <thead>
-          <tr><th>ID</th><th>Apellidos</th><th>Nombres</th><th>CI</th><th>Curso</th><th>Padre/Tutor</th><th>Acciones</th></tr>
-        </thead>
-        <tbody>
-          {% for e in ultimos_estudiantes %}
-          <tr>
-            <td>{{ e.id }}</td>
-            <td>{{ e.apellidos }}</td>
-            <td>{{ e.nombres }}</td>
-            <td>{{ e.ci }}</td>
-            <td>{{ e.curso }}</td>
-            <td>{{ e.padre }}</td>
-            <td>
-              <a href="{% url 'estudiantes:editar' e.id %}" class="btn-editar">Editar</a>
-              <a href="{% url 'estudiantes:eliminar' e.id %}" class="btn-eliminar">Eliminar</a>
-              <a href="{% url 'estudiantes:kardex_listar' e.id %}" class="btn-ver">Ver kárdex</a>
-              <a href="{% url 'estudiantes:kardex_nuevo' e.id %}" class="btn-nuevo">Registro kárdex</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% endif %}
-
-  {% if ultimos_kardex %}
-    <h2>Registros recientes de kárdex</h2>
-    <div class="tabla-wrapper">
-      <table class="tabla kardex-tabla">
-        <thead>
-          <tr><th>Fecha</th><th>Estudiante</th><th>Ítem</th><th>Observación</th></tr>
-        </thead>
-        <tbody>
-          {% for r in ultimos_kardex %}
-          <tr>
-            <td>{{ r.fecha }}{% if r.hora %} {{ r.hora }}{% endif %}</td>
-            <td>{{ r.estudiante }}</td>
-            <td>{{ r.kardex_item }}</td>
-            <td>{{ r.observacion|default:"—" }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% endif %}
-</div>
-
-{# === Datos para Chart.js (seguros) === #}
+</section>
+<!-- === DATOS DE CHART.JS === -->
 {{ asistencia_por_mes|json_script:"asistencia-por-mes" }}
 {{ negativos_por_area|json_script:"negativos-por-area" }}
 {{ negativos_semana|json_script:"negativos-semana" }}
-{{ roles_counts|json_script:"roles-counts" }}
+{{ roles_counts|json_script:"roles_counts" }}
 {{ asistencia_hoy|json_script:"asistencia-hoy" }}
 
-{# === Chart.js CDN === #}
+<!-- === CHART.JS === -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-  const C = { azul:'#0c2a57', azulSuave:'#13386f', metal:'#c7cdd6' };
-
-  // Donut asistencia hoy
-  (() => {
-    const el = document.getElementById("asistencia-hoy"); if(!el) return;
-    const val = JSON.parse(el.textContent || '0');
-    new Chart(document.getElementById('asistenciaHoyChart'), {
-      type:'doughnut',
-      data:{ labels:['Asistió','No asistió'], datasets:[{ data:[val, 100-val], backgroundColor:[C.azul, C.metal]}]},
-      options:{ cutout:'65%', plugins:{legend:{display:false}} }
-    });
-  })();
-
-  // Línea asistencia por mes
-  (() => {
-    const el = document.getElementById("asistencia-por-mes"); if(!el) return;
-    const d = JSON.parse(el.textContent || '[]');
-    new Chart(document.getElementById('asistenciaMeses'), {
-      type:'line',
-      data:{ labels:d.map(x=>x.mes),
-        datasets:[{ label:'Asistencia', data:d.map(x=>x.pct), borderColor:C.azul, backgroundColor:C.azul+'22', tension:.35, fill:true }]},
-      options:{ plugins:{legend:{display:false}}, scales:{y:{ticks:{callback:v=>v+'%'}}}}
-    });
-  })();
-
-  // Barras kárdex negativo por área
-  (() => {
-    const el = document.getElementById("negativos-por-area"); if(!el) return;
-    const d = JSON.parse(el.textContent || '[]');
-    new Chart(document.getElementById('kardexArea'), {
-      type:'bar',
-      data:{ labels:d.map(x=>x.area), datasets:[{ data:d.map(x=>x.total), backgroundColor:[C.azul,C.azulSuave,C.metal,'#8aa1c7']}]},
-      options:{ plugins:{legend:{display:false}} }
-    });
-  })();
-
-  // Mini barras: negativos por día (7d)
-  (() => {
-    const el = document.getElementById("negativos-semana"); if(!el) return;
-    const d = JSON.parse(el.textContent || '[]');
-    new Chart(document.getElementById('negativosSemana'), {
-      type:'bar',
-      data:{ labels:d.map(x=>x.dia), datasets:[{ data:d.map(x=>x.total), backgroundColor:C.azulSuave }]},
-      options:{ plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} }
-    });
-  })();
-
-  // Pie roles
-  (() => {
-    const el = document.getElementById("roles-counts"); if(!el) return;
-    const d = JSON.parse(el.textContent || '{}');
-    new Chart(document.getElementById('rolesPie'), {
-      type:'pie',
-      data:{ labels:Object.keys(d), datasets:[{ data:Object.values(d), backgroundColor:[C.azul,C.azulSuave,C.metal,'#8aa1c7'] }]},
-      options:{ plugins:{legend:{position:'bottom'}} }
-    });
-  })();
-</script>
+{% block scripts %}
+<script src="{% static 'cuentas/js/dashboard_director.js' %}"></script>
+{% endblock %}
 {% endblock %}
