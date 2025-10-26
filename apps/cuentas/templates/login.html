@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar sesión | Unidad Educativa La Paz A</title>
     {% load static %}
+
+    <!-- Evitar caché para que el botón Atrás no muestre formularios viejos -->
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
 </head>
 <body class="login-split">
@@ -12,24 +18,65 @@
     <div class="login-left">
         <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo">
         <h1>Unidad Educativa<br>La Paz "A"</h1>
-        
     </div>
 
     <div class="login-right">
         <div class="form-container">
             <h2>Iniciar Sesión</h2>
-            <form method="POST" action="{% url 'login' %}">
+
+            <!-- IMPORTANTE: IDs para enganchar el script anti multi-submit -->
+            <form id="login-form" method="POST" action="{% url 'login' %}" autocomplete="on">
                 {% csrf_token %}
-                <input type="text" name="username" placeholder="CI o Email" required>
-                <input type="password" name="password" placeholder="Contraseña" required>
+
+                <input type="text"
+                       name="username"
+                       placeholder="CI o Email"
+                       required
+                       autocomplete="username">
+
+                <input type="password"
+                       name="password"
+                       placeholder="Contraseña"
+                       required
+                       autocomplete="current-password">
 
                 <div class="form-options">
-                    
-                    <button type="submit" class="btn-go">Entrar</button>
+                    <button id="login-submit" type="submit" class="btn-go">Entrar</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- Script anti multi-submit: bloquea doble clic/Enter repetido -->
+    <script>
+    (function () {
+      const form = document.getElementById('login-form');
+      const btn  = document.getElementById('login-submit');
+      if (!form || !btn) return;
+
+      let locked = false;
+
+      form.addEventListener('submit', function (e) {
+        if (locked) { e.preventDefault(); return false; }
+        locked = true;
+        btn.disabled = true;
+        btn.dataset.originalText = btn.textContent;
+        btn.textContent = 'Procesando…';
+
+        // Rehabilita por cortesía si no hay respuesta en 8s
+        setTimeout(() => {
+          if (!locked) return;
+          locked = false;
+          btn.disabled = false;
+          btn.textContent = btn.dataset.originalText || 'Entrar';
+        }, 8000);
+      });
+
+      // Si el usuario spamea clicks muy rápidos en el botón
+      btn.addEventListener('click', function (e) {
+        if (btn.disabled) e.preventDefault();
+      });
+    })();
+    </script>
 </body>
 </html>
