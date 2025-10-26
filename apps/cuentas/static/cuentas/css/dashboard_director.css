@@ -12,18 +12,19 @@ html, body {
 
 /* === CONTENEDOR DASHBOARD === */
 .dashboard-container {
-  width: 100%;
-  height: 100vh; /* pantalla completa */
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   background: #f8fafc;
 }
 
 /* === ENCABEZADO === */
 .dashboard-header {
-  padding: 1.5rem 2rem;
+  padding: 1rem 2rem;
   background: #f8fafc;
+  flex-shrink: 0; /* No se encoge */
 }
 .dashboard-header h2 {
   font-size: 1.7rem;
@@ -41,7 +42,8 @@ html, body {
   display: flex;
   flex: 1; /* ocupa todo el espacio restante */
   gap: 1rem;
-  padding: 0 2rem 1rem 2rem; /* padding horizontal, vertical mínimo */
+  padding: 0 2rem 1rem 2rem;
+  min-height: 0; /* muy importante */
 }
 
 /* === COLUMNAS === */
@@ -50,6 +52,7 @@ html, body {
   flex-direction: column;
   gap: 1rem;
   flex: 1;
+  min-height: 0;
 }
 
 /* === FILAS === */
@@ -57,13 +60,14 @@ html, body {
   display: flex;
   gap: 1rem;
   flex: 1;
+  min-height: 0;
 }
 
 /* === PROPORCIONES EXACTAS === */
-.left-column .top-row { flex: 7; } /* Asistencia hoy más grande */
+.left-column .top-row { flex: 6; }       /* Asistencia hoy grande */
 .left-column .bottom-row { flex: 4; }
 .right-column .top-row { flex: 4; }
-.right-column .bottom-row { flex: 7; } /* Usuarios por rol más grande */
+.right-column .bottom-row { flex: 6; }   /* Usuarios por rol grande */
 
 /* === TARJETAS === */
 .chart-card, .kpi-card {
@@ -77,6 +81,7 @@ html, body {
   padding: 1rem;
   transition: transform 0.2s ease;
   flex: 1;
+  min-height: 0;
 }
 .chart-card:hover, .kpi-card:hover { transform: translateY(-3px); }
 
@@ -164,12 +169,13 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 0;
 }
 .pie-chart-body canvas {
   width: 100%;
   height: auto;
-  max-width: 90%;
-  max-height: 90%;
+  max-width: 100%;
+  max-height: 100%;
   aspect-ratio: 1/1;
 }
 
