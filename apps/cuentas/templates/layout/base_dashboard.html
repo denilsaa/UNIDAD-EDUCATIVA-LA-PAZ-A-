@@ -9,49 +9,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 
-{# Normalizamos el nombre del rol a minúsculas y manejamos None #}
 {% with role=request.user.rol.nombre|default_if_none:""|default:""|lower %}
 <body class="layout">
-
-  <!-- Header -->
-  <header class="hdr">
-    <div class="hdr-left">
-      <h1 class="hdr-title">Unidad Educativa La Paz “A”</h1>
-      <span class="hdr-sub">
-        {% if "director" in role %}Dashboard del Director
-        {% elif "regente" in role %}Dashboard del Regente
-        {% elif "secretaria" in role or "secretaría" in role %}Dashboard de Secretaría
-        {% elif "padre" in role %}Dashboard de Padre de familia
-        {% else %}Panel{% endif %}
-      </span>
-    </div>
-    <!-- BOTÓN DEL MENU MÓVIL -->
-    <span class="menu-toggle" onclick="toggleSidebar()">☰</span>
-    <nav class="hdr-nav">
-      {% if "director" in role %}
-        <a href="{% url 'cuentas:director_dashboard' %}">Inicio</a>
-        <a href="{% url 'estudiantes:listar' %}">Estudiantes</a>
-
-      {% elif "regente" in role %}
-        <a href="{% url 'cuentas:regente_dashboard' %}">Inicio</a>
-        <a href="{% url 'cursos:mis_cursos_regente' %}">Mis cursos</a>
-
-      {% elif "secretaria" in role or "secretaría" in role %}
-        <a href="{% url 'cuentas:secretaria_dashboard' %}">Inicio</a>
-        <a href="{% url 'estudiantes:listar' %}">Estudiantes</a>
-
-      {% elif "padre" in role %}
-        <a href="{% url 'cuentas:padre_dashboard' %}">Inicio</a>
-        <a href="{% url 'estudiantes:mis_hijos' %}">Mis hijos</a>
-      {% endif %}
-      <a href="{% url 'cuentas:logout' %}">Cerrar sesión</a>
-    </nav>
-  </header>
-
   <div class="wrap">
     <!-- Sidebar -->
     <aside class="sidenav">
       <nav>
+        <!-- Texto superior -->
+        <div class="sidebar-header">
+          <h1 class="hdr-title">Unidad Educativa La Paz “A”</h1>
+        </div>
+
+        <!-- Imagen centrada -->
+        <div class="sidebar-image">
+          <img src="{% static 'img/logo.png' %}" alt="Logo UE" />
+        </div>
+
+        <!-- Secciones -->
         <h2 class="sidenav-title">Secciones</h2>
         <ul class="sidenav-list">
 
@@ -71,7 +45,6 @@
           {% elif "regente" in role %}
             <li><a href="{% url 'cuentas:regente_dashboard' %}">📊 Resumen</a></li>
             <li><a href="{% url 'cursos:mis_cursos_regente' %}">📚 Mis cursos</a></li>
-            {# El CRUD global y el listado general de cursos NO se muestran al regente #}
 
           {# --- Secretaría --- #}
           {% elif "secretaria" in role or "secretaría" in role %}
@@ -86,7 +59,6 @@
           {% elif "padre" in role %}
             <li><a href="{% url 'cuentas:padre_dashboard' %}">🏠 Inicio</a></li>
             <li><a href="{% url 'estudiantes:mis_hijos' %}">👨‍👩‍👧 Mis hijos</a></li>
-            {# Dentro de “Mis hijos” podrá entrar a Ver Kárdex; no se muestra CRUD alguno #}
           {% endif %}
 
           <li class="sep"></li>
@@ -108,18 +80,12 @@
       {% block content %}{% endblock %}
     </main>
   </div>
-
-  <!-- Footer -->
-  <footer class="ftr">
-    <small>© {% now "Y" %} Unidad Educativa La Paz “A”.</small>
-  </footer>
-<script>
-function toggleSidebar() {
-  const sidenav = document.querySelector('.sidenav');
-  sidenav.classList.toggle('open');
-}
-</script>
-
 </body>
+<script>
+  function toggleSidebar() {
+    const sidenav = document.querySelector('.sidenav');
+    sidenav.classList.toggle('open');
+  }
+</script>
 {% endwith %}
 </html>
