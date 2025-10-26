@@ -88,3 +88,29 @@ class LastOKURLMiddleware:
             pass
 
         return response
+
+class CloseDBConnectionsMiddleware:
+    """
+    Cierra conexiones viejas/obsoletas al inicio y fin de cada request.
+    Evita superar el límite bajo de max_user_connections (Clever Cloud).
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Antes de procesar la vista
+        close_old_connections()
+
+        try:
+            response = self.get_response(request)
+            return response
+        finally:
+            # Después de procesar la vista
+            for conn in connections.all():
+                # Cierra si está obsoleta o en mal estado
+                conn.close_if_unusable_or_obsolete()
+                # Y fuerza el cierre para no dejar conexiones vivas
+                try:
+                    conn.close()
+                except Exception:
+                    pass
