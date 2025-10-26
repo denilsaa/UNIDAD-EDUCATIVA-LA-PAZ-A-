@@ -10,100 +10,106 @@
 {% block content %}
   <!-- === ENCABEZADO === -->
   <div class="dashboard-header">
-    <h2>Dashboard del Director</h2>
+    <h2 class="hdr-sub">
+      {% if "director" in role %}Dashboard del Director
+      {% elif "regente" in role %}Dashboard del Regente
+      {% elif "secretaria" in role or "secretaría" in role %}Dashboard de Secretaría
+      {% elif "padre" in role %}Dashboard de Padre de familia
+      {% else %}Panel{% endif %}
+    </h2>
     <p>Resumen general de asistencia, comportamiento y roles</p>
   </div>
+  <!-- === SECCIÓN: KPIs Y GRÁFICAS REORDENADAS === -->
+  <section class="dashboard-main-grid">
 
-<!-- === SECCIÓN: KPIs Y GRÁFICAS REORDENADAS === -->
-<section class="dashboard-main-grid">
-
-  <!-- === COLUMNA IZQUIERDA === -->
-  <div class="column left-column">
-    <!-- Fila superior (60%) -->
-    <div class="row top-row">
-      <div class="chart-card large-card">
-        <div class="chart-container">
-          <div class="chart-header">
-            <h4>Asistencia hoy</h4>
+    <!-- === COLUMNA IZQUIERDA === -->
+    <div class="column left-column">
+      <!-- Fila superior (60%) -->
+      <div class="row top-row">
+        <div class="chart-card large-card">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Asistencia hoy</h4>
+            </div>
+            <div class="chart-body kpi-chart-body">
+              <div class="kpi-canvas-wrapper">
+                <canvas id="asistenciaHoyChart"></canvas>
+                <div class="kpi-value">{{ asistencia_hoy|default:0 }}%</div>
+              </div>
+            </div>
           </div>
-          <div class="chart-body kpi-chart-body">
-            <div class="kpi-canvas-wrapper">
-              <canvas id="asistenciaHoyChart"></canvas>
-              <div class="kpi-value">{{ asistencia_hoy|default:0 }}%</div>
+        </div>
+      </div>
+      <!-- Fila inferior (40%) -->
+      <div class="row bottom-row">
+        <div class="chart-card">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Asistencia por mes</h4>
+            </div>
+            <div class="chart-body">
+              <canvas id="asistenciaMeses"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Kárdex negativo por área</h4>
+            </div>
+            <div class="chart-body">
+              <canvas id="kardexArea"></canvas>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Fila inferior (40%) -->
-    <div class="row bottom-row">
-      <div class="chart-card">
-        <div class="chart-container">
-          <div class="chart-header">
-            <h4>Asistencia por mes</h4>
+
+    <!-- === COLUMNA DERECHA === -->
+    <div class="column right-column">
+      <!-- Fila superior (40%) -->
+      <div class="row top-row">
+        <div class="chart-card">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Kárdex negativo (7 días)</h4>
+            </div>
+            <div class="chart-body">
+              <canvas id="negativosSemana"></canvas>
+            </div>
           </div>
-          <div class="chart-body">
-            <canvas id="asistenciaMeses"></canvas>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-actions">
+            <a href="" class="btn-azul">Crear Curso</a>
+            <a href="" class="btn-azul">Crear Usuario</a>
+            <a href="" class="btn-azul">Crear Estudiante</a>
+            <a href="" class="btn-outline">Listado Cursos</a>
+            <a href="" class="btn-outline">Listado Usuarios</a>
+            <a href="" class="btn-outline">Listado Estudiantes</a>
           </div>
         </div>
       </div>
-
-      <div class="chart-card">
-        <div class="chart-container">
-          <div class="chart-header">
-            <h4>Kárdex negativo por área</h4>
-          </div>
-          <div class="chart-body">
-            <canvas id="kardexArea"></canvas>
+      <!-- Fila inferior (60%) -->
+      <div class="row bottom-row">
+        <div class="chart-card">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Usuarios por rol</h4>
+            </div>
+            <div class="chart-body pie-chart-body">
+              <canvas id="rolesPie"></canvas>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- === COLUMNA DERECHA === -->
-  <div class="column right-column">
-    <!-- Fila superior (40%) -->
-    <div class="row top-row">
-      <div class="chart-card">
-        <div class="chart-container">
-          <div class="chart-header">
-            <h4>Kárdex negativo (7 días)</h4>
-          </div>
-          <div class="chart-body">
-            <canvas id="negativosSemana"></canvas>
-          </div>
-        </div>
-      </div>
+  </section>
+<br><br><br>
 
-      <div class="kpi-card">
-        <h3>Accesos rápidos</h3>
-        <div class="kpi-actions">
-          <a href="" class="btn-azul">Crear Curso</a>
-          <a href="" class="btn-azul">Crear Usuario</a>
-          <a href="" class="btn-azul">Crear Estudiante</a>
-          <a href="" class="btn-outline">Listado Cursos</a>
-          <a href="" class="btn-outline">Listado Usuarios</a>
-          <a href="" class="btn-outline">Listado Estudiantes</a>
-        </div>
-      </div>
-    </div>
-    <!-- Fila inferior (60%) -->
-    <div class="row bottom-row">
-      <div class="chart-card">
-        <div class="chart-container">
-          <div class="chart-header">
-            <h4>Usuarios por rol</h4>
-          </div>
-          <div class="chart-body pie-chart-body">
-            <canvas id="rolesPie"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</section>
 <!-- === DATOS DE CHART.JS === -->
 {{ asistencia_por_mes|json_script:"asistencia-por-mes" }}
 {{ negativos_por_area|json_script:"negativos-por-area" }}
@@ -116,4 +122,9 @@
 {% block scripts %}
 <script src="{% static 'cuentas/js/dashboard_director.js' %}"></script>
 {% endblock %}
+<!-- Footer -->
+<footer class="ftr">
+    <small>© {% now "Y" %} Unidad Educativa La Paz “A”.</small>
+  </footer>
 {% endblock %}
+
