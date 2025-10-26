@@ -3,6 +3,7 @@
 import re
 from django.conf import settings
 from django.shortcuts import redirect
+from django.db import connections, close_old_connections
 
 
 class DisableClientCacheMiddleware:
