@@ -9,6 +9,47 @@
 
 {% block content %}
 <div class="director-dashboard">
+  <!-- === KPIs === -->
+  <section class="kpis">
+    <article class="kpi">
+      <h3>Asistencia hoy</h3>
+      <canvas id="asistenciaHoyChart" height="110"></canvas>
+      <div class="kpi-val">{{ asistencia_hoy|default:0 }}%</div>
+    </article>
+    <article class="kpi">
+      <h3>Estudiantes en riesgo</h3>
+      <div class="kpi-big">{{ estudiantes_en_riesgo|default:"—" }}</div>
+      <small class="kpi-sub">{{ pct_riesgo|default:"0" }}%</small>
+    </article>
+    <article class="kpi">
+      <h3>Kárdex negativo (7 días)</h3>
+      <canvas id="negativosSemana" height="110"></canvas>
+    </article>
+    <article class="kpi actions">
+      <h3>Accesos rápidos</h3>
+      <div class="btns">
+        <a href="{% url 'cursos:lista_cursos' %}" class="btn-azul">Cursos</a>
+        <a href="{% url 'estudiantes:listar' %}" class="btn-azul-outline">Estudiantes</a>
+      </div>
+    </article>
+  </section>
+
+  <!-- === GRÁFICAS === -->
+  <section class="charts">
+    <article class="card">
+      <div class="card-title">Asistencia por mes</div>
+      <canvas id="asistenciaMeses" height="160"></canvas>
+    </article>
+    <article class="card">
+      <div class="card-title">Kárdex negativo por área</div>
+      <canvas id="kardexArea" height="160"></canvas>
+    </article>
+    <article class="card">
+      <div class="card-title">Usuarios por rol</div>
+      <canvas id="rolesPie" height="160"></canvas>
+    </article>
+  </section>
+
   <h2>Usuarios por rol</h2>
   <ul class="rol-list">
     <li><strong>Directores:</strong> {{ director_count }}</li>
@@ -45,6 +86,7 @@
       </tbody>
     </table>
   </div>
+
   <h2>Gestionar cursos</h2>
   <div class="gestion-cursos">
     <a href="{% url 'cursos:lista_cursos' %}" class="btn-ver">Ver / Administrar cursos</a>
@@ -141,4 +183,73 @@
     </div>
   {% endif %}
 </div>
+
+{# === Datos para Chart.js (seguros) === #}
+{{ asistencia_por_mes|json_script:"asistencia-por-mes" }}
+{{ negativos_por_area|json_script:"negativos-por-area" }}
+{{ negativos_semana|json_script:"negativos-semana" }}
+{{ roles_counts|json_script:"roles-counts" }}
+{{ asistencia_hoy|json_script:"asistencia-hoy" }}
+
+{# === Chart.js CDN === #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const C = { azul:'#0c2a57', azulSuave:'#13386f', metal:'#c7cdd6' };
+
+  // Donut asistencia hoy
+  (() => {
+    const el = document.getElementById("asistencia-hoy"); if(!el) return;
+    const val = JSON.parse(el.textContent || '0');
+    new Chart(document.getElementById('asistenciaHoyChart'), {
+      type:'doughnut',
+      data:{ labels:['Asistió','No asistió'], datasets:[{ data:[val, 100-val], backgroundColor:[C.azul, C.metal]}]},
+      options:{ cutout:'65%', plugins:{legend:{display:false}} }
+    });
+  })();
+
+  // Línea asistencia por mes
+  (() => {
+    const el = document.getElementById("asistencia-por-mes"); if(!el) return;
+    const d = JSON.parse(el.textContent || '[]');
+    new Chart(document.getElementById('asistenciaMeses'), {
+      type:'line',
+      data:{ labels:d.map(x=>x.mes),
+        datasets:[{ label:'Asistencia', data:d.map(x=>x.pct), borderColor:C.azul, backgroundColor:C.azul+'22', tension:.35, fill:true }]},
+      options:{ plugins:{legend:{display:false}}, scales:{y:{ticks:{callback:v=>v+'%'}}}}
+    });
+  })();
+
+  // Barras kárdex negativo por área
+  (() => {
+    const el = document.getElementById("negativos-por-area"); if(!el) return;
+    const d = JSON.parse(el.textContent || '[]');
+    new Chart(document.getElementById('kardexArea'), {
+      type:'bar',
+      data:{ labels:d.map(x=>x.area), datasets:[{ data:d.map(x=>x.total), backgroundColor:[C.azul,C.azulSuave,C.metal,'#8aa1c7']}]},
+      options:{ plugins:{legend:{display:false}} }
+    });
+  })();
+
+  // Mini barras: negativos por día (7d)
+  (() => {
+    const el = document.getElementById("negativos-semana"); if(!el) return;
+    const d = JSON.parse(el.textContent || '[]');
+    new Chart(document.getElementById('negativosSemana'), {
+      type:'bar',
+      data:{ labels:d.map(x=>x.dia), datasets:[{ data:d.map(x=>x.total), backgroundColor:C.azulSuave }]},
+      options:{ plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} }
+    });
+  })();
+
+  // Pie roles
+  (() => {
+    const el = document.getElementById("roles-counts"); if(!el) return;
+    const d = JSON.parse(el.textContent || '{}');
+    new Chart(document.getElementById('rolesPie'), {
+      type:'pie',
+      data:{ labels:Object.keys(d), datasets:[{ data:Object.values(d), backgroundColor:[C.azul,C.azulSuave,C.metal,'#8aa1c7'] }]},
+      options:{ plugins:{legend:{position:'bottom'}} }
+    });
+  })();
+</script>
 {% endblock %}

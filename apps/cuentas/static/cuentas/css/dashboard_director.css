@@ -1,293 +1,45 @@
-/* ================== CONTENEDOR PRINCIPAL ================== */
-.director-dashboard {
-  padding: 16px;
-  background: #f9fafe;
+:root{
+  --azul:#0c2a57; --azul-soft:#13386f; --metal:#c7cdd6; --borde:#e6e8ee;
+  --bg:#f6f8fb; --ink:#0f172a; --muted:#667085; --card:#fff;
 }
 
-/* ================== TITULOS ================== */
-.director-dashboard h2 {
-  color: #004a99;
-  margin-bottom: 10px;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 4px;
+/* contenedor general */
+.director-dashboard{display:flex; flex-direction:column; gap:18px}
+
+/* KPIs */
+.kpis{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px}
+.kpi{background:var(--card); border:1px solid var(--borde); border-radius:18px; padding:14px;
+     box-shadow:0 6px 16px rgba(12,42,87,.06); text-align:center}
+.kpi h3{margin:2px 0 8px; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px}
+.kpi .kpi-big{font-size:38px; font-weight:800; color:var(--azul)}
+.kpi .kpi-val{font-weight:800; color:var(--azul)}
+.kpi .kpi-sub{color:var(--muted)}
+.kpi.actions .btns{display:flex; gap:8px; justify-content:center; margin-top:8px}
+.btn-azul{background:linear-gradient(180deg,var(--azul-soft),var(--azul)); color:#fff; border-radius:12px; padding:.5rem .9rem; text-decoration:none; font-weight:700}
+.btn-azul-outline{background:#f2f5fa; color:var(--azul); border:1px solid var(--metal); border-radius:12px; padding:.5rem .9rem; text-decoration:none; font-weight:700}
+
+/* Gráficas */
+.charts{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px}
+.card{background:var(--card); border:1px solid var(--borde); border-radius:20px; padding:14px; box-shadow:0 6px 16px rgba(12,42,87,.06)}
+.card-title{font-weight:700; color:var(--azul); margin-bottom:8px}
+
+/* Dejo tus tablas tal cual; solo mínimos retoques opcionales */
+.tabla-wrapper{overflow:auto}
+.tabla{width:100%; border-collapse:separate; border-spacing:0; font-size:14px}
+.tabla thead th{background:#f3f6fb; color:var(--azul); font-weight:700; padding:10px 12px; text-align:left}
+.tabla tbody td{padding:10px 12px; border-top:1px solid var(--borde)}
+.btn-ver,.btn-editar,.btn-eliminar,.btn-nuevo{
+  display:inline-block; padding:.35rem .6rem; border-radius:10px; text-decoration:none; font-weight:600; border:1px solid transparent;
 }
+.btn-ver{ background:#f2f5fa; color:var(--azul) }
+.btn-editar{ background:#ecf2ff; color:var(--azul) }
+.btn-eliminar{ background:#fee2e2; color:#9f1d1d }
+.btn-nuevo{ background:#e6f0ff; color:var(--azul-soft) }
 
-.director-dashboard h3 {
-  color: #007bff;
-  margin-top: 20px;
-  margin-bottom: 8px;
+@media (max-width:1100px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .charts{grid-template-columns:repeat(2,1fr)}
 }
-
-/* ================== LISTA DE ROLES ================== */
-.director-dashboard .rol-list {
-  list-style: none;
-  padding-left: 0;
-  margin-bottom: 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.director-dashboard .rol-list li {
-  padding: 6px 12px;
-  font-weight: 500;
-  background: #e0f0ff;
-  border-radius: 6px;
-  border: 1px solid #cce0ff;
-}
-
-/* ================== TABLAS ================== */
-.director-dashboard .tabla-wrapper {
-  overflow-x: auto; /* scroll horizontal cuando sea necesario */
-  margin-bottom: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  background: #fff;
-}
-
-.director-dashboard table.tabla {
-  width: 100%;
-  min-width: 700px; /* evita que se encoja demasiado */
-  border-collapse: collapse;
-}
-
-.director-dashboard table.tabla th,
-.director-dashboard table.tabla td {
-  border: 1px solid #ddd;
-  padding: 10px 12px;
-  text-align: left;
-  vertical-align: middle;
-  white-space: nowrap; /* evita que se rompan los textos en celdas */
-}
-
-.director-dashboard table.tabla thead th {
-  background-color: #e0e7ff;
-  color: #004a99;
-  font-weight: 600;
-}
-
-.director-dashboard table.tabla tbody tr:nth-child(even) {
-  background: #f6f9ff;
-}
-
-.director-dashboard table.tabla tbody tr:hover {
-  background: #dbe7ff;
-}
-
-/* ================== LINKS DENTRO DE TABLAS ================== */
-.director-dashboard table.tabla a {
-  color: #007bff;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.director-dashboard table.tabla a:hover {
-  color: #004a99;
-  text-decoration: underline;
-}
-
-/* ================== DIFERENCIAR TABLAS ================== */
-.director-dashboard .usuarios-tabla thead th { background: #cce0ff; }
-.director-dashboard .cursos-tabla thead th { background: #d0e7ff; }
-.director-dashboard .estudiantes-tabla thead th { background: #e0f0ff; }
-.director-dashboard .kardex-tabla thead th { background: #f0f7ff; }
-
-/* ================== RESPONSIVE ================== */
-@media (max-width: 900px) {
-  .director-dashboard .rol-list {
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  /* Contenedor scroll horizontal */
-  .director-dashboard .tabla-wrapper {
-    max-width: 100%;
-  }
-
-  /* Asegura que las celdas no se rompan */
-  .director-dashboard table.tabla th,
-  .director-dashboard table.tabla td {
-    padding: 8px 10px;
-  }
-}
-/* ================== BOTONES DE ACCIONES ================== */
-.director-dashboard table.tabla a {
-  display: inline-block;
-  padding: 4px 10px;
-  margin: 2px 0;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-align: center;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
-}
-
-/* Ver */
-.director-dashboard table.tabla a.btn-ver {
-  background-color: #007bff;
-  color: #fff;
-  border-color: #007bff;
-}
-
-.director-dashboard table.tabla a.btn-ver:hover {
-  background-color: #004a99;
-  border-color: #004a99;
-  transform: translateY(-1px);
-}
-
-/* Editar */
-.director-dashboard table.tabla a.btn-editar {
-  background-color: #17a2b8;
-  color: #fff;
-  border-color: #17a2b8;
-}
-
-.director-dashboard table.tabla a.btn-editar:hover {
-  background-color: #0d6771;
-  border-color: #0d6771;
-  transform: translateY(-1px);
-}
-
-/* Eliminar */
-.director-dashboard table.tabla a.btn-eliminar {
-  background-color: #dc3545;
-  color: #fff;
-  border-color: #dc3545;
-}
-
-.director-dashboard table.tabla a.btn-eliminar:hover {
-  background-color: #a71d2a;
-  border-color: #a71d2a;
-  transform: translateY(-1px);
-}
-
-/* Nuevo / Crear */
-.director-dashboard table.tabla a.btn-nuevo {
-  background-color: #28a745;
-  color: #fff;
-  border-color: #28a745;
-}
-
-.director-dashboard table.tabla a.btn-nuevo:hover {
-  background-color: #19692c;
-  border-color: #19692c;
-  transform: translateY(-1px);
-}
-
-/* General hover */
-.director-dashboard table.tabla a:hover {
-  cursor: pointer;
-  text-decoration: none;
-}
-
-/* ================== GESTIÓN DE CURSOS ================== */
-.gestion-cursos {
-  display: flex;
-  gap: 12px;               /* separación entre botones */
-  flex-wrap: wrap;          /* para que no se desborde en móviles */
-  margin: 12px 0 20px 0;    /* espacio vertical */
-}
-
-.gestion-cursos a {
-  display: inline-block;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 500;
-  text-align: center;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-  border: 1px solid transparent;
-}
-
-/* Botones consistentes con los existentes */
-.gestion-cursos a.btn-ver {
-  background-color: #007bff;
-  color: #fff;
-  border-color: #007bff;
-}
-
-.gestion-cursos a.btn-ver:hover {
-  background-color: #004a99;
-  border-color: #004a99;
-  transform: translateY(-1px);
-}
-
-.gestion-cursos a.btn-nuevo {
-  background-color: #28a745;
-  color: #fff;
-  border-color: #28a745;
-}
-
-.gestion-cursos a.btn-nuevo:hover {
-  background-color: #19692c;
-  border-color: #19692c;
-  transform: translateY(-1px);
-}
-
-/* Responsive: si no cabe, scroll horizontal */
-@media (max-width: 600px) {
-  .gestion-cursos {
-    overflow-x: auto;
-    padding-bottom: 4px; /* evita que el scroll toque el texto */
-  }
-
-  .gestion-cursos a {
-    flex: 0 0 auto; /* evita que se reduzcan demasiado */
-  }
-}
-/* ================== GESTIÓN DE ESTUDIANTES ================== */
-.gestion-estudiantes {
-  display: flex;
-  gap: 12px;               /* separación entre botones */
-  flex-wrap: wrap;          /* permite ajuste en móviles */
-  margin: 12px 0 20px 0;    /* espacio vertical */
-}
-
-.gestion-estudiantes a {
-  display: inline-block;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 500;
-  text-align: center;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-  border: 1px solid transparent;
-}
-
-/* Botones consistentes con los existentes */
-.gestion-estudiantes a.btn-ver {
-  background-color: #007bff;
-  color: #fff;
-  border-color: #007bff;
-}
-
-.gestion-estudiantes a.btn-ver:hover {
-  background-color: #004a99;
-  border-color: #004a99;
-  transform: translateY(-1px);
-}
-
-.gestion-estudiantes a.btn-nuevo {
-  background-color: #28a745;
-  color: #fff;
-  border-color: #28a745;
-}
-
-.gestion-estudiantes a.btn-nuevo:hover {
-  background-color: #19692c;
-  border-color: #19692c;
-  transform: translateY(-1px);
-}
-
-/* Responsive: scroll horizontal si no cabe */
-@media (max-width: 600px) {
-  .gestion-estudiantes {
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
-
-  .gestion-estudiantes a {
-    flex: 0 0 auto; /* evita que se reduzcan demasiado */
-  }
+@media (max-width:720px){
+  .kpis,.charts{grid-template-columns:1fr}
 }
