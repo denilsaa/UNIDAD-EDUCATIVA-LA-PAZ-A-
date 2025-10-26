@@ -69,7 +69,8 @@ SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  
 
 MIDDLEWARE = [
-    'apps.cuentas.middleware.CloseDBConnectionsMiddleware',
+    'apps.cuentas.middleware.ThrottleLoginMiddleware',         # 1) Anti multi-click login
+    'apps.cuentas.middleware.CloseDBConnectionsMiddleware',    # 2) Cierre de conexiones
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -77,10 +78,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'apps.cuentas.middleware.DisableClientCacheMiddleware',
-    'apps.cuentas.middleware.AuthRequiredMiddleware',   
-    "apps.cuentas.middleware.LastOKURLMiddleware",
+    'apps.cuentas.middleware.DisableClientCacheMiddleware',    # 3) no-store en privadas y login/logout
+    'apps.cuentas.middleware.AuthRequiredMiddleware',          # 4) proteger todo
+    'apps.cuentas.middleware.LastOKURLMiddleware',             # 5) tracking suave
 ]
+
 
 
 ROOT_URLCONF = 'configuraciones.urls'

@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="{% static 'cuentas/css/dashboard.css' %}">
   {% block extra_css %}{% endblock %}
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <!-- Evitar caché en páginas autenticadas -->
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 </head>
 
 {% with role=request.user.rol.nombre|default_if_none:""|default:""|lower %}
@@ -80,12 +85,49 @@
       {% block content %}{% endblock %}
     </main>
   </div>
+
+  <!-- Scripts -->
+  <script>
+    // Abrir/cerrar sidebar (si lo usas en responsive)
+    function toggleSidebar() {
+      const sidenav = document.querySelector('.sidenav');
+      if (sidenav) sidenav.classList.toggle('open');
+    }
+
+    /*
+      Evitar "volver atrás" en páginas autenticadas:
+      - Si el usuario presiona Atrás, recargamos la misma URL (location.replace).
+      - Si la página viene del back/forward cache (bfcache), forzamos recarga.
+      Con headers no-store, si la sesión expiró, Django te enviará al login.
+    */
+    (function () {
+      try {
+        // Si la navegación viene del historial (bfcache), recarga dura
+        var navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+        if (navEntries && navEntries[0] && navEntries[0].type === 'back_forward') {
+          location.replace(location.href);
+          return;
+        }
+      } catch (_) {}
+
+      // Asegura revalidación si el navegador intenta servir desde bfcache
+      window.addEventListener('pageshow', function (evt) {
+        if (evt.persisted) {
+          location.replace(location.href);
+        }
+      });
+
+      // Fija un estado y si el usuario pulsa Atrás, recarga esta misma URL
+      try {
+        history.replaceState({ locked: true }, '', location.href);
+      } catch (_) {}
+
+      window.addEventListener('popstate', function () {
+        // Recarga y revalida en servidor (no-store + session check)
+        location.replace(location.href);
+      });
+    })();
+  </script>
 </body>
-<script>
-  function toggleSidebar() {
-    const sidenav = document.querySelector('.sidenav');
-    sidenav.classList.toggle('open');
-  }
-</script>
 {% endwith %}
 </html>
