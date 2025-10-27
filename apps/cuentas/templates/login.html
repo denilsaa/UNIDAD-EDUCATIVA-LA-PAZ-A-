@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <style>
       /* Estilos mínimos por si tu CSS no define mensajes */
-      .msgs{display:grid;gap:.5rem;margin-bottom:1rem}
+      .msgs{display:grid;gap:.5rem;margin-top:1rem}
       .msg{padding:.8rem 1rem;border-radius:8px;border:1px solid transparent}
       .msg-success{background:#e7f6ec;border-color:#b7e1c0;color:#1b6e35}
       .msg-error,.msg-danger{background:#fde8e8;border-color:#f5c2c7;color:#842029}
@@ -31,19 +31,11 @@
 
     <div class="login-right">
         <div class="form-container">
-
-            {% if messages %}
-              <div class="msgs">
-                {% for message in messages %}
-                  <div class="msg msg-{{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-              </div>
-            {% endif %}
-
             <h2>Iniciar Sesión</h2>
 
             <form id="login-form" method="POST" action="{% url 'login' %}" autocomplete="on">
                 {% csrf_token %}
+
                 <input
                     type="text"
                     name="username"
@@ -52,15 +44,26 @@
                     autocomplete="username"
                     pattern="^\S+$"
                     title="El usuario no debe contener espacios">
+
                 <input
                     type="password"
                     name="password"
                     placeholder="Contraseña"
                     required
                     autocomplete="current-password">
+
                 <div class="form-options">
                     <button id="login-submit" type="submit" class="btn-go">Entrar</button>
                 </div>
+
+                {# --- Mensajes debajo del botón --- #}
+                {% if messages %}
+                  <div class="msgs">
+                    {% for message in messages %}
+                      <div class="msg msg-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
             </form>
         </div>
     </div>
