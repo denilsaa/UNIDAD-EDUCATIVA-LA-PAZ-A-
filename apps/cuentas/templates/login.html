@@ -1,10 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar sesión | Unidad Educativa La Paz A</title>
-    {% load static %}
 
     <!-- Evitar caché para que el botón Atrás no muestre formularios viejos -->
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
@@ -12,6 +12,15 @@
     <meta http-equiv="Expires" content="0">
 
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <style>
+      /* Estilos mínimos por si tu CSS no define mensajes */
+      .msgs{display:grid;gap:.5rem;margin-bottom:1rem}
+      .msg{padding:.8rem 1rem;border-radius:8px;border:1px solid transparent}
+      .msg-success{background:#e7f6ec;border-color:#b7e1c0;color:#1b6e35}
+      .msg-error,.msg-danger{background:#fde8e8;border-color:#f5c2c7;color:#842029}
+      .msg-info{background:#e7f1ff;border-color:#b6d4fe;color:#084298}
+      .msg-warning{background:#fff4e5;border-color:#ffe0a3;color:#664d03}
+    </style>
 </head>
 <body class="login-split">
 
@@ -22,24 +31,33 @@
 
     <div class="login-right">
         <div class="form-container">
+
+            {% if messages %}
+              <div class="msgs">
+                {% for message in messages %}
+                  <div class="msg msg-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
             <h2>Iniciar Sesión</h2>
 
-            <!-- IMPORTANTE: IDs para enganchar el script anti multi-submit -->
             <form id="login-form" method="POST" action="{% url 'login' %}" autocomplete="on">
                 {% csrf_token %}
-
-                <input type="text"
-                       name="username"
-                       placeholder="CI"
-                       required
-                       autocomplete="username">
-
-                <input type="password"
-                       name="password"
-                       placeholder="Contraseña"
-                       required
-                       autocomplete="current-password">
-
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="CI"
+                    required
+                    autocomplete="username"
+                    pattern="^\S+$"
+                    title="El usuario no debe contener espacios">
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Contraseña"
+                    required
+                    autocomplete="current-password">
                 <div class="form-options">
                     <button id="login-submit" type="submit" class="btn-go">Entrar</button>
                 </div>
@@ -47,35 +65,36 @@
         </div>
     </div>
 
-    <!-- Script anti multi-submit: bloquea doble clic/Enter repetido -->
+    <!-- Script anti multi-submit y validación de espacios -->
     <script>
     (function () {
       const form = document.getElementById('login-form');
       const btn  = document.getElementById('login-submit');
+      const user = document.querySelector('input[name="username"]');
       if (!form || !btn) return;
 
-      let locked = false;
+      if (user) {
+        user.addEventListener('input', function () {
+          if (/\s/.test(user.value)) user.setCustomValidity('El usuario no debe contener espacios.');
+          else user.setCustomValidity('');
+        });
+      }
 
+      let locked = false;
       form.addEventListener('submit', function (e) {
         if (locked) { e.preventDefault(); return false; }
+        if (user && /\s/.test(user.value)) { e.preventDefault(); user.reportValidity(); return false; }
         locked = true;
         btn.disabled = true;
         btn.dataset.originalText = btn.textContent;
         btn.textContent = 'Procesando…';
-
-        // Rehabilita por cortesía si no hay respuesta en 8s
         setTimeout(() => {
           if (!locked) return;
-          locked = false;
-          btn.disabled = false;
+          locked = false; btn.disabled = false;
           btn.textContent = btn.dataset.originalText || 'Entrar';
         }, 8000);
       });
-
-      // Si el usuario spamea clicks muy rápidos en el botón
-      btn.addEventListener('click', function (e) {
-        if (btn.disabled) e.preventDefault();
-      });
+      btn.addEventListener('click', e => { if (btn.disabled) e.preventDefault(); });
     })();
     </script>
 </body>
