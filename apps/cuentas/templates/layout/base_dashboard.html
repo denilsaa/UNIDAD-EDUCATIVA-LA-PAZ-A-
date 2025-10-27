@@ -156,6 +156,102 @@
       });
     });
   });
+  (function () {
+  let locked = false;
+  let blockerFn = null;
+
+  function addGlobalBlockers() {
+    blockerFn = function (e) {
+      if (locked) {
+        e.stopPropagation();
+        e.preventDefault();
+        return false;
+      }
+    };
+    // ¡En captura! para que intercepte antes que cualquier handler
+    ['click', 'submit', 'keydown', 'touchstart'].forEach(type => {
+      document.addEventListener(type, blockerFn, true);
+    });
+  }
+
+  function removeGlobalBlockers() {
+    if (!blockerFn) return;
+    ['click', 'submit', 'keydown', 'touchstart'].forEach(type => {
+      document.removeEventListener(type, blockerFn, true);
+    });
+    blockerFn = null;
+  }
+
+  function makeOverlay() {
+    const ov = document.createElement('div');
+    ov.id = 'ui-lock';
+    ov.innerHTML = '<div class="ui-lock__box"><div class="ui-lock__spinner"></div><p>Procesando…</p></div>';
+    document.body.appendChild(ov);
+  }
+
+  function disableInteractives() {
+    const els = document.querySelectorAll('a, button, input, select, textarea, [tabindex]');
+    els.forEach(el => {
+      el.dataset.prevTabindex = el.getAttribute('tabindex') || '';
+      el.setAttribute('tabindex', '-1');
+      el.classList.add('is-disabled');
+      if ('disabled' in el) el.disabled = true;
+    });
+  }
+
+  function enableInteractives() {
+    const els = document.querySelectorAll('.is-disabled');
+    els.forEach(el => {
+      if (el.dataset.prevTabindex !== undefined) {
+        if (el.dataset.prevTabindex) el.setAttribute('tabindex', el.dataset.prevTabindex);
+        else el.removeAttribute('tabindex');
+      }
+      el.classList.remove('is-disabled');
+      if ('disabled' in el) el.disabled = false;
+    });
+  }
+
+  function lockUI() {
+    if (locked) return;
+    locked = true;
+    addGlobalBlockers();
+    disableInteractives();
+    makeOverlay();
+  }
+
+  function unlockUI() {
+    locked = false;
+    removeGlobalBlockers();
+    enableInteractives();
+    const ov = document.getElementById('ui-lock');
+    if (ov) ov.remove();
+  }
+
+  // Exponer para casos AJAX
+  window.unlockUI = unlockUI;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Primer click en cualquier control navegable => lock
+    document.addEventListener('click', function (e) {
+      if (locked) return; // ya bloqueado
+      const t = e.target.closest('a, button, input[type=submit], [type=submit]');
+      if (!t) return;
+      lockUI(); // NO prevenimos el primer click: la acción sigue su curso
+    }, true);
+
+    // Primer submit (por si viene de Enter o submit programático)
+    document.addEventListener('submit', function () {
+      if (!locked) lockUI();
+    }, true);
+
+    // Si la página navega, se descarga y el lock desaparece de forma natural.
+    // (Si no hay navegación porque usas fetch/XHR, recuerda llamar window.unlockUI())
+    window.addEventListener('pageshow', function (evt) {
+      // Si se vuelve desde bfcache, por si acaso limpiamos overlay
+      if (evt.persisted) unlockUI();
+    });
+  });
+})();
 </script>
 
 </body>
