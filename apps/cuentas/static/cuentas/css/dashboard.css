@@ -333,6 +333,7 @@ thead {
   }
 }
 
+/* Tu CSS (ok) */
 #ui-lock{
   position:fixed; inset:0; z-index:9999;
   background:rgba(255,255,255,.6);
@@ -350,3 +351,16 @@ thead {
 }
 @keyframes ui-spin { to { transform: rotate(360deg); } }
 .is-disabled{ pointer-events:none !important; }
+
+/* 1) Botón con feedback sin romper el submit */
+.is-loading { opacity:.7; pointer-events:none; }
+
+/* 2) Fallback si no hay soporte de backdrop-filter */
+@supports not ((backdrop-filter: blur(2px))) {
+  #ui-lock { background: rgba(255,255,255,.85); }
+}
+
+/* 3) Oscuro (si usas dark mode del SO) */
+@media (prefers-color-scheme: dark) {
+  .ui-lock__box { background:#111; color:#f6f6f6; }
+}

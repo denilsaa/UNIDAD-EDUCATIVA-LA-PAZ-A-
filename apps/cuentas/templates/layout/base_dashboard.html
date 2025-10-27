@@ -128,131 +128,72 @@
       });
     })();
   </script>
-  <script>
-  // Evita clics múltiples en formularios y botones
-  document.addEventListener("DOMContentLoaded", function () {
-    const forms = document.querySelectorAll("form");
-    forms.forEach(form => {
-      form.addEventListener("submit", function (e) {
-        const btn = form.querySelector("[type=submit]");
-        if (btn) {
-          btn.disabled = true;
-          btn.innerText = "Procesando...";
-        }
-      });
-    });
-
-    // También evita múltiples clics en enlaces tipo botón
-    const links = document.querySelectorAll("a, button");
-    links.forEach(link => {
-      link.addEventListener("click", function (e) {
-        if (link.dataset.clicked === "true") {
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-        }
-        link.dataset.clicked = "true";
-        setTimeout(() => { link.dataset.clicked = "false"; }, 3000); // se reactiva tras 3s
-      });
-    });
-  });
-  (function () {
-  let locked = false;
-  let blockerFn = null;
-
-  function addGlobalBlockers() {
-    blockerFn = function (e) {
-      if (locked) {
-        e.stopPropagation();
-        e.preventDefault();
-        return false;
-      }
-    };
-    // ¡En captura! para que intercepte antes que cualquier handler
-    ['click', 'submit', 'keydown', 'touchstart'].forEach(type => {
-      document.addEventListener(type, blockerFn, true);
-    });
-  }
-
-  function removeGlobalBlockers() {
-    if (!blockerFn) return;
-    ['click', 'submit', 'keydown', 'touchstart'].forEach(type => {
-      document.removeEventListener(type, blockerFn, true);
-    });
-    blockerFn = null;
-  }
-
-  function makeOverlay() {
-    const ov = document.createElement('div');
-    ov.id = 'ui-lock';
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // ------- Overlay SOLO cuando hay salida de la página (navegación real) ------
+  function showOverlay() {
+    if (document.getElementById("ui-lock")) return;
+    const ov = document.createElement("div");
+    ov.id = "ui-lock";
     ov.innerHTML = '<div class="ui-lock__box"><div class="ui-lock__spinner"></div><p>Procesando…</p></div>';
+    Object.assign(ov.style, {
+      position:"fixed", inset:"0", zIndex:"9999",
+      background:"rgba(255,255,255,.6)",
+      display:"flex", alignItems:"center", justifyContent:"center",
+      backdropFilter:"saturate(180%) blur(2px)"
+    });
     document.body.appendChild(ov);
+    document.body.style.overflow = "hidden";
   }
+  window.addEventListener("beforeunload", showOverlay);
 
-  function disableInteractives() {
-    const els = document.querySelectorAll('a, button, input, select, textarea, [tabindex]');
-    els.forEach(el => {
-      el.dataset.prevTabindex = el.getAttribute('tabindex') || '';
-      el.setAttribute('tabindex', '-1');
-      el.classList.add('is-disabled');
-      if ('disabled' in el) el.disabled = true;
-    });
-  }
-
-  function enableInteractives() {
-    const els = document.querySelectorAll('.is-disabled');
-    els.forEach(el => {
-      if (el.dataset.prevTabindex !== undefined) {
-        if (el.dataset.prevTabindex) el.setAttribute('tabindex', el.dataset.prevTabindex);
-        else el.removeAttribute('tabindex');
+  // ------- 1) Anti double-submit por formulario (no tocar disabled/value) ------
+  document.querySelectorAll("form").forEach(form => {
+    let submitting = false;
+    form.addEventListener("submit", function (e) {
+      if (submitting) {
+        e.preventDefault(); e.stopPropagation(); return false;
       }
-      el.classList.remove('is-disabled');
-      if ('disabled' in el) el.disabled = false;
-    });
-  }
+      submitting = true;
 
-  function lockUI() {
-    if (locked) return;
-    locked = true;
-    addGlobalBlockers();
-    disableInteractives();
-    makeOverlay();
-  }
+      // Feedback opcional en el botón sin cambiar value/disabled
+      const btn = form.querySelector("button[type=submit], input[type=submit]");
+      if (btn) btn.classList.add("is-loading");
 
-  function unlockUI() {
-    locked = false;
-    removeGlobalBlockers();
-    enableInteractives();
-    const ov = document.getElementById('ui-lock');
-    if (ov) ov.remove();
-  }
-
-  // Exponer para casos AJAX
-  window.unlockUI = unlockUI;
-
-  document.addEventListener('DOMContentLoaded', function () {
-    // Primer click en cualquier control navegable => lock
-    document.addEventListener('click', function (e) {
-      if (locked) return; // ya bloqueado
-      const t = e.target.closest('a, button, input[type=submit], [type=submit]');
-      if (!t) return;
-      lockUI(); // NO prevenimos el primer click: la acción sigue su curso
+      // Importante: NO bloquear aquí la UI, dejamos que el navegador navegue.
+      // El overlay aparecerá en beforeunload cuando la navegación realmente empiece.
     }, true);
-
-    // Primer submit (por si viene de Enter o submit programático)
-    document.addEventListener('submit', function () {
-      if (!locked) lockUI();
-    }, true);
-
-    // Si la página navega, se descarga y el lock desaparece de forma natural.
-    // (Si no hay navegación porque usas fetch/XHR, recuerda llamar window.unlockUI())
-    window.addEventListener('pageshow', function (evt) {
-      // Si se vuelve desde bfcache, por si acaso limpiamos overlay
-      if (evt.persisted) unlockUI();
-    });
   });
-})();
+
+  // ------- 2) Debounce para ENLACES y mostrar overlay sólo si navegan -------
+  document.querySelectorAll("a[href]").forEach(link => {
+    link.addEventListener("click", function (e) {
+      const href = link.getAttribute("href") || "";
+      if (href.startsWith("#")) return;
+
+      if (link.dataset.clicked === "true") {
+        e.preventDefault(); e.stopPropagation(); return false;
+      }
+      link.dataset.clicked = "true";
+
+      // Si es una navegación a otra página, el beforeunload disparará overlay.
+      // Si no hay navegación (misma página o AJAX), rearmamos el debounce:
+      setTimeout(() => { link.dataset.clicked = "false"; }, 4000);
+    }, { capture:true });
+  });
+
+  // Limpieza si el navegador usa bfcache
+  window.addEventListener("pageshow", function (evt) {
+    if (evt.persisted) {
+      const ov = document.getElementById("ui-lock");
+      if (ov) ov.remove();
+      document.body.style.overflow = "";
+    }
+  });
+});
 </script>
+
+
 
 </body>
 {% endwith %}
