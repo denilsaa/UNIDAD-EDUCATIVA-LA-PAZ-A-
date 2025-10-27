@@ -96,17 +96,19 @@ class UsuarioCreateForm(forms.ModelForm):
 
         return apellidos
     def clean_email(self):
-        email = self.cleaned_data.get("email", "").strip()
-        
-        # Campo opcional
+        email = (self.cleaned_data.get("email") or "").strip()
         if email == "":
-            return email
-        
-        # Validar formato general de email
+            return email  # es opcional
+
+        # formato (dejas tu regex si quieres)
         email_regex = r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(email_regex, email):
             raise ValidationError("Correo inválido. Debe tener formato ejemplo@gmail.com")
-        
+
+        # unicidad case-insensitive
+        if Usuario.objects.filter(email__iexact=email).exists():
+            raise ValidationError("Este correo ya está registrado.")
+        return email
         # limitamos solo a Gmail????
         # if not email.lower().endswith("@gmail.com"):
         #     raise ValidationError("Solo se permiten correos @gmail.com")
@@ -184,3 +186,19 @@ class UsuarioUpdateForm(forms.ModelForm):
         if commit:
             usuario.save()
         return usuario
+  # 👇 añade esto para edición
+    def clean_email(self):
+        email = (self.cleaned_data.get("email") or "").strip()
+        if email == "":
+            return email
+        # formato si quieres mantenerlo
+        email_regex = r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, email):
+            raise ValidationError("Correo inválido. Debe tener formato ejemplo@gmail.com")
+
+        qs = Usuario.objects.filter(email__iexact=email)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise ValidationError("Este correo ya está registrado.")
+        return email

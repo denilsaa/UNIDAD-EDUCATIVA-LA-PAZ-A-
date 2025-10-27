@@ -28,13 +28,16 @@ def crear_usuario(request):
     if request.method == "POST":
         form = UsuarioCreateForm(request.POST)
         if form.is_valid():
-            form.save()
+            try:
+                form.save()
+            except IntegrityError:
+                form.add_error('email', "Este correo ya está registrado.")
+                return render(request, "cuentas/crear_usuario.html", {"form": form})
             messages.success(request, "Usuario creado correctamente.")
             return redirect("cuentas:lista_usuarios")
     else:
         form = UsuarioCreateForm()
     return render(request, "cuentas/crear_usuario.html", {"form": form})
-
 
 @role_required("director")
 def editar_usuario(request, user_id):
