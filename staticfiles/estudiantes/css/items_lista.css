@@ -1,0 +1,333 @@
+/* ================== FORMULARIO DE FILTRO ================== */
+.form-filtros {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0;
+  max-width: 1000px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Contenedor principal: input + selects + botones */
+.filtros-principal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Input de búsqueda */
+.filtros-principal input[type="text"] {
+  flex: 1 1 250px; /* se expande según el espacio disponible */
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  min-width: 150px;
+  box-sizing: border-box;
+}
+
+/* Selects */
+.filtros-principal select {
+  flex: 0 0 150px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+/* Botones uniformes */
+.filtros-principal button,
+.filtros-principal .btn-nuevo {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 16px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  box-sizing: border-box;
+  height: 40px; /* misma altura para todos */
+  transition: all 0.2s ease;
+  flex: 0 0 auto;
+}
+
+/* Botón Filtrar */
+.filtros-principal button {
+  background-color: #28a745;
+  color: #fff;
+  border-color: #28a745;
+}
+
+.filtros-principal button:hover {
+  background-color: #19692c;
+  border-color: #19692c;
+  transform: translateY(-1px);
+}
+
+/* Botón Nuevo ítem */
+.filtros-principal .btn-nuevo {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  text-decoration: none;
+}
+
+.filtros-principal .btn-nuevo:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+  transform: translateY(-1px);
+}
+
+/* Links adicionales */
+.filtros-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.filtros-links a {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 14px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid #007bff;
+  background-color: #fff;
+  color: #007bff;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  height: 38px; /* altura uniforme */
+}
+
+.filtros-links a:hover {
+  background-color: #007bff;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 1000px) {
+  .filtros-principal {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .filtros-principal input[type="text"],
+  .filtros-principal select,
+  .filtros-principal button,
+  .filtros-principal .btn-nuevo {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .filtros-links {
+    flex-direction: column;
+  }
+}
+
+/* ================== TITULO CENTRAL ================== */
+h2 {
+  color: #004a99;
+  text-align: center;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 6px;
+}
+
+/* ================== TABLA ================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+thead th {
+  background-color: #d0e7ff;
+  color: #004a99;
+  font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+  background: #f6f9ff;
+}
+
+tbody tr:hover {
+  background: #dbe7ff;
+}
+
+/* ================== LINKS / BOTONES DENTRO DE TABLA ================== */
+table a {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 2px 2px 2px 0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  text-decoration: none;
+}
+
+/* Editar */
+table a[href*="editar"] {
+  background-color: #17a2b8;
+  color: #fff;
+  border-color: #17a2b8;
+}
+
+table a[href*="editar"]:hover {
+  background-color: #0d6771;
+  border-color: #0d6771;
+  transform: translateY(-1px);
+}
+
+/* Eliminar */
+table a[href*="eliminar"] {
+  background-color: #dc3545;
+  color: #fff;
+  border-color: #dc3545;
+}
+
+table a[href*="eliminar"]:hover {
+  background-color: #a71d2a;
+  border-color: #a71d2a;
+  transform: translateY(-1px);
+}
+
+/* ================== PAGINACIÓN ================== */
+.paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  margin-top: 12px;
+}
+
+.paginacion a {
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  background-color: #007bff;
+  color: #fff;
+  border: 1px solid #007bff;
+  transition: all 0.2s ease;
+}
+
+.paginacion a:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+  transform: translateY(-1px);
+}
+
+.paginacion span {
+  font-weight: 500;
+  color: #333;
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 900px) {
+  form {
+    flex-direction: column;
+  }
+
+  table, th, td {
+    padding: 8px 10px;
+  }
+
+  form input[type="text"], form select {
+    width: 100%;
+  }
+}
+/* ================== BOTONES UNIFORMES ================== */
+.filtros-principal button,
+.filtros-principal .btn-nuevo {
+  display: inline-flex;          /* Igual comportamiento de layout */
+  justify-content: center;       /* Centrar texto */
+  align-items: center;
+  padding: 8px 16px;             /* Igual padding */
+  font-size: 1rem;               /* Igual fuente */
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  box-sizing: border-box;        /* Incluye padding en ancho total */
+  height: 40px;                  /* Forzar misma altura */
+  transition: all 0.2s ease;
+}
+
+/* Botón Filtrar */
+.filtros-principal button {
+  background-color: #28a745;
+  color: #fff;
+  border-color: #28a745;
+}
+
+.filtros-principal button:hover {
+  background-color: #19692c;
+  border-color: #19692c;
+  transform: translateY(-1px);
+}
+
+/* Botón Nuevo ítem */
+.filtros-principal .btn-nuevo {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  text-decoration: none;
+}
+
+.filtros-principal .btn-nuevo:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+  transform: translateY(-1px);
+}
+
+.total-items {
+  display: inline-block;
+  padding: 8px 14px;
+  margin: 6px 0;
+  background-color: #eaf1ff; /* azul muy suave */
+  color: #004a99; /* azul más oscuro para el texto */
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  font-size: 0.95rem;
+}
+
+.table-wrapper {
+  overflow-x: auto; /* scroll horizontal si es necesario */
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background-color: #fff;
+  margin-top: 12px;
+}
+
+/* Asegura que la tabla ocupe su ancho natural */
+.table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+}

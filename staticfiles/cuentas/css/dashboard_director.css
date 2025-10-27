@@ -1,0 +1,228 @@
+/* === RESET Y CONTENEDOR PRINCIPAL === */
+* {
+  margin: 0;
+  padding-top: 00;
+  box-sizing: border-box;
+}
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* === CONTENEDOR DASHBOARD === */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+/* === ENCABEZADO DEL DASHBOARD === */
+.dashboard-header {
+  background: linear-gradient(90deg, #0c2a57, #13386f); /* degradado azul elegante */
+  color: #fff;
+  padding: 1.8rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Opcional: puntitos sutiles animados como el header principal */
+.dashboard-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: moveDots 12s linear infinite;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.dashboard-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-header p {
+  font-size: 1rem;
+  color: #dce6ff; /* subtítulo suave */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 1;
+}
+
+/* Animación de puntitos compartida con el header */
+@keyframes moveDots {
+  from { background-position: 0 0; }
+  to { background-position: 40px 40px; }
+}
+
+
+/* === GRID PRINCIPAL === */
+.dashboard-main-grid {
+  display: flex;
+  flex: 1; /* ocupa todo el espacio restante */
+  gap: 1rem;
+  padding: 0 2rem 1rem 2rem;
+  min-height: 0; /* muy importante */
+}
+
+/* === COLUMNAS === */
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
+}
+
+/* === FILAS === */
+.row {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
+}
+
+/* === PROPORCIONES EXACTAS === */
+.left-column .top-row { flex: 6; }       /* Asistencia hoy grande */
+.left-column .bottom-row { flex: 4; }
+.right-column .top-row { flex: 4; }
+.right-column .bottom-row { flex: 6; }   /* Usuarios por rol grande */
+
+/* === TARJETAS === */
+.chart-card, .kpi-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  transition: transform 0.2s ease;
+  flex: 1;
+  min-height: 0;
+}
+.chart-card:hover, .kpi-card:hover { transform: translateY(-3px); }
+
+/* === TARJETAS GRANDES DESTACADAS === */
+.large-card, /* Asistencia hoy */
+.right-column .bottom-row .chart-card { /* Usuarios por rol */
+  flex: 1.3; /* 30% más grande que otras tarjetas dentro de la fila */
+}
+
+/* Tarjetas normales dentro de filas */
+.left-column .bottom-row .chart-card,
+.right-column .top-row .chart-card,
+.right-column .top-row .kpi-card { flex: 1; }
+.right-column .bottom-row .chart-card { width: 100%; height: 100%; }
+
+/* === KPI CIRCULAR === */
+.kpi-chart-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.kpi-canvas-wrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+.kpi-canvas-wrapper canvas { width: 100% !important; height: 100% !important; }
+.kpi-canvas-wrapper .kpi-value {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #0c2a57;
+}
+
+/* === BOTONES === */
+.btn-azul, .btn-outline {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: 0.2s;
+}
+.btn-azul { background: #0c2a57; color: white; }
+.btn-azul:hover { background: #13386f; }
+.btn-outline { background: white; border: 1px solid #0c2a57; color: #0c2a57; }
+.btn-outline:hover { background: #0c2a57; color: white; }
+
+/* Accesos rápidos */
+.kpi-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+/* === CHARTS === */
+.chart-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.5rem 0.8rem;
+}
+.chart-header {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.4rem;
+  text-align: center;
+}
+.chart-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+.chart-body, .pie-chart-body {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+}
+.pie-chart-body canvas {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1/1;
+}
+
+/* === RESPONSIVO === */
+@media (max-width: 1300px) {
+  .dashboard-main-grid { flex-direction: column; }
+  .row { flex-direction: column; }
+  .row .chart-card, .row .kpi-card { width: 100%; }
+}
+@media (max-width: 900px) {
+  .dashboard-container { padding: 0.5rem; }
+  .chart-card { height: 300px; }
+}
