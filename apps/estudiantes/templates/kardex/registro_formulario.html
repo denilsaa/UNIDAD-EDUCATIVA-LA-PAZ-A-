@@ -5,11 +5,19 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'estudiantes/css/registro_kardex.css' %}">
+<style>
+  /* Oculta inputs nativos pero siguen enviándose al backend */
+  #id_fecha, #id_hora { position: absolute; left: -9999px; }
+
+  /* UI visible */
+  .select-ui { padding: .5rem .75rem; border:1px solid #cfd8e3; border-radius:.5rem; }
+  .mes-label { font-weight:600; margin-right:.5rem; text-transform: capitalize; }
+  .fecha-ui { display:flex; gap:.5rem; align-items:center; }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="kardex-form-dashboard">
-
   <form method="post" class="form-usuario">
     {% csrf_token %}
     {{ form.non_field_errors }}
@@ -20,14 +28,23 @@
       <span>Estudiante:</span> {{ estudiante.apellidos }} {{ estudiante.nombres }}
     </div>
 
+    <!-- ======= FECHA ======= -->
     <div class="form-group">
+      {{ form.fecha.errors }}
       {{ form.fecha.label_tag }}
-      {{ form.fecha }}
+      {{ form.fecha }}  <!-- input nativo (oculto) -->
+      <div class="fecha-ui">
+        <span id="mes_label" class="mes-label"></span>
+        <select id="dia_select" class="select-ui"></select>
+      </div>
     </div>
 
+    <!-- ======= HORA ======= -->
     <div class="form-group">
+      {{ form.hora.errors }}
       {{ form.hora.label_tag }}
-      {{ form.hora }}
+      {{ form.hora }}  <!-- input nativo (oculto) -->
+      <select id="hora_select" class="select-ui"></select>
     </div>
 
     <div class="form-group">
@@ -58,7 +75,90 @@
       <button type="submit" class="btn-guardar">Guardar</button>
       <a href="{% url 'estudiantes:kardex_listar' estudiante.id %}" class="btn-volver">Cancelar</a>
     </div>
-
   </form>
 </div>
+
+<!-- Script dentro del mismo bloque para asegurar ejecución -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // ========= FECHA =========
+  const inFecha = document.getElementById('id_fecha');
+  const selDia  = document.getElementById('dia_select');
+  const mesLbl  = document.getElementById('mes_label');
+
+  if (!inFecha || !selDia || !mesLbl) return;
+
+  const minStr = inFecha.getAttribute('min');
+  const maxStr = inFecha.getAttribute('max');
+
+  let y, m;
+  if (minStr) { const p = minStr.split('-'); y = +p[0]; m = +p[1]; }
+  else { const now = new Date(); y = now.getFullYear(); m = now.getMonth()+1; }
+
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  mesLbl.textContent = `${meses[m-1]} ${y}`;
+
+  const lastDay = maxStr ? +maxStr.slice(8,10) : new Date(y, m, 0).getDate();
+  const firstDay = 1;
+
+  const hoy = new Date();
+  const esMismoMes = (hoy.getFullYear() === y && (hoy.getMonth()+1) === m);
+  const diaDefault = esMismoMes ? hoy.getDate() : firstDay;
+
+  selDia.innerHTML = '';
+  for (let d = firstDay; d <= lastDay; d++) {
+    const op = document.createElement('option');
+    op.value = String(d).padStart(2,'0');
+    op.textContent = d;
+    if (d === diaDefault) op.selected = true;
+    selDia.appendChild(op);
+  }
+
+  function syncFecha() {
+    const day = selDia.value;
+    const iso = `${y}-${String(m).padStart(2,'0')}-${day}`;
+    inFecha.value = iso;
+  }
+  syncFecha();
+  selDia.addEventListener('change', syncFecha);
+
+  // ========= HORA =========
+  const inHora = document.getElementById('id_hora');
+  const selHora = document.getElementById('hora_select');
+  if (!inHora || !selHora) return;
+
+  const pasoMin = 30;     // ← cada 30 minutos
+  const startH  = 7, startM = 0;
+  const endH    = 14, endM  = 0;
+
+  function toHM(h, m){ return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0'); }
+
+  selHora.innerHTML = '';
+  for (let h = startH; h <= endH; h++) {
+    for (let mm = (h===startH?startM:0); mm < 60; mm += pasoMin) {
+      if (h === endH && mm > endM) break; // evita 14:30
+      const val = toHM(h, mm);
+      const op = document.createElement('option');
+      op.value = val; op.textContent = val;
+      selHora.appendChild(op);
+    }
+  }
+
+  const preset = (inHora.value && selHora.querySelector(`option[value="${inHora.value}"]`))
+                  ? inHora.value : toHM(startH,startM);
+  selHora.value = preset;
+  inHora.value  = preset;
+
+  selHora.addEventListener('change', () => { inHora.value = selHora.value; });
+
+  const form = inFecha.closest('form');
+  if (form) {
+    form.addEventListener('submit', () => {
+      syncFecha();
+      inHora.value = selHora.value;
+    });
+  }
+});
+</script>
+
 {% endblock %}

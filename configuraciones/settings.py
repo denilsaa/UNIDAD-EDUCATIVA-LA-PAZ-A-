@@ -125,11 +125,14 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# === IDIOMA / ZONA HORARIA ===
-LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
+# settings.py
+LANGUAGE_CODE = "es"
 USE_I18N = True
+
+# Si estás en Bolivia:
+TIME_ZONE = "America/La_Paz"
 USE_TZ = True
+
 
 # === STATIC (WhiteNoise) ===
 STATIC_URL = "/static/"

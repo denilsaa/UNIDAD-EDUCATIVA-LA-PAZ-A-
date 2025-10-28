@@ -1,9 +1,15 @@
+# apps/estudiantes/views/forms_kardex.py
+from datetime import date, time, datetime
+from calendar import monthrange
+
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import models
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
-from django.utils.timezone import now
+from django.utils import timezone, translation
+from django.utils.timezone import now, localdate
 
 from apps.estudiantes.models.estudiante import Estudiante
 from apps.estudiantes.models.kardex_registro import KardexRegistro
@@ -36,6 +42,46 @@ class KardexRegistroForm(forms.ModelForm):
         # Ordenar por área y descripción para que sea más fácil encontrar el ítem
         self.fields["kardex_item"].queryset = KardexItem.objects.order_by("area", "descripcion")
 
+        # === Límites dinámicos de fecha/hora ===
+        hoy = localdate()  # respeta TIME_ZONE + USE_TZ
+        last_day = monthrange(hoy.year, hoy.month)[1]
+        first_of_month = date(hoy.year, hoy.month, 1)
+        last_of_month = date(hoy.year, hoy.month, last_day)
+
+        # Fecha: SOLO el mes vigente
+        self.fields["fecha"].widget.attrs.update({
+            "min": first_of_month.isoformat(),
+            "max": last_of_month.isoformat(),
+        })
+
+        # Hora: 07:00–14:00 en pasos de 30 minutos
+        self.fields["hora"].widget.attrs.update({
+            "min": time(7, 0).strftime("%H:%M"),
+            "max": time(14, 0).strftime("%H:%M"),
+            "step": "1800",  # 1800s = 30 min
+        })
+
+    # ==== Validación servidor (por si fuerzan el HTML) ====
+    def clean_fecha(self):
+        f = self.cleaned_data.get("fecha")
+        if not f:
+            return f
+        hoy = localdate()
+        last_day = monthrange(hoy.year, hoy.month)[1]
+        if not (date(hoy.year, hoy.month, 1) <= f <= date(hoy.year, hoy.month, last_day)):
+            raise forms.ValidationError("Solo se permiten fechas del mes actual.")
+        return f
+
+    def clean_hora(self):
+        h = self.cleaned_data.get("hora")
+        if not h:
+            return h
+        if not (time(7, 0) <= h <= time(14, 0)):
+            raise forms.ValidationError("La hora debe estar entre 07:00 y 14:00.")
+        if h.minute % 30 != 0 or h.second != 0:
+            raise forms.ValidationError("La hora debe ir en intervalos de 30 minutos (00 o 30).")
+        return h
+
 
 # ---------- VISTAS ----------
 @login_required
@@ -47,6 +93,10 @@ def kardex_registro_nuevo(request, estudiante_id: int):
       - Regente: solo si el estudiante pertenece a su curso.
       - Director/Secretaría: permitido.
     """
+    # Forzar respuesta en español (formatos, meses, etc.)
+    translation.activate("es")
+    request.LANGUAGE_CODE = "es"
+
     estudiante = get_object_or_404(Estudiante, pk=estudiante_id)
 
     # 🔒 Autorización
@@ -63,12 +113,21 @@ def kardex_registro_nuevo(request, estudiante_id: int):
         if form.is_valid():
             reg = form.save(commit=False)
             reg.estudiante = estudiante
+
+            # Si 'fecha' en el modelo es DateTimeField, combinar fecha+hora como "aware" en TZ local
+            if isinstance(KardexRegistro._meta.get_field("fecha"), models.DateTimeField):
+                f = form.cleaned_data.get("fecha")  # date
+                h = form.cleaned_data.get("hora")   # time
+                if f and h:
+                    naive_local = datetime.combine(f, h)  # naive (sin tz)
+                    reg.fecha = timezone.make_aware(naive_local, timezone.get_current_timezone())
+
             reg.save()
             messages.success(request, "Registro de kárdex añadido.")
             return redirect(reverse("estudiantes:kardex_listar", args=[estudiante.pk]))
         messages.error(request, "Por favor corrija los errores del formulario.")
     else:
-        form = KardexRegistroForm(initial={"fecha": now().date()})
+        form = KardexRegistroForm(initial={"fecha": localdate()})
 
     return render(request, "kardex/registro_formulario.html", {"form": form, "estudiante": estudiante})
 
@@ -82,6 +141,9 @@ def kardex_registro_listar(request, estudiante_id: int):
       - Regente: solo si es regente del curso del estudiante.
       - Director/Secretaría: permitido.
     """
+    translation.activate("es")
+    request.LANGUAGE_CODE = "es"
+
     estudiante = get_object_or_404(Estudiante, pk=estudiante_id)
 
     # 🔒 Autorización
