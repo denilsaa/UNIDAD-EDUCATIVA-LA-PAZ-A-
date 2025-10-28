@@ -50,19 +50,39 @@
     <!-- ROL -->
     <p>{{ form.rol.label_tag }} {{ form.rol }}</p>
 
-
     <!-- ACTIVO -->
     <div class="form-group">
       <label for="id_is_activo" class="form-check-label">Estado del usuario:</label>
       <div>
-        <input type="checkbox" id="id_is_activo" name="is_activo" class="checkbox-input"
-          {% if usuario.is_activo %}checked{% endif %}>
+        {# 🚫 Si estoy editando mi propio usuario, no permito inactivarme #}
+        {% if usuario.id == request.user.id %}
+          <input
+            type="checkbox"
+            id="id_is_activo"
+            name="is_activo"
+            class="checkbox-input"
+            checked
+            disabled
+            title="No puedes inactivarte a ti mismo"
+          >
+          {# Importante: como el checkbox está disabled, envío un hidden para mantener 'on' en el POST #}
+          <input type="hidden" name="is_activo" value="on">
+          <small class="text-muted">No puedes inactivarte a ti mismo.</small>
+        {% else %}
+          <input
+            type="checkbox"
+            id="id_is_activo"
+            name="is_activo"
+            class="checkbox-input"
+            {% if usuario.is_activo %}checked{% endif %}
+          >
+        {% endif %}
+
         <span id="estado-texto">
           {% if usuario.is_activo %}Activo{% else %}Inactivo{% endif %}
         </span>
       </div>
     </div>
-
 
     <!-- CAMBIO DE CONTRASEÑA -->
     <fieldset class="fieldset-password">
@@ -93,5 +113,16 @@
 
 {% block scripts %}
 <script src="{% static 'cuentas/js/editar_usuario.js' %}"></script>
+<script>
+  // Si el checkbox está habilitado, actualiza el texto "Activo/Inactivo" al vuelo.
+  (function(){
+    var cb = document.getElementById('id_is_activo');
+    var label = document.getElementById('estado-texto');
+    if (!cb || cb.disabled) return;
+    cb.addEventListener('change', function(){
+      label.textContent = cb.checked ? 'Activo' : 'Inactivo';
+    });
+  })();
+</script>
 {% endblock %}
 {% endblock %}

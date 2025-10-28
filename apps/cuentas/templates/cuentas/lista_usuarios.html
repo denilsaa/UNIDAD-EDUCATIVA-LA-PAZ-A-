@@ -34,10 +34,16 @@
         <td>{{ u.apellidos }}</td>
         <td>{{ u.email }}</td>
         <td>{{ u.is_activo|yesno:"Activo,Inactivo" }}</td>
-        <td>
+        <td class="acciones">
           <a href="{% url 'cuentas:ver_usuario' u.id %}" class="btn-ver">Ver</a>
           <a href="{% url 'cuentas:editar_usuario' u.id %}" class="btn-editar">Editar</a>
-          <a href="{% url 'cuentas:eliminar_usuario' u.id %}" class="btn-eliminar">Eliminar</a>
+
+          {# 🚫 No mostrar eliminar si es el propio usuario autenticado #}
+          {% if u.id != request.user.id %}
+            <a href="{% url 'cuentas:eliminar_usuario' u.id %}" class="btn-eliminar">Eliminar</a>
+          {% else %}
+            <span class="btn-eliminar disabled" title="No puedes eliminarte a ti mismo">Eliminar</span>
+          {% endif %}
         </td>
       </tr>
       {% empty %}

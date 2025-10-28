@@ -9,37 +9,59 @@
 
 {% block content %}
 <div class="detalle-usuario">
-    <h2 class="titulo-detalle">Eliminar usuario</h2>
+  <h2 class="titulo-detalle">Eliminar usuario</h2>
+
+  {# 🚫 Defensa UX: si llegó aquí con su propio id, no mostrar el formulario #}
+  {% if usuario.id == request.user.id %}
+    <div class="alert alert-warning">
+      No puedes eliminarte a ti mismo.
+    </div>
+    <a href="{% url 'cuentas:lista_usuarios' %}" class="btn btn-volver">Volver</a>
+  {% else %}
 
     <div class="card-detalle">
-        <p>Está a punto de eliminar al usuario <strong>{{ usuario.username }}</strong>.</p>
+      <p>Está a punto de eliminar al usuario <strong>{{ usuario.username }}</strong>.</p>
 
-        {% if estudiantes %}
-            <p>Este usuario tiene los siguientes estudiantes asignados:</p>
-            <ul class="lista-detalle">
-                {% for estudiante in estudiantes %}
-                    <li>
-                        <span class="valor">{{ estudiante.apellidos }} {{ estudiante.nombres }}</span>
-                        <span class="label">{{ estudiante.curso.nivel }} {{ estudiante.curso.paralelo }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No tiene estudiantes asignados.</p>
-        {% endif %}
-
+      {% if estudiantes %}
+        <p>Este usuario tiene los siguientes estudiantes asignados:</p>
+        <ul class="lista-detalle">
+          {% for estudiante in estudiantes %}
+            <li>
+              <span class="valor">{{ estudiante.apellidos }} {{ estudiante.nombres }}</span>
+              <span class="label">{{ estudiante.curso.nivel }} {{ estudiante.curso.paralelo }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No tiene estudiantes asignados.</p>
+      {% endif %}
     </div>
 
-    <p>¿Desea eliminar también a estos estudiantes junto con el usuario?</p>
-
-    <div class="acciones-detalle">
+    {% if estudiantes %}
+      <p>¿Desea eliminar también a estos estudiantes junto con el usuario?</p>
+      <div class="acciones-detalle">
         <form method="post" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" name="eliminar_todo" class="btn-editar">
-                Sí, eliminar usuario y estudiantes
-            </button>
+          {% csrf_token %}
+          <button type="submit" name="eliminar_todo" class="btn-editar">
+            Sí, eliminar usuario y estudiantes
+          </button>
         </form>
         <a href="{% url 'cuentas:lista_usuarios' %}" class="btn btn-volver">Cancelar</a>
-    </div>
+      </div>
+    {% else %}
+      <p>Esta acción eliminará permanentemente al usuario.</p>
+      <div class="acciones-detalle">
+        {# El view elimina si NO hay estudiantes y es un POST (sin necesidad de name) #}
+        <form method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn-eliminar">
+            Sí, eliminar usuario
+          </button>
+        </form>
+        <a href="{% url 'cuentas:lista_usuarios' %}" class="btn btn-volver">Cancelar</a>
+      </div>
+    {% endif %}
+
+  {% endif %}
 </div>
 {% endblock %}
