@@ -8,44 +8,46 @@ import re
 
 from apps.cuentas.models import Usuario
 
-# Backend de autenticación a usar para auth_login
 BACKEND_PATH = 'apps.cuentas.backends.CustomBackend'
-# Si prefieres el de Django:
-# BACKEND_PATH = 'django.contrib.auth.backends.ModelBackend'
 
+# ✅ Reglas
+CI_RE = re.compile(r'^\d{1,8}$')  # solo números, 1–8 dígitos
 
 @never_cache
 @ensure_csrf_cookie
 def login_view(request):
     """
-    Login por CI o Email + password.
-    - Rechaza *cualquier* espacio en el usuario.
-    - Respeta ?next=/ruta/protegida y redirige por rol si no hay next.
-    - Tu modelo usa is_activo (no is_active).
+    Login por CI + password (sin email).
+    - Usuario: solo números (1–8 dígitos). Sin espacios.
+    - Password: obligatoria, máx 50 caracteres.
+    - Respeta ?next= y redirige por rol si no hay next.
+    - Usa is_activo.
     """
     if request.method == 'POST':
         username_raw = request.POST.get('username') or ''
-        password = request.POST.get('password') or ''
-        next_url = request.GET.get('next')
+        password     = request.POST.get('password') or ''
+        next_url     = request.GET.get('next')
 
-        # No permitir espacios en el usuario (inicio/medio/fin)
+        # 🔒 Validaciones de formato
         if re.search(r'\s', username_raw):
             messages.error(request, "El usuario no debe contener espacios.")
             return redirect('login')
 
-        username = username_raw  # sin strip, para no "arreglar" entradas incorrectas
+        if not CI_RE.fullmatch(username_raw):
+            messages.error(request, "El CI debe ser solo números (1–8 dígitos).")
+            return redirect('login')
 
-        # Buscar usuario por CI exacto o email case-insensitive
-        user = None
+        if len(password) == 0 or len(password) > 50:
+            messages.error(request, "La contraseña es obligatoria y debe tener máximo 50 caracteres.")
+            return redirect('login')
+
+        # 🔎 Buscar solo por CI
         try:
-            user = Usuario.objects.get(ci=username)
+            user = Usuario.objects.get(ci=username_raw)
         except Usuario.DoesNotExist:
-            try:
-                user = Usuario.objects.get(email__iexact=username)
-            except Usuario.DoesNotExist:
-                user = None
+            user = None
 
-        # Validar credenciales
+        # ✅ Credenciales
         if user and user.check_password(password):
             if not getattr(user, "is_activo", True):
                 messages.error(request, "Tu usuario está inactivo.")
@@ -53,13 +55,12 @@ def login_view(request):
 
             auth_login(request, user, backend=BACKEND_PATH)
             request.session.set_expiry(0)  # expira al cerrar el navegador
-
-            # Limpia mensajes pendientes para que no aparezcan en el dashboard
-            list(messages.get_messages(request))
+            list(messages.get_messages(request))  # limpia mensajes
 
             if next_url:
                 return redirect(next_url)
 
+            # 🔀 Redirección por rol
             rol_nombre = (getattr(user.rol, "nombre", "") or "").strip().lower()
             if rol_nombre == "director":
                 return redirect('cuentas:director_dashboard')
