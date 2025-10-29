@@ -1,4 +1,5 @@
-# apps/cuentas/roles.py
+from django.contrib.auth import get_user_model
+
 def rol_nombre(user) -> str:
     return (getattr(getattr(user, "rol", None), "nombre", "") or "").lower()
 
@@ -17,3 +18,11 @@ def es_secretaria(user) -> bool:
 
 def es_padre(user) -> bool:
     return has_any_role(user, "padre")
+
+def total_directores_activos(exclude_pk=None) -> int:
+    Usuario = get_user_model()
+    qs = Usuario.objects.filter(is_activo=True)
+    if exclude_pk:
+        qs = qs.exclude(pk=exclude_pk)
+    # ✅ llamar es_director directamente, sin import
+    return sum(1 for u in qs.select_related("rol") if es_director(u))
