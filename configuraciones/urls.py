@@ -14,18 +14,23 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# configuraciones/urls.py
+from django.contrib import admin
 from django.urls import path, include
-from apps.cuentas.views.login import login_view  # Importa la vista de login
-from apps.cuentas.views.director_dashboard import director_dashboard  # Importa la vista del dashboard
-from apps.cuentas.views_dev import dev_404 
+from apps.cuentas.views.login import login_view
+from apps.cuentas.views.director_dashboard import director_dashboard
+from apps.cuentas.views_dev import dev_404
+
 urlpatterns = [
-    path('login/', login_view, name='login'),
-    path('dashboard/director/', director_dashboard, name='director_dashboard'),
-    path('', include('apps.cuentas.urls')),  # Incluir las URLs de la aplicación 'cuentas'
-    path('cursos/', include('apps.cursos.urls')),
-    path("estudiantes/", include("apps.estudiantes.urls")),
+    path("", login_view, name="home"),                      # ⬅️ raíz = login
+    path("login/", login_view, name="login"),
+    path("dashboard/director/", director_dashboard, name="director_dashboard"),
     path("cuentas/", include(("apps.cuentas.urls", "cuentas"), namespace="cuentas")),
-    path("dev/404/", dev_404, name="dev_404"),  
+    path("cursos/", include("apps.cursos.urls")),
+    path("estudiantes/", include("apps.estudiantes.urls")),
+    path("admin/", admin.site.urls),
+    path("dev/404/", dev_404, name="dev_404"),
 ]
+
 handler403 = "apps.cuentas.views.errors.error_403"
 handler404 = "apps.cuentas.handlers.error_404"
