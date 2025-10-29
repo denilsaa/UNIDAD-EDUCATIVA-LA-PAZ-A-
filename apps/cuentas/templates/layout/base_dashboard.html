@@ -74,6 +74,7 @@
 
     <!-- Contenido -->
     <main class="main">
+      <!-- Botón hamburguesa (solo visible en móvil) -->
       {% if messages %}
         <div class="msgs">
           {% for message in messages %}
@@ -192,8 +193,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 </script>
-
-
 
 </body>
 {% endwith %}

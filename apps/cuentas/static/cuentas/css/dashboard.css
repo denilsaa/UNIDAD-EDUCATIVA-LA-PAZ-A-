@@ -364,3 +364,58 @@ thead {
 @media (prefers-color-scheme: dark) {
   .ui-lock__box { background:#111; color:#f6f6f6; }
 }
+
+
+/* === BOTÓN HAMBURGUESA (RESPONSIVO) === */
+.menu-toggle {
+  display: none; /* oculto en escritorio */
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  background: #0c2a57;
+  color: white;
+  border: none;
+  font-size: 1.6rem;
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+  z-index: 1001; /* encima de todo */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transition: background 0.3s;
+}
+
+.menu-toggle:hover {
+  background: #13386f;
+}
+
+/* Sidebar en móvil */
+@media (max-width: 900px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .sidenav {
+    position: fixed;
+    top: 0;
+    left: -260px; /* oculto fuera de pantalla */
+    width: 240px;
+    height: 100%;
+    background: #0c2a57;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    box-shadow: 4px 0 8px rgba(0,0,0,0.2);
+  }
+
+  .sidenav.open {
+    left: 0; /* visible cuando tiene la clase .open */
+  }
+
+  /* Empuja contenido principal cuando el menú está abierto */
+  .main {
+    transition: margin-left 0.3s ease;
+  }
+
+  .sidenav.open ~ .main {
+    margin-left: 240px;
+  }
+}
