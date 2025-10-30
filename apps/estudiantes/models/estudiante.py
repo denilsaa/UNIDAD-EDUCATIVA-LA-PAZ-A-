@@ -2,10 +2,13 @@ from django.db import models
 from apps.cuentas.models import Usuario
 from apps.cursos.models import Curso, Kardex
 
+
 class Estudiante(models.Model):
     kardex = models.ForeignKey(Kardex, on_delete=models.RESTRICT, related_name="estudiantes")
-    curso = models.ForeignKey(Curso, on_delete=models.RESTRICT, related_name="estudiantes")
+    # ⬇️ Ahora puede quedar sin curso (no bloquea el borrado del curso)
+    curso = models.ForeignKey(Curso, null=True, blank=True, on_delete=models.SET_NULL, related_name="estudiantes")
     padre = models.ForeignKey(Usuario, on_delete=models.RESTRICT, related_name="hijos")
+
     ci = models.CharField("CI", max_length=40, unique=True, null=True, blank=True)
     nombres = models.CharField(max_length=120)
     apellidos = models.CharField(max_length=120)
@@ -14,6 +17,7 @@ class Estudiante(models.Model):
     class Sexo(models.TextChoices):
         M = "M", "Masculino"
         F = "F", "Femenino"
+
     sexo = models.CharField(max_length=1, choices=Sexo.choices, null=True, blank=True)
 
     creado_en = models.DateTimeField(auto_now_add=True)
