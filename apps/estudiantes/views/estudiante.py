@@ -7,7 +7,6 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.shortcuts import get_object_or_404, render
 
-from apps.estudiantes.forms import EstudianteForm
 from apps.estudiantes.models.estudiante import Estudiante
 from apps.cursos.models.kardex import Kardex
 from apps.cursos.models.curso import Curso
@@ -15,6 +14,9 @@ from apps.cursos.models.curso import Curso
 # 🔒 roles/mixins
 from apps.cuentas.mixins import RoleRequiredMixin
 from apps.cuentas.roles import es_regente, es_director, es_secretaria
+
+# 👇 importa la clase del formulario (NO string)
+from apps.estudiantes.forms import EstudianteForm
 
 
 def trimestre_actual(hoy: date) -> int:
@@ -54,7 +56,7 @@ class EstudianteListView(RoleRequiredMixin, ListView):
 
 class EstudianteCreateView(RoleRequiredMixin, CreateView):
     model = Estudiante
-    form_class = EstudianteForm
+    form_class = EstudianteForm          # <- usar la clase
     template_name = "estudiantes/formulario_estudiante.html"
     success_url = reverse_lazy("estudiantes:listar")
     required_roles = ("director", "secretaria", "secretaría")
@@ -84,7 +86,7 @@ class EstudianteCreateView(RoleRequiredMixin, CreateView):
 
 class EstudianteUpdateView(RoleRequiredMixin, UpdateView):
     model = Estudiante
-    form_class = EstudianteForm
+    form_class = EstudianteForm          # <- usar la clase
     template_name = "estudiantes/formulario_estudiante.html"
     success_url = reverse_lazy("estudiantes:listar")
     required_roles = ("director", "secretaria", "secretaría")
@@ -160,7 +162,6 @@ class EstudiantesPorCursoListView(RoleRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        # Usa el queryset ya evaluado para contar sin repetir consultas
         qs = self.get_queryset()
         ctx["curso"] = self.curso
         ctx["total"] = qs.count()
