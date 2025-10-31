@@ -1,0 +1,74 @@
+{% extends "layout/base_dashboard.html" %}
+
+{% block content %}
+<h2>Calendarios de asistencia</h2>
+
+<!-- Crear/activar calendario -->
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button>Guardar</button>
+</form>
+
+<hr>
+
+<!-- Resumen mensual del calendario ACTIVO -->
+<h3>Resumen mensual (calendario activo)</h3>
+
+<form method="get">
+  <label>Año
+    <input type="number" name="anio" value="{{ resumen.year }}" min="2000" max="2100">
+  </label>
+    <label>Mes
+    <select name="mes">
+        {% for m in meses %}
+        <option value="{{ m }}" {% if resumen.month == m %}selected{% endif %}>
+            {{ m|stringformat:"02d" }}
+        </option>
+        {% endfor %}
+    </select>
+    </label>
+
+  <button>Ver</button>
+</form>
+
+{% if not resumen.tiene_calendario %}
+  <p>No hay calendario activo. Crea uno y se activará automáticamente.</p>
+{% else %}
+  <ul>
+    <li>Días hábiles (según rango + L–V + exclusiones): <strong>{{ resumen.dias_habiles }}</strong></li>
+    <li>Presencias (P): <strong>{{ resumen.cuenta_P }}</strong> — {{ resumen.pct_P }}%</li>
+    <li>Faltas (F): <strong>{{ resumen.cuenta_F }}</strong> — {{ resumen.pct_F }}%</li>
+    <li>Atrasos (R): <strong>{{ resumen.cuenta_R }}</strong> — {{ resumen.pct_R }}%</li>
+  </ul>
+{% endif %}
+
+<hr>
+
+<!-- Lista de calendarios existentes -->
+<table>
+  <thead>
+    <tr>
+      <th>Rango</th>
+      <th>Días</th>
+      <th>Activo</th>
+      <th>Exclusiones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in calendarios %}
+      <tr>
+        <td>{{ c.fecha_inicio }} → {{ c.fecha_fin }}</td>
+        <td>
+          {% if c.lunes %}L {% endif %}{% if c.martes %}M {% endif %}{% if c.miercoles %}X {% endif %}
+          {% if c.jueves %}J {% endif %}{% if c.viernes %}V{% endif %}
+        </td>
+        <td>{{ c.activo|yesno:"Sí,No" }}</td>
+        <td><a href="{% url 'estudiantes:asistencia_exclusiones' c.id %}">Gestionar</a></td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4">Sin calendarios.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

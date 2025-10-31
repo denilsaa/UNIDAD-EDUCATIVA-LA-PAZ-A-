@@ -39,6 +39,12 @@
             <li><a href="{% url 'cuentas:director_dashboard' %}">📊 Resumen</a></li>
             <li><a href="{% url 'cuentas:lista_usuarios' %}">👤 Usuarios</a></li>
             <li><a href="{% url 'cursos:lista_cursos' %}">📚 Cursos</a></li>
+
+            <!-- 👇 NUEVO: Asistencia (Director) -->
+            <li><a href="{% url 'estudiantes:asistencia_calendario' %}">🗓️ Calendario asistencia</a></li>
+            <!-- Tip: para tomar asistencia el Director elige curso primero -->
+            <li><a href="{% url 'cursos:lista_cursos' %}">📋 Tomar asistencia</a></li>
+
             <li><a href="{% url 'cuentas:crear_usuario' %}">➕ Nuevo usuario</a></li>
             <li><a href="{% url 'cursos:crear_curso' %}">➕ Nuevo curso</a></li>
             <li><a href="{% url 'estudiantes:kardex_items_listar' %}">🗂️ Kárdex</a></li>
@@ -50,6 +56,8 @@
           {% elif "regente" in role %}
             <li><a href="{% url 'cuentas:regente_dashboard' %}">📊 Resumen</a></li>
             <li><a href="{% url 'cursos:mis_cursos_regente' %}">📚 Mis cursos</a></li>
+            <!-- 👇 NUEVO: Tomar asistencia (Regente) va por sus cursos -->
+            <li><a href="{% url 'cursos:mis_cursos_regente' %}">📋 Tomar asistencia</a></li>
 
           {# --- Secretaría --- #}
           {% elif "secretaria" in role or "secretaría" in role %}
@@ -64,6 +72,7 @@
           {% elif "padre" in role %}
             <li><a href="{% url 'cuentas:padre_dashboard' %}">🏠 Inicio</a></li>
             <li><a href="{% url 'estudiantes:mis_hijos' %}">👨‍👩‍👧 Mis hijos</a></li>
+            <!-- Para ver asistencia, entra al detalle del hijo -->
           {% endif %}
 
           <li class="sep"></li>
@@ -129,70 +138,70 @@
       });
     })();
   </script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  // ------- Overlay SOLO cuando hay salida de la página (navegación real) ------
-  function showOverlay() {
-    if (document.getElementById("ui-lock")) return;
-    const ov = document.createElement("div");
-    ov.id = "ui-lock";
-    ov.innerHTML = '<div class="ui-lock__box"><div class="ui-lock__spinner"></div><p>Procesando…</p></div>';
-    Object.assign(ov.style, {
-      position:"fixed", inset:"0", zIndex:"9999",
-      background:"rgba(255,255,255,.6)",
-      display:"flex", alignItems:"center", justifyContent:"center",
-      backdropFilter:"saturate(180%) blur(2px)"
-    });
-    document.body.appendChild(ov);
-    document.body.style.overflow = "hidden";
-  }
-  window.addEventListener("beforeunload", showOverlay);
-
-  // ------- 1) Anti double-submit por formulario (no tocar disabled/value) ------
-  document.querySelectorAll("form").forEach(form => {
-    let submitting = false;
-    form.addEventListener("submit", function (e) {
-      if (submitting) {
-        e.preventDefault(); e.stopPropagation(); return false;
-      }
-      submitting = true;
-
-      // Feedback opcional en el botón sin cambiar value/disabled
-      const btn = form.querySelector("button[type=submit], input[type=submit]");
-      if (btn) btn.classList.add("is-loading");
-
-      // Importante: NO bloquear aquí la UI, dejamos que el navegador navegue.
-      // El overlay aparecerá en beforeunload cuando la navegación realmente empiece.
-    }, true);
-  });
-
-  // ------- 2) Debounce para ENLACES y mostrar overlay sólo si navegan -------
-  document.querySelectorAll("a[href]").forEach(link => {
-    link.addEventListener("click", function (e) {
-      const href = link.getAttribute("href") || "";
-      if (href.startsWith("#")) return;
-
-      if (link.dataset.clicked === "true") {
-        e.preventDefault(); e.stopPropagation(); return false;
-      }
-      link.dataset.clicked = "true";
-
-      // Si es una navegación a otra página, el beforeunload disparará overlay.
-      // Si no hay navegación (misma página o AJAX), rearmamos el debounce:
-      setTimeout(() => { link.dataset.clicked = "false"; }, 4000);
-    }, { capture:true });
-  });
-
-  // Limpieza si el navegador usa bfcache
-  window.addEventListener("pageshow", function (evt) {
-    if (evt.persisted) {
-      const ov = document.getElementById("ui-lock");
-      if (ov) ov.remove();
-      document.body.style.overflow = "";
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // ------- Overlay SOLO cuando hay salida de la página (navegación real) ------
+    function showOverlay() {
+      if (document.getElementById("ui-lock")) return;
+      const ov = document.createElement("div");
+      ov.id = "ui-lock";
+      ov.innerHTML = '<div class="ui-lock__box"><div class="ui-lock__spinner"></div><p>Procesando…</p></div>';
+      Object.assign(ov.style, {
+        position:"fixed", inset:"0", zIndex:"9999",
+        background:"rgba(255,255,255,.6)",
+        display:"flex", alignItems:"center", justifyContent:"center",
+        backdropFilter:"saturate(180%) blur(2px)"
+      });
+      document.body.appendChild(ov);
+      document.body.style.overflow = "hidden";
     }
+    window.addEventListener("beforeunload", showOverlay);
+
+    // ------- 1) Anti double-submit por formulario (no tocar disabled/value) ------
+    document.querySelectorAll("form").forEach(form => {
+      let submitting = false;
+      form.addEventListener("submit", function (e) {
+        if (submitting) {
+          e.preventDefault(); e.stopPropagation(); return false;
+        }
+        submitting = true;
+
+        // Feedback opcional en el botón sin cambiar value/disabled
+        const btn = form.querySelector("button[type=submit], input[type=submit]");
+        if (btn) btn.classList.add("is-loading");
+
+        // Importante: NO bloquear aquí la UI, dejamos que el navegador navegue.
+        // El overlay aparecerá en beforeunload cuando la navegación realmente empiece.
+      }, true);
+    });
+
+    // ------- 2) Debounce para ENLACES y mostrar overlay sólo si navegan -------
+    document.querySelectorAll("a[href]").forEach(link => {
+      link.addEventListener("click", function (e) {
+        const href = link.getAttribute("href") || "";
+        if (href.startsWith("#")) return;
+
+        if (link.dataset.clicked === "true") {
+          e.preventDefault(); e.stopPropagation(); return false;
+        }
+        link.dataset.clicked = "true";
+
+        // Si es una navegación a otra página, el beforeunload disparará overlay.
+        // Si no hay navegación (misma página o AJAX), rearmamos el debounce:
+        setTimeout(() => { link.dataset.clicked = "false"; }, 4000);
+      }, { capture:true });
+    });
+
+    // Limpieza si el navegador usa bfcache
+    window.addEventListener("pageshow", function (evt) {
+      if (evt.persisted) {
+        const ov = document.getElementById("ui-lock");
+        if (ov) ov.remove();
+        document.body.style.overflow = "";
+      }
+    });
   });
-});
-</script>
+  </script>
 
 </body>
 {% endwith %}

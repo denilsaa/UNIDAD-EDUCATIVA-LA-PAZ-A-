@@ -226,3 +226,49 @@ html, body {
   .dashboard-container { padding: 0.5rem; }
   .chart-card { height: 300px; }
 }
+
+/* === BOTÓN HAMBURGUESA DENTRO DEL HEADER - FORZADO === */
+.dashboard-header { position: relative; z-index: 2; }
+
+/* estilos base del botón */
+.menu-toggle {
+  display: none;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border: none;
+  font-size: 1.4rem;
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  z-index: 6; /* encima de pseudo-elementos del header */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+}
+
+/* asegurar que el botón esté visible en mobile (forzado) */
+@media (max-width: 900px) {
+  .dashboard-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 1rem !important;
+  }
+
+  .header-left { display: flex; flex-direction: column; gap: 0.25rem; }
+
+  .dashboard-header p { display: none !important; } /* opcional */
+
+  .menu-toggle {
+    display: inline-flex !important;
+    margin-left: 1rem;
+    align-self: center;
+    background: rgba(255,255,255,0.12) !important;
+  }
+}
+
+/* Forzar que no quede oculto por overflow o transform del padre */
+.menu-toggle {
+  position: relative;
+  transform: none !important;
+  pointer-events: auto;
+}

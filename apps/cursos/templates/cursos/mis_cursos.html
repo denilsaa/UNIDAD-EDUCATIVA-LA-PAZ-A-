@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block content %}
+{% now "Y-m-d" as hoy %}
 <div class="cursos-header">
   <h2>Mis cursos asignados</h2>
   <p>Consulta y gestiona los cursos bajo tu supervisión.</p>
@@ -20,6 +21,8 @@
       <p>Curso asignado al regente actual.</p>
       <div class="curso-actions">
         <a href="{% url 'estudiantes:por_curso' c.id %}" class="btn-ver">Ver estudiantes</a>
+        <!-- 👉 NUEVO: Llamar asistencia (regente solo en sus cursos) -->
+        <a href="{% url 'estudiantes:asistencia_tomar' c.id %}?fecha={{ hoy }}" class="btn-llamar-asistencia">Llamar asistencia</a>
       </div>
     </div>
   {% empty %}

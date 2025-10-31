@@ -1,0 +1,26 @@
+{% extends "layout/base_dashboard.html" %}
+{% block content %}
+<h2>Exclusiones para {{ calendario }}</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn btn-primary">Agregar día sin lista</button>
+</form>
+
+<hr>
+<ul>
+  {% for e in exclusiones %}
+    <li>
+      {{ e.fecha }}
+      <form method="post" action="{% url 'estudiantes:asistencia_exclusion_eliminar' calendario.id e.id %}" style="display:inline">
+        {% csrf_token %}<button class="btn btn-link text-danger">Eliminar</button>
+      </form>
+    </li>
+  {% empty %}
+    <li>No hay exclusiones.</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'estudiantes:asistencia_calendario' %}">Volver</a>
+{% endblock %}
