@@ -1,42 +1,70 @@
+# apps/citaciones/models/citacion.py
 from django.db import models
-from apps.estudiantes.models import Estudiante
+from apps.estudiantes.models.estudiante import Estudiante
+from apps.estudiantes.models.kardex_registro import KardexRegistro
 from apps.cuentas.models import Usuario
 
+
 class Citacion(models.Model):
-    class Categoria(models.TextChoices):
-        ASISTENCIA="ASISTENCIA"; CONDUCTA="CONDUCTA"; ACADEMICO="ACADEMICO"
     class Estado(models.TextChoices):
-        ABIERTA="ABIERTA"; NOTIFICADA="NOTIFICADA"; AGENDADA="AGENDADA"
-        ATENDIDA="ATENDIDA"; CERRADA="CERRADA"; CANCELADA="CANCELADA"
+        ABIERTA = "ABIERTA", "Abierta (borrador)"
+        AGENDADA = "AGENDADA", "Agendada"
+        NOTIFICADA = "NOTIFICADA", "Notificada a padres/tutores"
+        ATENDIDA = "ATENDIDA", "Atendida"
+        CANCELADA = "CANCELADA", "Cancelada"
 
-    estudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name="citaciones")
-    creador = models.ForeignKey(Usuario, on_delete=models.RESTRICT, related_name="citaciones_creadas")
-    categoria = models.CharField(max_length=12, choices=Categoria.choices)
-    severidad = models.PositiveSmallIntegerField(default=1)  # se eleva al máximo de sus motivos
-    estado = models.CharField(max_length=12, choices=Estado.choices, default=Estado.ABIERTA)
+    # --- Relación base ---
+    estudiante = models.ForeignKey(
+        Estudiante,
+        on_delete=models.RESTRICT,
+        related_name="citaciones",
+        verbose_name="Estudiante",
+    )
+    kardex_registro = models.OneToOneField(
+        KardexRegistro,
+        on_delete=models.RESTRICT,
+        related_name="citacion_origen",
+        verbose_name="Registro de Kárdex",
+        null=True, blank=True,          # <-- AÑADE ESTO
+    )
 
-    fecha_citacion = models.DateField(null=True, blank=True)
-    hora_citacion = models.TimeField(null=True, blank=True)
 
-    # banderas opcionales
-    flag_falta = models.BooleanField(default=False)
-    flag_atraso = models.BooleanField(default=False)
-    flag_no_tarea = models.BooleanField(default=False)
+    # --- Motivo resumido (puedes tener además tu relación a motivos detallados) ---
+    motivo_resumen = models.CharField(
+        "Motivo (resumen)", max_length=160, blank=True, default=""
+    )
 
-    puntaje_motivos = models.IntegerField(default=0)
-    recurrencia_30d = models.IntegerField(default=0)
-    impulso_manual = models.IntegerField(default=0)
+    # --- Estado de la citación ---
+    estado = models.CharField(
+        "Estado", max_length=12, choices=Estado.choices, default=Estado.ABIERTA
+    )
 
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_objetivo = models.DateTimeField(null=True, blank=True)
-    fecha_cierre = models.DateTimeField(null=True, blank=True)
+    # ============= NUEVO: aprobación + duración (añade ESTOS campos) =============
+    duracion_min = models.PositiveSmallIntegerField(
+        "Duración (minutos)", default=30,
+        help_text="15, 30, 45 o 60. Se usa para agenda y métricas."
+    )
+    aprobado_por = models.ForeignKey(
+        Usuario, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="citaciones_aprobadas", verbose_name="Aprobado por"
+    )
+    aprobado_en = models.DateTimeField("Aprobado en", null=True, blank=True)
+    # ============================================================================
 
-    creado_en = models.DateTimeField(auto_now_add=True)
-    actualizado_en = models.DateTimeField(auto_now=True)
+    # --- Agenda (si ya tienes campos de fecha/hora, mantenlos; si no, estos ayudan) ---
+    fecha_citacion = models.DateField("Fecha de citación", null=True, blank=True)
+    hora_citacion = models.TimeField("Hora de citación", null=True, blank=True)
+
+    creado_en = models.DateTimeField("Creado en", auto_now_add=True)
+    actualizado_en = models.DateTimeField("Actualizado en", auto_now=True)
 
     class Meta:
         verbose_name = "citación"
         verbose_name_plural = "citaciones"
+        ordering = ["-creado_en"]
 
     def __str__(self):
-        return f"Citación {self.id} — {self.estudiante}"
+        base = f"{self.estudiante} · {self.motivo_resumen or 'Citación'}"
+        if self.fecha_citacion and self.hora_citacion:
+            return f"{base} · {self.fecha_citacion:%d/%m} {self.hora_citacion:%H:%M}"
+        return base
