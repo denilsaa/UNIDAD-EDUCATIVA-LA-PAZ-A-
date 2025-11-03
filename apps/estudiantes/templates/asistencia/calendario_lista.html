@@ -1,73 +1,66 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+{% block title %}Calendario de Asistencia{% endblock %}
 
 {% block content %}
-<h2>Calendarios de asistencia</h2>
+<h2>Calendario de asistencia</h2>
 
-<!-- Crear/activar calendario -->
-<form method="post">
+<form method="post" class="card p-3 mb-4">
   {% csrf_token %}
-  {{ form.as_p }}
-  <button>Guardar</button>
+  <div class="row g-3">
+    {{ form.as_p }}
+  </div>
+  <button class="btn btn-primary mt-2">Guardar y activar</button>
 </form>
 
-<hr>
-
-<!-- Resumen mensual del calendario ACTIVO -->
-<h3>Resumen mensual (calendario activo)</h3>
-
-<form method="get">
-  <label>Año
-    <input type="number" name="anio" value="{{ resumen.year }}" min="2000" max="2100">
-  </label>
-    <label>Mes
-    <select name="mes">
-        {% for m in meses %}
-        <option value="{{ m }}" {% if resumen.month == m %}selected{% endif %}>
-            {{ m|stringformat:"02d" }}
-        </option>
-        {% endfor %}
+<h4 class="mt-4">Resumen mensual</h4>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-auto">
+    <input type="number" name="anio" value="{{ resumen.year }}" class="form-control" min="2000" max="2100">
+  </div>
+  <div class="col-auto">
+    <select name="mes" class="form-select">
+      {% for m in meses %}
+        <option value="{{ m }}" {% if m == resumen.month %}selected{% endif %}>{{ m }}</option>
+      {% endfor %}
     </select>
-    </label>
-
-  <button>Ver</button>
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-outline-secondary">Filtrar</button>
+  </div>
 </form>
 
-{% if not resumen.tiene_calendario %}
-  <p>No hay calendario activo. Crea uno y se activará automáticamente.</p>
+{% if resumen.tiene_calendario %}
+  <div class="row g-3">
+    <div class="col">
+      <div class="card p-3">
+        <div><strong>Días hábiles:</strong> {{ resumen.dias_habiles }}</div>
+        <div>P: {{ resumen.cuenta_P }} ({{ resumen.pct_P }}%)</div>
+        <div>F: {{ resumen.cuenta_F }} ({{ resumen.pct_F }}%)</div>
+        <div>R: {{ resumen.cuenta_R }} ({{ resumen.pct_R }}%)</div>
+      </div>
+    </div>
+  </div>
 {% else %}
-  <ul>
-    <li>Días hábiles (según rango + L–V + exclusiones): <strong>{{ resumen.dias_habiles }}</strong></li>
-    <li>Presencias (P): <strong>{{ resumen.cuenta_P }}</strong> — {{ resumen.pct_P }}%</li>
-    <li>Faltas (F): <strong>{{ resumen.cuenta_F }}</strong> — {{ resumen.pct_F }}%</li>
-    <li>Atrasos (R): <strong>{{ resumen.cuenta_R }}</strong> — {{ resumen.pct_R }}%</li>
-  </ul>
+  <div class="alert alert-warning mt-2">No hay calendario activo.</div>
 {% endif %}
 
-<hr>
-
-<!-- Lista de calendarios existentes -->
-<table>
-  <thead>
-    <tr>
-      <th>Rango</th>
-      <th>Días</th>
-      <th>Activo</th>
-      <th>Exclusiones</th>
-    </tr>
-  </thead>
+<h4 class="mt-4">Calendarios existentes</h4>
+<table class="table table-sm">
+  <thead><tr><th>Rango</th><th>Activo</th><th>Acciones</th></tr></thead>
   <tbody>
     {% for c in calendarios %}
       <tr>
         <td>{{ c.fecha_inicio }} → {{ c.fecha_fin }}</td>
-        <td>
-          {% if c.lunes %}L {% endif %}{% if c.martes %}M {% endif %}{% if c.miercoles %}X {% endif %}
-          {% if c.jueves %}J {% endif %}{% if c.viernes %}V{% endif %}
-        </td>
         <td>{{ c.activo|yesno:"Sí,No" }}</td>
-        <td><a href="{% url 'estudiantes:asistencia_exclusiones' c.id %}">Gestionar</a></td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'estudiantes:asistencia_exclusiones' c.id %}">
+            Exclusiones
+          </a>
+        </td>
       </tr>
     {% empty %}
-      <tr><td colspan="4">Sin calendarios.</td></tr>
+      <tr><td colspan="3">Sin calendarios.</td></tr>
     {% endfor %}
   </tbody>
 </table>

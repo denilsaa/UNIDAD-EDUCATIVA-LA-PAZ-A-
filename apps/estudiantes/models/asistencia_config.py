@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 
-
 class AsistenciaCalendario(models.Model):
     """
     Definido por el Director: rango de fechas y qué días hábiles (L–V) cuentan.
@@ -85,8 +84,10 @@ class AsistenciaExclusion(models.Model):
         verbose_name_plural = "exclusiones de asistencia"
 
     def clean(self):
+        # Nota: clean se usa con commit=False en la vista y ya se setea calendario antes de full_clean()
         if not (self.calendario.fecha_inicio <= self.fecha <= self.calendario.fecha_fin):
             raise ValidationError("La fecha excluida debe estar dentro del rango del calendario.")
 
     def __str__(self):
-        return f"{self.fecha} (sin lista)"
+        cal_id = getattr(self, "calendario_id", None)
+        return f"{self.fecha} (sin lista) · cal:{cal_id or '—'}"

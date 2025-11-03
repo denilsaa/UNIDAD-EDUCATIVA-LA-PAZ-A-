@@ -1,31 +1,24 @@
 {% extends "layout/base_dashboard.html" %}
+{% block title %}Tomar asistencia{% endblock %}
+
 {% block content %}
+<h2>Tomar asistencia — {{ curso.nivel }} {{ curso.paralelo }}</h2>
 
-<h2>
-  Tomar asistencia — {{ curso.nivel }} {{ curso.paralelo }}
-  {% if modo == "dia" %} — {{ fecha|date:"j \\d\\e F \\d\\e Y" }}{% endif %}
-  {% if modo == "mes" %} — {{ mes_nombre }} {{ year }}{% endif %}
-  {% if modo == "anio" %} — Año {{ year }}{% endif %}
-</h2>
-
-<p>
-  <a href="?modo=dia">Diario</a> |
-  <a href="?modo=mes">Mensual</a> |
-  <a href="?modo=anio">Anual</a>
-</p>
+<div class="mb-3">
+  <a class="btn btn-outline-secondary btn-sm" href="?modo=dia">Día</a>
+  <a class="btn btn-outline-secondary btn-sm" href="?modo=mes">Mes</a>
+  <a class="btn btn-outline-secondary btn-sm" href="?modo=anio">Año</a>
+</div>
 
 {% if modo == "dia" %}
-  <form method="post">
+  <form method="post" class="card p-3">
     {% csrf_token %}
-    <input type="hidden" name="modo" value="dia">
-    <input type="date" name="fecha" value="{{ fecha|date:'Y-m-d' }}">
+    <div class="mb-2">
+      <input type="date" name="fecha" value="{{ fecha|date:'Y-m-d' }}" class="form-control" style="max-width:220px">
+    </div>
 
-    <table border="1" cellspacing="0" cellpadding="4">
-      <thead>
-        <tr>
-          <th>Estudiante</th><th>Presente</th><th>Falta</th><th>Atraso</th>
-        </tr>
-      </thead>
+    <table class="table">
+      <thead><tr><th>Estudiante</th><th>Estado</th></tr></thead>
       <tbody>
         {% for form in formset %}
           <tr>
@@ -33,108 +26,68 @@
               {{ form.estudiante_id }} <!-- hidden -->
               {{ form.nombres }}
             </td>
-            <td><input type="radio" name="{{ form.prefix }}-estado" value="PRESENTE" required></td>
-            <td><input type="radio" name="{{ form.prefix }}-estado" value="FALTA"></td>
-            <td><input type="radio" name="{{ form.prefix }}-estado" value="ATRASO"></td>
+            <td>{{ form.estado }}</td>
           </tr>
-        {% empty %}
-          <tr><td colspan="4">Sin estudiantes.</td></tr>
         {% endfor %}
       </tbody>
     </table>
 
-    <p><button>Guardar asistencia</button></p>
+    <button class="btn btn-primary">Guardar</button>
   </form>
 
 {% elif modo == "mes" %}
-  <form method="get">
-    <input type="hidden" name="modo" value="mes">
-    <label>Año <input type="number" name="anio" value="{{ year }}" min="2000" max="2100"></label>
-    <label>Mes
-      <select name="mes">
-        <option value="1"  {% if month == 1 %}selected{% endif %}>Enero</option>
-        <option value="2"  {% if month == 2 %}selected{% endif %}>Febrero</option>
-        <option value="3"  {% if month == 3 %}selected{% endif %}>Marzo</option>
-        <option value="4"  {% if month == 4 %}selected{% endif %}>Abril</option>
-        <option value="5"  {% if month == 5 %}selected{% endif %}>Mayo</option>
-        <option value="6"  {% if month == 6 %}selected{% endif %}>Junio</option>
-        <option value="7"  {% if month == 7 %}selected{% endif %}>Julio</option>
-        <option value="8"  {% if month == 8 %}selected{% endif %}>Agosto</option>
-        <option value="9"  {% if month == 9 %}selected{% endif %}>Septiembre</option>
-        <option value="10" {% if month == 10 %}selected{% endif %}>Octubre</option>
-        <option value="11" {% if month == 11 %}selected{% endif %}>Noviembre</option>
-        <option value="12" {% if month == 12 %}selected{% endif %}>Diciembre</option>
-      </select>
-    </label>
-    <button>Ver</button>
-  </form>
-
-  <form method="post">
+  <h5>{{ mes_nombre }} {{ year }}</h5>
+  <form method="post" class="card p-3">
     {% csrf_token %}
     <input type="hidden" name="modo" value="mes">
     <input type="hidden" name="anio" value="{{ year }}">
     <input type="hidden" name="mes" value="{{ month }}">
 
-    <table border="1" cellspacing="0" cellpadding="4">
+    <table class="table table-sm">
       <thead>
         <tr>
-          <th rowspan="2">N°</th>
-          <th rowspan="2">Nombres y Apellidos</th>
-          {% for h in headers %}<th>{{ h.ini }}</th>{% endfor %}
-          <th rowspan="2">P</th>
-          <th rowspan="2">F</th>
-          <th rowspan="2">R</th>
-          <th rowspan="2">%P</th>
-          <th rowspan="2">%F</th>
-          <th rowspan="2">%R</th>
-        </tr>
-        <tr>
-          {% for h in headers %}<th>{{ h.day }}</th>{% endfor %}
+          <th>Estudiante</th>
+          {% for h in headers %}
+            <th class="text-center">{{ h.ini }}<br>{{ h.day }}</th>
+          {% endfor %}
+          <th class="text-center">P</th>
+          <th class="text-center">F</th>
+          <th class="text-center">R</th>
+          <th class="text-center">P%</th>
         </tr>
       </thead>
       <tbody>
         {% for fila in filas %}
           <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ fila.est.apellidos }} {{ fila.est.nombres }}</td>
+            <td>{{ fila.est.apellidos }}, {{ fila.est.nombres }}</td>
             {% for c in fila.celdas %}
-              <td>
-                <select name="{{ c.name_estado }}">
-                  <option value="" {% if not c.estado %}selected{% endif %}>—</option>
+              <td class="text-center">
+                <select name="{{ c.name_estado }}" class="form-select form-select-sm">
+                  <option value="" {% if not c.estado %}selected{% endif %}></option>
                   <option value="PRESENTE" {% if c.estado == "PRESENTE" %}selected{% endif %}>P</option>
                   <option value="FALTA" {% if c.estado == "FALTA" %}selected{% endif %}>F</option>
                   <option value="ATRASO" {% if c.estado == "ATRASO" %}selected{% endif %}>R</option>
                 </select>
               </td>
             {% endfor %}
-            <td>{{ fila.totP }}</td>
-            <td>{{ fila.totF }}</td>
-            <td>{{ fila.totR }}</td>
-            <td>{{ fila.pctP }}%</td>
-            <td>{{ fila.pctF }}%</td>
-            <td>{{ fila.pctR }}%</td>
+            <td class="text-center">{{ fila.totP }}</td>
+            <td class="text-center">{{ fila.totF }}</td>
+            <td class="text-center">{{ fila.totR }}</td>
+            <td class="text-center">{{ fila.pctP }}%</td>
           </tr>
-        {% empty %}
-          <tr><td colspan="999">Sin estudiantes.</td></tr>
         {% endfor %}
       </tbody>
     </table>
 
-    <p><button>Guardar asistencia mensual</button></p>
+    <button class="btn btn-primary">Guardar mes</button>
   </form>
 
-{% elif modo == "anio" %}
-  <form method="get">
-    <input type="hidden" name="modo" value="anio">
-    <label>Año <input type="number" name="anio" value="{{ year }}" min="2000" max="2100"></label>
-    <button>Ver</button>
-  </form>
-
-  <ul>
-    {% for val,label in meses %}
-      <li><a href="?modo=mes&anio={{ year }}&mes={{ val }}">{{ label }}</a></li>
+{% else %}
+  <h5>Año {{ year }}</h5>
+  <div class="d-flex flex-wrap gap-2">
+    {% for m in meses %}
+      <a class="btn btn-outline-primary btn-sm" href="?modo=mes&anio={{ year }}&mes={{ m.0 }}">{{ m.1 }}</a>
     {% endfor %}
-  </ul>
+  </div>
 {% endif %}
-
 {% endblock %}

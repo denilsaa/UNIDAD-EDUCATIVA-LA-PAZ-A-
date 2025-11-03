@@ -1,3 +1,5 @@
+# apps/estudiantes/views/asistencia.py
+
 from datetime import date
 import calendar
 
@@ -113,14 +115,13 @@ def asistencia_calendario(request):
                 resumen["pct_F"] = int(round(resumen["cuenta_F"] * 100.0 / total))
                 resumen["pct_R"] = int(round(resumen["cuenta_R"] * 100.0 / total))
 
-        ctx = {
-            "form": form,
-            "calendarios": calendarios,
-            "resumen": resumen,
-            "meses": list(range(1, 13)),  # ← agregamos meses para el template
-        }
-        return render(request, "asistencia/calendario_lista.html", ctx)
-
+    ctx = {
+        "form": form,
+        "calendarios": calendarios,
+        "resumen": resumen,
+        "meses": list(range(1, 13)),
+    }
+    return render(request, "asistencia/calendario_lista.html", ctx)
 
 
 # =========================
@@ -130,16 +131,20 @@ def asistencia_calendario(request):
 @require_http_methods(["GET", "POST"])
 def asistencia_exclusiones(request, cal_id):
     cal = get_object_or_404(AsistenciaCalendario, pk=cal_id)
+
     form = ExclusionAsistenciaForm(request.POST or None)
+    # ⬇️ Clave: asignar la FK en la instancia ANTES de validar (evita RelatedObjectDoesNotExist en clean())
+    form.instance.calendario = cal
+
     if request.method == "POST":
         if form.is_valid():
+            # La instancia ya tiene calendario; guardar directo
             ex = form.save(commit=False)
-            ex.calendario = cal
-            ex.full_clean()
             ex.save()
             messages.success(request, "Día marcado como sin lista.")
             return redirect("estudiantes:asistencia_exclusiones", cal_id=cal.id)
-        messages.error(request, "No se pudo agregar la exclusión.")
+        messages.error(request, "No se pudo agregar la exclusión. Revisa la fecha.")
+
     exclusiones = cal.exclusiones.all()
     return render(
         request,
