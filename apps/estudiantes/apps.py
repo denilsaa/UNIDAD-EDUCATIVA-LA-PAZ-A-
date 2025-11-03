@@ -5,4 +5,14 @@ class EstudiantesConfig(AppConfig):
     name = "apps.estudiantes"
 
     def ready(self):
-        from . import signals  
+        # Si ya tenías otras señales, déjalas
+        try:
+            from . import signals  # opcional, si existe
+        except Exception:
+            pass
+
+        try:
+            from .views import signals_citaciones  # noqa: F401
+        except Exception:
+            # Evita romper en migraciones tempranas
+            pass
