@@ -1,6 +1,4 @@
-# apps/estudiantes/models/kardex_item.py
 from django.db import models
-
 
 class KardexItem(models.Model):
     class Area(models.TextChoices):
@@ -17,7 +15,7 @@ class KardexItem(models.Model):
     descripcion = models.CharField("Descripción", max_length=160)
     sentido = models.CharField("Sentido", max_length=16, choices=Sentido.choices, default=Sentido.NEGATIVO)
 
-    # ========== NUEVOS CAMPOS DE REGLA (añadir) ==========
+    # ===== nuevos campos =====
     peso = models.PositiveSmallIntegerField(
         "Peso (severidad)", default=10,
         help_text="Severidad base: p.ej., 5 (leve), 10 (mod.), 20 (import.), 35 (grave)."
@@ -35,12 +33,13 @@ class KardexItem(models.Model):
         help_text="Si es True, un solo evento crea citación (Abierta)."
     )
     activo = models.BooleanField("Activo", default=True)
-    # ======================================================
 
     creado_en = models.DateTimeField("Creado en", auto_now_add=True)
     actualizado_en = models.DateTimeField("Actualizado en", auto_now=True)
 
     class Meta:
+        # Mantén la unicidad original + el índice nuevo
+        constraints = [models.UniqueConstraint(fields=["area", "descripcion"], name="uq_kdx_item")]
         indexes = [models.Index(fields=["area", "sentido", "activo"])]
         ordering = ["area", "descripcion"]
         verbose_name = "ítem de kárdex"
