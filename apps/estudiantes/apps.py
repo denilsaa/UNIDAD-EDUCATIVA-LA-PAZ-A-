@@ -5,14 +5,14 @@ class EstudiantesConfig(AppConfig):
     name = "apps.estudiantes"
 
     def ready(self):
-        # Si ya tenías otras señales, déjalas
+        # (opcional) si tienes otras señales
         try:
-            from . import signals  # opcional, si existe
+            import apps.estudiantes.signals  # noqa
         except Exception:
             pass
 
+        # 👇 IMPORTANTE: registra el receiver que crea citaciones
         try:
-            from .views import signals_citaciones  # noqa: F401
+            import apps.estudiantes.signals_citaciones  # noqa
         except Exception:
-            # Evita romper en migraciones tempranas
             pass
