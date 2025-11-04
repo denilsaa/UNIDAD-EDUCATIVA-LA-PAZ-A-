@@ -96,7 +96,9 @@
             <li><a href="{% url 'estudiantes:kardex_items_listar' %}">🗂️ Kárdex</a></li>
 
             <!-- 👇 NUEVO: Bandeja de aprobación de citaciones -->
-            <li><a href="{% url 'citaciones:pendientes' %}">📑 Citaciones</a></li>
+            <li><a href="{% url 'citaciones:pendientes' %}">📑 Citaciones por aprovar</a></li>
+            <li><a href="{% url 'citaciones:agendadas_rango' %}">Citaciones agendadas</a></li>
+
 
             <li class="sep"></li>
             <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>

@@ -1,11 +1,17 @@
 {% extends "layout/base_dashboard.html" %}
+
 {% block content %}
 <h2>Citaciones pendientes de aprobación</h2>
 
 <table class="table mt-3">
   <thead>
     <tr>
-      <th>ID</th><th>Estudiante</th><th>Motivo</th><th>ETA sugerida</th><th>ρ/Wq</th><th>Acciones</th>
+      <th>ID</th>
+      <th>Estudiante</th>
+      <th>Motivo</th>
+      <th>ETA sugerida</th>
+      <th>ρ/Wq</th>
+      <th>Acciones</th>
     </tr>
   </thead>
   <tbody>
@@ -14,12 +20,22 @@
       <td>#{{ c.id }}</td>
       <td>{{ c.estudiante }}</td>
       <td>{{ c.motivo_resumen }}</td>
-      <td>—</td>
-      <td>—</td>
       <td>
-          <button class="btn btn-sm btn-success btn-aprobar" data-id="{{ c.id }}">Aprobar</button>
-          <a class="btn btn-sm btn-secondary" href="{% url 'citaciones:editar_form' c.id %}">Editar</a>
-          <button class="btn btn-sm btn-outline-danger btn-rechazar" data-id="{{ c.id }}">Rechazar</button>
+        {% if c.eta_fecha and c.eta_hora %}
+          {{ c.eta_fecha|date:"Y-m-d" }} {{ c.eta_hora|time:"H:i" }}
+        {% else %}—{% endif %}
+      </td>
+      <td>
+        {% if mm1 and not mm1.saturada and mm1.rho is not None and mm1.Wq_min is not None %}
+          ρ={{ mm1.rho|floatformat:2 }} | Wq={{ mm1.Wq_min|floatformat:1 }} min
+        {% elif mm1 and mm1.saturada %}
+          ρ≥1 (saturada)
+        {% else %}—{% endif %}
+      </td>
+      <td>
+        <button class="btn btn-sm btn-success btn-aprobar" data-id="{{ c.id }}">Aprobar</button>
+        <a class="btn btn-sm btn-secondary" href="{% url 'citaciones:editar_form' c.id %}">Editar</a>
+        <button class="btn btn-sm btn-outline-danger btn-rechazar" data-id="{{ c.id }}">Rechazar</button>
       </td>
     </tr>
   {% empty %}
@@ -29,7 +45,7 @@
 </table>
 
 <script>
-console.log("[PENDIENTES] JS cargado");  // <- verás esto en la consola si el script se insertó
+console.log("[PENDIENTES] JS cargado");
 
 async function post(url, data) {
   const body = new URLSearchParams(data || {});
@@ -47,25 +63,19 @@ function getCookie(name){
 }
 
 document.addEventListener('click', async (e) => {
-  const b = e.target.closest('.btn-aprobar, .btn-editar, .btn-rechazar');
+  const b = e.target.closest('.btn-aprobar, .btn-rechazar');
   if (!b) return;
   const id = b.dataset.id;
 
   if (b.classList.contains('btn-aprobar')) {
     const r = await post(`/citaciones/${id}/aprobar/`);
-    console.log("aprobar", id, r);
     if (r.ok) location.reload();
+    else alert(r.error || "Error al aprobar");
   } else if (b.classList.contains('btn-rechazar')) {
+    if (!confirm('¿Cancelar esta citación?')) return;
     const r = await post(`/citaciones/${id}/rechazar/`);
-    console.log("rechazar", id, r);
     if (r.ok) location.reload();
-  } else if (b.classList.contains('btn-editar')) {
-    const fecha = prompt('Nueva fecha (YYYY-MM-DD):', b.dataset.fecha || '');
-    const hora  = prompt('Nueva hora (HH:MM):', b.dataset.hora || '');
-    if (!fecha || !hora) return;
-    const r = await post(`/citaciones/${id}/editar/`, {fecha, hora});
-    console.log("editar", id, r);
-    if (r.ok) location.reload();
+    else alert(r.error || "Error al cancelar");
   }
 });
 </script>

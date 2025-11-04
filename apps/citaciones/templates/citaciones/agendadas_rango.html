@@ -1,0 +1,79 @@
+{% extends "layout/base_dashboard.html" %}
+{% block content %}
+<h2>Agenda de citaciones</h2>
+
+<form class="mb-3" method="get">
+  <label class="me-2">Desde:</label>
+  <input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}">
+  <label class="ms-3 me-2">Días:</label>
+  <input type="number" name="dias" min="1" max="31" value="{{ dias }}" style="width:80px">
+  <button class="btn btn-sm btn-primary ms-2" type="submit">Ver</button>
+
+  <a class="btn btn-sm btn-light ms-2" href="{% url 'citaciones:agendadas_rango' %}?desde={{ hoy|date:'Y-m-d' }}&dias={{ dias }}">Hoy → {{ hoy|date:'Y-m-d' }}</a>
+  <a class="btn btn-sm btn-light ms-1" href="{% url 'citaciones:agendadas_rango' %}?desde={{ prev_desde|date:'Y-m-d' }}&dias={{ dias }}">⟵ Anterior</a>
+  <a class="btn btn-sm btn-light ms-1" href="{% url 'citaciones:agendadas_rango' %}?desde={{ next_desde|date:'Y-m-d' }}&dias={{ dias }}">Siguiente ⟶</a>
+
+  <span class="ms-3 text-muted">Total: {{ total }}</span>
+</form>
+
+{% if por_dia and por_dia.items %}
+  {% for dia, items in por_dia.items %}
+    <h5 class="mt-4">{{ dia|date:"l d/m/Y" }}</h5>
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>Hora</th>
+          <th>Estudiante</th>
+          <th>Motivo</th>
+          <th>Duración</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for c in items %}
+        <tr>
+          <td>{{ c.hora_citacion|time:"H:i" }}</td>
+          <td>{{ c.estudiante }}</td>
+          <td>{{ c.motivo_resumen }}</td>
+          <td>{{ c.duracion_min }} min</td>
+          <td>
+            <a class="btn btn-sm btn-secondary" href="{% url 'citaciones:editar_form' c.id %}">Editar</a>
+            <button class="btn btn-sm btn-outline-danger btn-cancelar" data-id="{{ c.id }}">Cancelar</button>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% empty %}
+    <div class="alert alert-info">No hay citaciones agendadas en el rango.</div>
+  {% endfor %}
+{% else %}
+  <div class="alert alert-info">No hay citaciones agendadas en el rango.</div>
+{% endif %}
+
+<script>
+async function post(url, data) {
+  const body = new URLSearchParams(data || {});
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {'X-CSRFToken': getCookie('csrftoken')},
+    credentials: 'same-origin',
+    body
+  });
+  return resp.json();
+}
+function getCookie(name){
+  const v = `; ${document.cookie}`.split(`; ${name}=`);
+  if (v.length === 2) return v.pop().split(';').shift();
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('.btn-cancelar');
+  if (!b) return;
+  const id = b.dataset.id;
+  if (!confirm('¿Cancelar esta citación?')) return;
+  const r = await post(`/citaciones/${id}/rechazar/`);
+  if (r.ok) location.reload();
+  else alert(r.error || "Error al cancelar");
+});
+</script>
+{% endblock %}
