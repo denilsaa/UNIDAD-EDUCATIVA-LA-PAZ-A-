@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
+    "channels", 
     # Apps del proyecto
     "apps.cuentas.apps.CuentasConfig",
     "apps.cursos.apps.CursosConfig",
@@ -40,10 +40,19 @@ INSTALLED_APPS = [
     "django_extensions",
 ]
 
+ASGI_APPLICATION = "configuraciones.asgi.application"
+
+
 AUTHENTICATION_BACKENDS = [
     "apps.cuentas.backends.CustomBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False

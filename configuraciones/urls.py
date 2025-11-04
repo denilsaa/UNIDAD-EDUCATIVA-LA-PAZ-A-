@@ -20,6 +20,7 @@ from django.urls import path, include
 from apps.cuentas.views.login import login_view
 from apps.cuentas.views.director_dashboard import director_dashboard
 from apps.cuentas.views_dev import dev_404
+from django.conf import settings
 
 urlpatterns = [
     path("", login_view, name="home"),                      # ⬅️ raíz = login
@@ -31,6 +32,12 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("dev/404/", dev_404, name="dev_404"),
 ]
-
+if settings.DEBUG:
+    from apps.citaciones.views_debug import ping_notifs, ping_cola, ping_dashboard
+    urlpatterns += [
+        path("debug/ws/notifs/", ping_notifs),
+        path("debug/ws/cola/", ping_cola),
+        path("debug/ws/dashboard/", ping_dashboard),
+    ]
 handler403 = "apps.cuentas.views.errors.error_403"
 handler404 = "apps.cuentas.handlers.error_404"

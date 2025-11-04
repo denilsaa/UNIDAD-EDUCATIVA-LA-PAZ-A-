@@ -12,6 +12,55 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+
+  <!-- Estilos mínimos para campana, badge y panel (puedes moverlos a tu CSS) -->
+  <style>
+    .topbar {
+      display:flex; align-items:center; justify-content:flex-end;
+      gap:8px; padding:10px 12px; border-bottom:1px solid #eee;
+      background:#fff; position:sticky; top:0; z-index:20;
+    }
+    .notif-bell {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px; height: 40px;
+      border: 0; border-radius: 999px;
+      background: transparent;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+    .notif-bell:hover { background: rgba(0,0,0,.06); }
+    .notif-bell svg { width: 22px; height: 22px; fill: currentColor; color: #333; }
+
+    .notif-badge {
+      position: absolute; top: -4px; right: -2px;
+      min-width: 18px; height: 18px; padding: 0 6px;
+      border-radius: 999px; background: #e11; color: #fff;
+      font-size: 12px; line-height: 18px; text-align: center;
+      box-shadow: 0 0 0 2px #fff;
+      display:none;
+    }
+
+    .notif-panel {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: min(380px, 92vw); background: #fff;
+      box-shadow: -12px 0 30px rgba(0,0,0,.12);
+      z-index: 10000; display: flex; flex-direction: column;
+    }
+    .notif-panel[hidden] { display:none; }
+    .notif-panel__hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; border-bottom: 1px solid #eee;
+    }
+    .notif-panel__content { padding: 12px 14px; overflow: auto; flex: 1; }
+    .notif-close {
+      border:none; background:transparent; font-size:18px; cursor:pointer;
+      padding:4px 8px; border-radius:8px;
+    }
+    .notif-close:hover { background:rgba(0,0,0,.06); }
+  </style>
 </head>
 
 {% with role=request.user.rol.nombre|default_if_none:""|default:""|lower %}
@@ -83,7 +132,20 @@
 
     <!-- Contenido -->
     <main class="main">
-      <!-- Botón hamburguesa (solo visible en móvil) -->
+
+      <!-- Topbar con campana -->
+      <div class="topbar">
+        <!-- Campana de notificaciones -->
+        <button id="notif-bell" class="notif-bell" type="button" aria-label="Notificaciones">
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+            <path d="M12 2a6 6 0 0 0-6 6v3.586l-.707.707A1 1 0 0 0 6 14h12a1 1 0 0 0 .707-1.707L18 11.586V8a6 6 0 0 0-6-6zm0 20a3 3 0 0 0 2.995-2.824L15 19h-6a3 3 0 0 0 2.824 2.995L12 22z"/>
+          </svg>
+          <!-- Badge que el WS actualiza -->
+          <span id="notif-badge" class="notif-badge">0</span>
+        </button>
+      </div>
+
+      <!-- Mensajes Django -->
       {% if messages %}
         <div class="msgs">
           {% for message in messages %}
@@ -95,6 +157,17 @@
       {% block content %}{% endblock %}
     </main>
   </div>
+
+  <!-- Panel lateral de notificaciones (opcional) -->
+  <aside id="notif-panel" class="notif-panel" hidden>
+    <header class="notif-panel__hdr">
+      <strong>Notificaciones</strong>
+      <button type="button" id="notif-close" class="notif-close" aria-label="Cerrar">✕</button>
+    </header>
+    <div class="notif-panel__content">
+      <p style="opacity:.7">Sin notificaciones aún.</p>
+    </div>
+  </aside>
 
   <!-- Scripts -->
   <script>
@@ -112,7 +185,6 @@
     */
     (function () {
       try {
-        // Si la navegación viene del historial (bfcache), recarga dura
         var navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
         if (navEntries && navEntries[0] && navEntries[0].type === 'back_forward') {
           location.replace(location.href);
@@ -120,24 +192,20 @@
         }
       } catch (_) {}
 
-      // Asegura revalidación si el navegador intenta servir desde bfcache
       window.addEventListener('pageshow', function (evt) {
         if (evt.persisted) {
           location.replace(location.href);
         }
       });
 
-      // Fija un estado y si el usuario pulsa Atrás, recarga esta misma URL
-      try {
-        history.replaceState({ locked: true }, '', location.href);
-      } catch (_) {}
+      try { history.replaceState({ locked: true }, '', location.href); } catch (_) {}
 
       window.addEventListener('popstate', function () {
-        // Recarga y revalida en servidor (no-store + session check)
         location.replace(location.href);
       });
     })();
   </script>
+
   <script>
   document.addEventListener("DOMContentLoaded", function () {
     // ------- Overlay SOLO cuando hay salida de la página (navegación real) ------
@@ -157,25 +225,18 @@
     }
     window.addEventListener("beforeunload", showOverlay);
 
-    // ------- 1) Anti double-submit por formulario (no tocar disabled/value) ------
+    // ------- 1) Anti double-submit por formulario (no tocar disabled/value) ----
     document.querySelectorAll("form").forEach(form => {
       let submitting = false;
       form.addEventListener("submit", function (e) {
-        if (submitting) {
-          e.preventDefault(); e.stopPropagation(); return false;
-        }
+        if (submitting) { e.preventDefault(); e.stopPropagation(); return false; }
         submitting = true;
-
-        // Feedback opcional en el botón sin cambiar value/disabled
         const btn = form.querySelector("button[type=submit], input[type=submit]");
         if (btn) btn.classList.add("is-loading");
-
-        // Importante: NO bloquear aquí la UI, dejamos que el navegador navegue.
-        // El overlay aparecerá en beforeunload cuando la navegación realmente empiece.
       }, true);
     });
 
-    // ------- 2) Debounce para ENLACES y mostrar overlay sólo si navegan -------
+    // ------- 2) Debounce para ENLACES y overlay sólo si navegan -----------------
     document.querySelectorAll("a[href]").forEach(link => {
       link.addEventListener("click", function (e) {
         const href = link.getAttribute("href") || "";
@@ -185,9 +246,6 @@
           e.preventDefault(); e.stopPropagation(); return false;
         }
         link.dataset.clicked = "true";
-
-        // Si es una navegación a otra página, el beforeunload disparará overlay.
-        // Si no hay navegación (misma página o AJAX), rearmamos el debounce:
         setTimeout(() => { link.dataset.clicked = "false"; }, 4000);
       }, { capture:true });
     });
@@ -200,7 +258,96 @@
         document.body.style.overflow = "";
       }
     });
+
+    // Toggle panel notificaciones
+    (function(){
+      const bell = document.getElementById('notif-bell');
+      const panel = document.getElementById('notif-panel');
+      const closeBtn = document.getElementById('notif-close');
+
+      if (bell && panel) {
+        bell.addEventListener('click', () => { panel.hidden = !panel.hidden; });
+      }
+      if (closeBtn && panel) {
+        closeBtn.addEventListener('click', () => { panel.hidden = true; });
+      }
+    })();
   });
+  </script>
+
+  <script>
+  (function(){
+    // Ajusta host si no es localhost
+    const WS = (path) => {
+      const proto = (location.protocol === "https:") ? "wss" : "ws";
+      return `${proto}://${location.host}${path}`;
+    };
+
+    // --- Notificaciones (simula uid=1) ---
+    const notifSocket = new WebSocket(WS("/ws/notifs/?uid=1"));
+    notifSocket.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      if (msg.type === "notif") {
+        const badge = document.getElementById("notif-badge");
+        if (badge && typeof msg.data.unread !== "undefined") {
+          badge.textContent = msg.data.unread;
+          badge.style.display = "inline-block";
+        }
+        // (Opcional) insertar item en el panel
+        const panel = document.getElementById('notif-panel');
+        const content = document.querySelector('.notif-panel__content');
+        if (panel && content && msg.data && msg.data.title) {
+          const row = document.createElement('div');
+          row.style.padding = "8px 0";
+          row.style.borderBottom = "1px solid #f3f3f3";
+          row.innerHTML = `<strong>${msg.data.title}</strong><br><small>${msg.data.msg || ''}</small>`;
+          content.prepend(row);
+        }
+        console.log("[WS NOTIF]", msg.data);
+      } else {
+        console.log("[WS NOTIF RAW]", msg);
+      }
+    };
+
+    // --- Cola ---
+    const colaSocket = new WebSocket(WS("/ws/cola/"));
+    colaSocket.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      console.log("[WS COLA]", msg.data);
+    };
+
+    // --- Dashboard ---
+    const dashSocket = new WebSocket(WS("/ws/dashboard/"));
+    dashSocket.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      console.log("[WS DASH]", msg.data);
+      // Aquí luego pintamos semáforo y métricas
+    };
+  })();
+(function(){
+  const WS = (path) => {
+    const proto = (location.protocol === "https:") ? "wss" : "ws";
+    // Fuerza la misma IP/puerto donde corre Daphne
+    const host = "127.0.0.1:8000";
+    return `${proto}://${host}${path}`;
+  };
+
+  function wire(name, url){
+    const s = new WebSocket(url);
+    s.onopen  = () => console.log(`[WS ${name}] OPEN`, url);
+    s.onerror = (e) => console.warn(`[WS ${name}] ERROR`, e);
+    s.onclose = (e) => console.warn(`[WS ${name}] CLOSE`, e.code, e.reason);
+    s.onmessage = (e) => {
+      try { console.log(`[WS ${name}] MSG`, JSON.parse(e.data)); }
+      catch { console.log(`[WS ${name}] MSG`, e.data); }
+    };
+    return s;
+  }
+
+  wire("NOTIFS", WS("/ws/notifs/?uid=1"));
+  wire("COLA",   WS("/ws/cola/"));
+  wire("DASH",   WS("/ws/dashboard/"));
+})();
   </script>
 
 </body>

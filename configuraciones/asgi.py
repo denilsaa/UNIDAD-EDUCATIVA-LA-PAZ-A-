@@ -1,16 +1,26 @@
 """
 ASGI config for configuraciones project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.2/howto/deployment/asgi/
+DEV: WebSockets sin AuthMiddlewareStack para evitar hits a BD (max_user_connections).
 """
-
 import os
-
 from django.core.asgi import get_asgi_application
+from channels.routing import ProtocolTypeRouter, URLRouter
+from django.urls import path
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'configuraciones.settings')
+# 👇 Consumers
+from apps.notificaciones.ws import NotifConsumer
+from apps.citaciones.ws import ColaConsumer, DashboardConsumer
 
-application = get_asgi_application()
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "configuraciones.settings")
+
+django_asgi_app = get_asgi_application()
+
+# ⚠️ DEV: sin AuthMiddlewareStack en websocket para no tocar la BD en handshake
+application = ProtocolTypeRouter({
+    "http": django_asgi_app,
+    "websocket": URLRouter([
+        path("ws/notifs/", NotifConsumer.as_asgi()),
+        path("ws/cola/", ColaConsumer.as_asgi()),
+        path("ws/dashboard/", DashboardConsumer.as_asgi()),
+    ]),
+})
