@@ -1,0 +1,35 @@
+{% extends "layout/base_dashboard.html" %}
+{% block content %}
+<h2>Citaciones pendientes de aprobación</h2>
+<table class="table mt-3">
+  <thead>
+    <tr><th>ID</th><th>Estudiante</th><th>Motivo</th><th>ETA sugerida</th><th>ρ/Wq</th><th>Acciones</th></tr>
+  </thead>
+  <tbody>
+  {% for c in citaciones %}
+    <tr>
+      <td>#{{ c.id }}</td>
+      <td>{{ c.estudiante }}</td>
+      <td>{{ c.motivo_resumen }}</td>
+      <td>
+        {% with s=sugerencias.c.id %}
+          {% if s and s.sugerido %}{{ s.sugerido|date:"Y-m-d H:i" }}{% else %}—{% endif %}
+        {% endwith %}
+      </td>
+      <td>
+        {% with s=sugerencias.c.id %}
+          ρ={{ s.rho|floatformat:2 }} | Wq={{ s.Wq|floatformat:1 }} min
+        {% endwith %}
+      </td>
+      <td>
+        <a class="btn btn-sm btn-success" href="{% url 'citaciones:aprobar' c.id %}">Aprobar</a>
+        <a class="btn btn-sm btn-secondary" href="{% url 'citaciones:editar' c.id %}">Editar</a>
+        <a class="btn btn-sm btn-outline-danger" href="{% url 'citaciones:rechazar' c.id %}">Rechazar</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">Sin pendientes.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

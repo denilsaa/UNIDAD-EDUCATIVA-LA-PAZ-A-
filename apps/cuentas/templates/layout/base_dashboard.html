@@ -82,24 +82,27 @@
         <!-- Secciones -->
         <h2 class="sidenav-title">Secciones</h2>
         <ul class="sidenav-list">
-
           {# --- Director --- #}
           {% if "director" in role %}
             <li><a href="{% url 'cuentas:director_dashboard' %}">📊 Resumen</a></li>
             <li><a href="{% url 'cuentas:lista_usuarios' %}">👤 Usuarios</a></li>
             <li><a href="{% url 'cursos:lista_cursos' %}">📚 Cursos</a></li>
 
-            <!-- 👇 NUEVO: Asistencia (Director) -->
             <li><a href="{% url 'estudiantes:asistencia_calendario' %}">🗓️ Calendario asistencia</a></li>
-            <!-- Tip: para tomar asistencia el Director elige curso primero -->
             <li><a href="{% url 'cursos:lista_cursos' %}">📋 Tomar asistencia</a></li>
 
             <li><a href="{% url 'cuentas:crear_usuario' %}">➕ Nuevo usuario</a></li>
             <li><a href="{% url 'cursos:crear_curso' %}">➕ Nuevo curso</a></li>
             <li><a href="{% url 'estudiantes:kardex_items_listar' %}">🗂️ Kárdex</a></li>
+
+            <!-- 👇 NUEVO: Bandeja de aprobación de citaciones -->
+            <li><a href="{% url 'citaciones:pendientes' %}">📑 Citaciones</a></li>
+
             <li class="sep"></li>
             <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
             <li><a href="{% url 'estudiantes:crear' %}">➕ Nuevo estudiante</a></li>
+          {% elif "regente" in role %}
+
 
           {# --- Regente --- #}
           {% elif "regente" in role %}
@@ -285,29 +288,54 @@
 
     // --- Notificaciones (simula uid=1) ---
     const notifSocket = new WebSocket(WS("/ws/notifs/?uid=1"));
-    notifSocket.onmessage = (e) => {
-      const msg = JSON.parse(e.data);
-      if (msg.type === "notif") {
-        const badge = document.getElementById("notif-badge");
-        if (badge && typeof msg.data.unread !== "undefined") {
-          badge.textContent = msg.data.unread;
-          badge.style.display = "inline-block";
-        }
-        // (Opcional) insertar item en el panel
-        const panel = document.getElementById('notif-panel');
-        const content = document.querySelector('.notif-panel__content');
-        if (panel && content && msg.data && msg.data.title) {
-          const row = document.createElement('div');
-          row.style.padding = "8px 0";
-          row.style.borderBottom = "1px solid #f3f3f3";
-          row.innerHTML = `<strong>${msg.data.title}</strong><br><small>${msg.data.msg || ''}</small>`;
-          content.prepend(row);
-        }
-        console.log("[WS NOTIF]", msg.data);
-      } else {
-        console.log("[WS NOTIF RAW]", msg);
-      }
-    };
+   notifSocket.onmessage = (e) => {
+  const msg = JSON.parse(e.data);
+
+  // 1) Notificación al PADRE (campana)
+  if (msg.type === "notif") {
+    const badge = document.getElementById("notif-badge");
+    if (badge && typeof msg.data.unread !== "undefined") {
+      const curr = parseInt(badge.textContent || "0", 10);
+      badge.textContent = (curr + (parseInt(msg.data.unread,10)||0)).toString();
+      badge.style.display = "inline-block";
+    }
+    const panel = document.getElementById('notif-panel');
+    const content = document.querySelector('.notif-panel__content');
+    if (panel && content && msg.data && msg.data.event === "citacion") {
+      const row = document.createElement('div');
+      row.style.padding = "8px 0";
+      row.style.borderBottom = "1px solid #f3f3f3";
+      row.innerHTML = `<strong>Citación #${msg.data.citacion_id}</strong><br>
+                       <small>${msg.data.estudiante} — ${msg.data.mensaje}</small><br>
+                       <small>${msg.data.cuando || ''}</small>`;
+      content.prepend(row);
+    }
+    return;
+  }
+
+  // 2) Propuesta al DIRECTOR (inbox)
+  if (msg.type === "director_inbox") {
+    const content = document.querySelector('.notif-panel__content');
+    if (content) {
+      const d = msg.data || {};
+      const row = document.createElement('div');
+      row.style.padding = "10px 0";
+      row.style.borderBottom = "1px solid #eee";
+      row.innerHTML = `
+        <strong>Propuesta de citación</strong><br>
+        <small>#${d.citacion_id} · ${d.estudiante}</small><br>
+        <small>${d.motivo} · ${d.razon}</small><br>
+        <small>ρ≈${(d.rho||0).toFixed(2)} · Wq≈${d.Wq? d.Wq.toFixed(1) : "—"} min</small><br>
+        <small>Sugerido: ${d.sugerido ? new Date(d.sugerido).toLocaleString() : "—"}</small><br>
+        <a href="${window.location.origin}/citaciones/pendientes/" class="btn btn-sm btn-primary" style="margin-top:6px; display:inline-block;">Revisar</a>
+      `;
+      content.prepend(row);
+    }
+    return;
+  }
+
+  console.log("[WS NOTIF RAW]", msg);
+};
 
     // --- Cola ---
     const colaSocket = new WebSocket(WS("/ws/cola/"));

@@ -1,0 +1,22 @@
+{% extends "layout/base_dashboard.html" %}
+{% block content %}
+<h2>Editar citación #{{ citacion.id }}</h2>
+<form method="post">
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-md-6">
+      {{ form.as_p }}
+    </div>
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h5>Sugerencia M/M/1 (informativa)</h5>
+        <p><b>Propuesto:</b> {{ sugerido|date:"Y-m-d H:i" }}</p>
+        <p>ρ ≈ {{ rho|floatformat:2 }} | Wq ≈ {{ Wq|floatformat:1 }} min</p>
+        <small>Al aprobar se recalcula y se fija el horario final (08:00–12:00, L–V; fines de semana → lunes 08:00).</small>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-primary mt-3" type="submit">Guardar</button>
+  <a class="btn btn-light mt-3" href="{% url 'citaciones:pendientes' %}">Volver</a>
+</form>
+{% endblock %}
