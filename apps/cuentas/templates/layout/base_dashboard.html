@@ -96,8 +96,8 @@
             <li><a href="{% url 'estudiantes:kardex_items_listar' %}">🗂️ Kárdex</a></li>
 
             <!-- 👇 NUEVO: Bandeja de aprobación de citaciones -->
-            <li><a href="{% url 'citaciones:pendientes' %}">📑 Citaciones por aprovar</a></li>
-            <li><a href="{% url 'citaciones:agendadas_rango' %}">Citaciones agendadas</a></li>
+            <li><a href="{% url 'citaciones:pendientes' %}">📑 Citaciones por aprobar</a></li>
+            <li><a href="{% url 'citaciones:agendadas_rango' %}">📑 Citaciones agendadas</a></li>
 
 
             <li class="sep"></li>
@@ -277,105 +277,115 @@
   });
   </script>
 
-  <script>
-  (function(){
-    // Ajusta host si no es localhost
-    const WS = (path) => {
-      const proto = (location.protocol === "https:") ? "wss" : "ws";
-      return `${proto}://${location.host}${path}`;
-    };
-
-    // --- Notificaciones (simula uid=1) ---
-    const notifSocket = new WebSocket(WS("/ws/notifs/?uid=1"));
-   notifSocket.onmessage = (e) => {
-  const msg = JSON.parse(e.data);
-
-  // 1) Notificación al PADRE (campana)
-  if (msg.type === "notif") {
-    const badge = document.getElementById("notif-badge");
-    if (badge && typeof msg.data.unread !== "undefined") {
-      const curr = parseInt(badge.textContent || "0", 10);
-      badge.textContent = (curr + (parseInt(msg.data.unread,10)||0)).toString();
-      badge.style.display = "inline-block";
-    }
-    const panel = document.getElementById('notif-panel');
-    const content = document.querySelector('.notif-panel__content');
-    if (panel && content && msg.data && msg.data.event === "citacion") {
-      const row = document.createElement('div');
-      row.style.padding = "8px 0";
-      row.style.borderBottom = "1px solid #f3f3f3";
-      row.innerHTML = `<strong>Citación #${msg.data.citacion_id}</strong><br>
-                       <small>${msg.data.estudiante} — ${msg.data.mensaje}</small><br>
-                       <small>${msg.data.cuando || ''}</small>`;
-      content.prepend(row);
-    }
-    return;
-  }
-
-  // 2) Propuesta al DIRECTOR (inbox)
-  if (msg.type === "director_inbox") {
-    const content = document.querySelector('.notif-panel__content');
-    if (content) {
-      const d = msg.data || {};
-      const row = document.createElement('div');
-      row.style.padding = "10px 0";
-      row.style.borderBottom = "1px solid #eee";
-      row.innerHTML = `
-        <strong>Propuesta de citación</strong><br>
-        <small>#${d.citacion_id} · ${d.estudiante}</small><br>
-        <small>${d.motivo} · ${d.razon}</small><br>
-        <small>ρ≈${(d.rho||0).toFixed(2)} · Wq≈${d.Wq? d.Wq.toFixed(1) : "—"} min</small><br>
-        <small>Sugerido: ${d.sugerido ? new Date(d.sugerido).toLocaleString() : "—"}</small><br>
-        <a href="${window.location.origin}/citaciones/pendientes/" class="btn btn-sm btn-primary" style="margin-top:6px; display:inline-block;">Revisar</a>
-      `;
-      content.prepend(row);
-    }
-    return;
-  }
-
-  console.log("[WS NOTIF RAW]", msg);
-};
-
-    // --- Cola ---
-    const colaSocket = new WebSocket(WS("/ws/cola/"));
-    colaSocket.onmessage = (e) => {
-      const msg = JSON.parse(e.data);
-      console.log("[WS COLA]", msg.data);
-    };
-
-    // --- Dashboard ---
-    const dashSocket = new WebSocket(WS("/ws/dashboard/"));
-    dashSocket.onmessage = (e) => {
-      const msg = JSON.parse(e.data);
-      console.log("[WS DASH]", msg.data);
-      // Aquí luego pintamos semáforo y métricas
-    };
-  })();
+<script>
 (function(){
+  const uid = {{ request.user.id|default:0 }};
+  const role = "{{ request.user.rol.nombre|default_if_none:''|lower }}";
+
+  const $ = (sel) => document.querySelector(sel);
+  const badge = $("#notif-badge");
+  const panel = $("#notif-panel");
+  const panelContent = panel ? panel.querySelector(".notif-panel__content") : null;
+
+  function incBadge(n=1){
+    if (!badge) return;
+    const curr = parseInt(badge.textContent || "0", 10) || 0;
+    const val = curr + (parseInt(n,10)||0);
+    badge.textContent = String(val);
+    badge.style.display = val > 0 ? "inline-block" : "none";
+  }
+  function addNotifRow(html){
+    if (!panelContent) return;
+    const row = document.createElement("div");
+    row.style.padding = "8px 0";
+    row.style.borderBottom = "1px solid #f3f3f3";
+    row.innerHTML = html;
+    panelContent.prepend(row);
+  }
+
   const WS = (path) => {
     const proto = (location.protocol === "https:") ? "wss" : "ws";
-    // Fuerza la misma IP/puerto donde corre Daphne
-    const host = "127.0.0.1:8000";
-    return `${proto}://${host}${path}`;
+    return `${proto}://${location.host}${path}`;
   };
 
-  function wire(name, url){
-    const s = new WebSocket(url);
-    s.onopen  = () => console.log(`[WS ${name}] OPEN`, url);
-    s.onerror = (e) => console.warn(`[WS ${name}] ERROR`, e);
-    s.onclose = (e) => console.warn(`[WS ${name}] CLOSE`, e.code, e.reason);
-    s.onmessage = (e) => {
-      try { console.log(`[WS ${name}] MSG`, JSON.parse(e.data)); }
-      catch { console.log(`[WS ${name}] MSG`, e.data); }
+  // NOTIFS
+  if (uid) {
+    const notifs = new WebSocket(WS(`/ws/notifs/?uid=${uid}`));
+    notifs.onopen = () => console.log("[WS NOTIFS] OPEN");
+    notifs.onclose = (e) => console.log("[WS NOTIFS] CLOSE", e.code, e.reason);
+    notifs.onerror = (e) => console.warn("[WS NOTIFS] ERROR", e);
+    notifs.onmessage = (e) => {
+      let msg; try { msg = JSON.parse(e.data); } catch { return; }
+      if (msg.type === "notify.unread" && msg.event === "citacion") {
+        incBadge(msg.unread || 1);
+        addNotifRow(`
+          <strong>Citación #${msg.citacion_id || "—"}</strong><br>
+          <small>${msg.estudiante || ""} — ${msg.mensaje || "Nueva citación"}</small><br>
+          <small>${msg.cuando ? new Date(msg.cuando).toLocaleString() : ""}</small>
+        `);
+        return;
+      }
+      if (msg.type === "director.citacion" && msg.data) {
+        const d = msg.data;
+        addNotifRow(`
+          <strong>Propuesta de citación</strong><br>
+          <small>#${d.citacion_id || "—"} · ${d.estudiante || ""}</small><br>
+          <small>${d.motivo || ""} · ${d.razon || ""}</small><br>
+          <small>ρ≈${(d.rho||0).toFixed(2)} · Wq≈${d.Wq? d.Wq.toFixed(1) : "—"} min</small><br>
+          <small>Sugerido: ${d.sugerido ? new Date(d.sugerido).toLocaleString() : "—"}</small><br>
+          <a href="${location.origin}/citaciones/pendientes/" class="btn btn-sm btn-primary" style="margin-top:6px; display:inline-block;">Revisar</a>
+        `);
+        return;
+      }
+      console.log("[WS NOTIFS RAW]", msg);
     };
-    return s;
   }
 
-  wire("NOTIFS", WS("/ws/notifs/?uid=1"));
-  wire("COLA",   WS("/ws/cola/"));
-  wire("DASH",   WS("/ws/dashboard/"));
+  // COLA
+  (function(){
+    const s = new WebSocket(WS("/ws/cola/"));
+    s.onopen = () => console.log("[WS COLA] OPEN");
+    s.onmessage = (e) => {
+      try { console.log("[WS COLA]", JSON.parse(e.data)); }
+      catch { console.log("[WS COLA]", e.data); }
+    };
+    s.onclose = () => console.log("[WS COLA] CLOSE");
+  })();
+
+  // DASHBOARD
+  (function(){
+    const s = new WebSocket(WS("/ws/dashboard/"));
+    s.onopen = () => console.log("[WS DASH] OPEN");
+    s.onmessage = (e) => {
+      try { console.log("[WS DASH]", JSON.parse(e.data)); }
+      catch { console.log("[WS DASH]", e.data); }
+    };
+    s.onclose = () => console.log("[WS DASH] CLOSE");
+  })();
 })();
-  </script>
+</script>
+<script>
+(function(){
+  const uid = "{{ request.user.id }}";
+  if (!uid) return;
+  const proto = location.protocol === "https:" ? "wss" : "ws";
+  const ws = new WebSocket(`${proto}://${location.host}/ws/notifs/?uid=${uid}`);
+  ws.onmessage = (ev) => {
+    try {
+      const data = JSON.parse(ev.data);
+      const badge = document.querySelector('#notif-badge');
+      if (badge) {
+        const n = parseInt(badge.innerText || "0", 10) + 1;
+        badge.innerText = n;
+        badge.style.display = 'inline-block';
+      }
+      // opcional: mostrar toast/panel con "data"
+      console.log("Notif WS:", data);
+    } catch (e) { console.error(e); }
+  };
+})();
+</script>
+
 
 </body>
 {% endwith %}

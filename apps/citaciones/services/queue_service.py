@@ -7,7 +7,13 @@ from channels.layers import get_channel_layer
 from apps.citaciones.models.citacion import Citacion
 from apps.citaciones.services.agenda_service import agendar
 from apps.citaciones.services.metrics_service import metrics_payload
-
+from django.db import transaction
+from django.utils.timezone import now
+from apps.citaciones.models.citacion import Citacion
+from apps.citaciones.services.agenda_service import agendar
+from apps.citaciones.services.metrics_service import metrics_payload
+from apps.citaciones.ws import push_cola_state, push_dashboard_metrics, push_citacion_padre
+from apps.citaciones.services.notify_service import resolve_padres_ids
 COLA_GROUP = "cola_room"          # ← coincide con tu ColaConsumer
 DASH_GROUP = "dashboard_room"     # ← coincide con tu DashboardConsumer
 
@@ -81,4 +87,28 @@ def rechazar(citacion_id: int, usuario) -> Citacion:
 
     _broadcast_cola({"id": c.id, "estado": c.estado})
     _broadcast_dashboard_metrics(metrics_payload())
+    return c
+
+
+@transaction.atomic
+def aprobar(citacion_id: int, usuario):
+    c = Citacion.objects.select_for_update().get(id=citacion_id)
+    c.aprobado_por = usuario
+    c.aprobado_en = now()
+    agendar(c, c.duracion_min)
+
+    # (tu lógica de broadcast para cola/dashboard)
+    try:
+        push_cola_state({"event": "agendada", "id": c.id})
+        push_dashboard_metrics(metrics_payload())
+    except Exception:
+        pass
+
+    # 🔔 Notificar a los padres por WS
+    try:
+        for padre_id in resolve_padres_ids(c.estudiante):
+            push_citacion_padre(c, padre_id=padre_id)
+    except Exception:
+        pass
+
     return c
