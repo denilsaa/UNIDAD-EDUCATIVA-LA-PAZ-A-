@@ -31,7 +31,8 @@ urlpatterns = [
     path("estudiantes/", include("apps.estudiantes.urls")),
     path("admin/", admin.site.urls),
     path("dev/404/", dev_404, name="dev_404"),
-    path("citaciones/", include("apps.citaciones.urls")),
+    path("citaciones/", include("apps.citaciones.urls", namespace="citaciones")),
+
 ]
 if settings.DEBUG:
     from apps.citaciones.views_debug import ping_notifs, ping_cola, ping_dashboard

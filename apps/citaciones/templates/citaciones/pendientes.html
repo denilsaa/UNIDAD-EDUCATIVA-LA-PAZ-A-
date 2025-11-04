@@ -1,30 +1,25 @@
 {% extends "layout/base_dashboard.html" %}
 {% block content %}
 <h2>Citaciones pendientes de aprobación</h2>
+
 <table class="table mt-3">
   <thead>
-    <tr><th>ID</th><th>Estudiante</th><th>Motivo</th><th>ETA sugerida</th><th>ρ/Wq</th><th>Acciones</th></tr>
+    <tr>
+      <th>ID</th><th>Estudiante</th><th>Motivo</th><th>ETA sugerida</th><th>ρ/Wq</th><th>Acciones</th>
+    </tr>
   </thead>
   <tbody>
-  {% for c in citaciones %}
+  {% for c in rows %}
     <tr>
       <td>#{{ c.id }}</td>
       <td>{{ c.estudiante }}</td>
       <td>{{ c.motivo_resumen }}</td>
+      <td>—</td>
+      <td>—</td>
       <td>
-        {% with s=sugerencias.c.id %}
-          {% if s and s.sugerido %}{{ s.sugerido|date:"Y-m-d H:i" }}{% else %}—{% endif %}
-        {% endwith %}
-      </td>
-      <td>
-        {% with s=sugerencias.c.id %}
-          ρ={{ s.rho|floatformat:2 }} | Wq={{ s.Wq|floatformat:1 }} min
-        {% endwith %}
-      </td>
-      <td>
-        <a class="btn btn-sm btn-success" href="{% url 'citaciones:aprobar' c.id %}">Aprobar</a>
-        <a class="btn btn-sm btn-secondary" href="{% url 'citaciones:editar' c.id %}">Editar</a>
-        <a class="btn btn-sm btn-outline-danger" href="{% url 'citaciones:rechazar' c.id %}">Rechazar</a>
+          <button class="btn btn-sm btn-success btn-aprobar" data-id="{{ c.id }}">Aprobar</button>
+          <a class="btn btn-sm btn-secondary" href="{% url 'citaciones:editar_form' c.id %}">Editar</a>
+          <button class="btn btn-sm btn-outline-danger btn-rechazar" data-id="{{ c.id }}">Rechazar</button>
       </td>
     </tr>
   {% empty %}
@@ -32,4 +27,46 @@
   {% endfor %}
   </tbody>
 </table>
+
+<script>
+console.log("[PENDIENTES] JS cargado");  // <- verás esto en la consola si el script se insertó
+
+async function post(url, data) {
+  const body = new URLSearchParams(data || {});
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {'X-CSRFToken': getCookie('csrftoken')},
+    credentials: 'same-origin',
+    body
+  });
+  return resp.json();
+}
+function getCookie(name){
+  const v = `; ${document.cookie}`.split(`; ${name}=`);
+  if (v.length === 2) return v.pop().split(';').shift();
+}
+
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('.btn-aprobar, .btn-editar, .btn-rechazar');
+  if (!b) return;
+  const id = b.dataset.id;
+
+  if (b.classList.contains('btn-aprobar')) {
+    const r = await post(`/citaciones/${id}/aprobar/`);
+    console.log("aprobar", id, r);
+    if (r.ok) location.reload();
+  } else if (b.classList.contains('btn-rechazar')) {
+    const r = await post(`/citaciones/${id}/rechazar/`);
+    console.log("rechazar", id, r);
+    if (r.ok) location.reload();
+  } else if (b.classList.contains('btn-editar')) {
+    const fecha = prompt('Nueva fecha (YYYY-MM-DD):', b.dataset.fecha || '');
+    const hora  = prompt('Nueva hora (HH:MM):', b.dataset.hora || '');
+    if (!fecha || !hora) return;
+    const r = await post(`/citaciones/${id}/editar/`, {fecha, hora});
+    console.log("editar", id, r);
+    if (r.ok) location.reload();
+  }
+});
+</script>
 {% endblock %}

@@ -101,9 +101,6 @@
             <li class="sep"></li>
             <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
             <li><a href="{% url 'estudiantes:crear' %}">➕ Nuevo estudiante</a></li>
-          {% elif "regente" in role %}
-
-
           {# --- Regente --- #}
           {% elif "regente" in role %}
             <li><a href="{% url 'cuentas:regente_dashboard' %}">📊 Resumen</a></li>
