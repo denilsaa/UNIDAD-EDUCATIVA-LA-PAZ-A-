@@ -11,10 +11,10 @@
   <!-- === ENCABEZADO === -->
   <div class="dashboard-header">
     <h2 class="hdr-sub">
-      {% if "director" in role %}Dashboard del Director
-      {% elif "regente" in role %}Dashboard del Regente
-      {% elif "secretaria" in role or "secretaría" in role %}Dashboard de Secretaría
-      {% elif "padre" in role %}Dashboard de Padre de familia
+      {% if "director" in role %}Panel del Director
+      {% elif "regente" in role %}Panel del Regente
+      {% elif "secretaria" in role or "secretaría" in role %}Panel de Secretaría
+      {% elif "padre" in role %}Panel de Padre de familia
       {% else %}Panel{% endif %}
     </h2>
     <p>Resumen general de asistencia, comportamiento y roles</p>
@@ -108,8 +108,9 @@
 
 <!-- === CHART.JS === -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-{% block scripts %}
-<script src="{% static 'cuentas/js/dashboard_director.js' %}"></script>
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'cuentas/js/dashboard_director.js' %}"></script>
 {% endblock %}
 <!-- Footer -->
 <footer class="ftr">

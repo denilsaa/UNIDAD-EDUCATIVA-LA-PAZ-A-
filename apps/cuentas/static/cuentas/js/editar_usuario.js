@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     // =====================
-    // CI: solo lectura
+    // CI: solo lectura (no modificar)
     // =====================
     const ciInput = document.getElementById('id_ci');
+    const ciError = document.getElementById('ci-error');
     ciInput.readOnly = true;
 
     // =====================
@@ -11,41 +12,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const nombresInput = document.getElementById('id_nombres');
     const nombresError = document.getElementById('nombres-error');
 
-    nombresInput.addEventListener('input', () => {
-        let value = nombresInput.value;
+    const validarNombres = (input, error, maxPalabras) => {
+        let value = input.value.replace(/\s+/g, ' ').trimStart();
         if (value.length === 0) {
-            nombresError.textContent = "El nombre es obligatorio.";
-            nombresError.style.display = 'block';
+            error.textContent = `El ${input.placeholder.toLowerCase()} es obligatorio.`;
+            error.style.display = 'block';
             return;
         }
-        value = value.replace(/\s+/g, ' ').trimStart();
         if (/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(value)) {
-            nombresError.textContent = "Solo se permiten letras y espacios.";
-            nombresError.style.display = 'block';
-            nombresInput.value = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+            error.textContent = "Solo se permiten letras y espacios.";
+            input.value = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+            error.style.display = 'block';
             return;
         }
+
         const palabras = value.trim().split(' ').filter(p => p.length > 0);
-        if (palabras.length > 3) {
-            nombresError.textContent = "Solo se permiten hasta 3 palabras.";
-            nombresError.style.display = 'block';
-            nombresInput.value = palabras.slice(0, 3).join(' ');
+        if (palabras.length > maxPalabras) {
+            error.textContent = `Solo se permiten hasta ${maxPalabras} palabras.`;
+            input.value = palabras.slice(0, maxPalabras).join(' ');
+            error.style.display = 'block';
             return;
         }
+
         if (palabras.some(p => p.length < 3)) {
-            nombresError.textContent = "Cada palabra debe tener al menos 3 letras.";
-            nombresError.style.display = 'block';
+            error.textContent = "Cada palabra debe tener al menos 3 letras.";
+            error.style.display = 'block';
             return;
         }
-        if (palabras.length === 3 && value.endsWith(' ')) {
-            nombresError.textContent = "Ya no puedes añadir más palabras.";
-            nombresError.style.display = 'block';
-            nombresInput.value = value.trim();
+
+        if (palabras.length === maxPalabras && value.endsWith(' ')) {
+            error.textContent = "Ya no puedes añadir más palabras.";
+            input.value = value.trim();
+            error.style.display = 'block';
             return;
         }
-        nombresError.style.display = 'none';
-        nombresInput.value = value;
-    });
+
+        error.style.display = 'none';
+        input.value = value;
+    };
+
+    nombresInput.addEventListener('input', () => validarNombres(nombresInput, nombresError, 3));
+    nombresInput.addEventListener('blur', () => nombresInput.value = nombresInput.value.trim());
 
     // =====================
     // Apellidos
@@ -53,41 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const apellidosInput = document.getElementById('id_apellidos');
     const apellidosError = document.getElementById('error-apellidos');
 
-    apellidosInput.addEventListener('input', () => {
-        let value = apellidosInput.value;
-        if (value.length === 0) {
-            apellidosError.textContent = "El apellido es obligatorio.";
-            apellidosError.style.display = 'block';
-            return;
-        }
-        value = value.replace(/\s+/g, ' ').trimStart();
-        if (/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(value)) {
-            apellidosError.textContent = "Solo se permiten letras y espacios.";
-            apellidosError.style.display = 'block';
-            apellidosInput.value = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
-            return;
-        }
-        const palabras = value.trim().split(' ').filter(p => p.length > 0);
-        if (palabras.length > 2) {
-            apellidosError.textContent = "Solo se permiten hasta 2 palabras.";
-            apellidosError.style.display = 'block';
-            apellidosInput.value = palabras.slice(0, 2).join(' ');
-            return;
-        }
-        if (palabras.some(p => p.length < 3)) {
-            apellidosError.textContent = "Cada palabra debe tener al menos 3 letras.";
-            apellidosError.style.display = 'block';
-            return;
-        }
-        if (palabras.length === 2 && value.endsWith(' ')) {
-            apellidosError.textContent = "Ya no puedes añadir más palabras.";
-            apellidosError.style.display = 'block';
-            apellidosInput.value = value.trim();
-            return;
-        }
-        apellidosError.style.display = 'none';
-        apellidosInput.value = value;
-    });
+    apellidosInput.addEventListener('input', () => validarNombres(apellidosInput, apellidosError, 2));
+    apellidosInput.addEventListener('blur', () => apellidosInput.value = apellidosInput.value.trim());
 
     // =====================
     // Gmail
@@ -98,24 +72,16 @@ document.addEventListener('DOMContentLoaded', () => {
     emailInput.addEventListener('input', () => {
         let value = emailInput.value;
         const partes = value.split('@');
-        if (partes.length > 1) {
-            partes[0] = partes[0].replace(/[^a-zA-Z0-9._-]/g, '');
-            value = partes.join('@');
-        } else {
-            value = value.replace(/[^a-zA-Z0-9._-]/g, '');
-        }
+        if (partes.length > 1) partes[0] = partes[0].replace(/[^a-zA-Z0-9._-]/g, '');
+        else value = value.replace(/[^a-zA-Z0-9._-]/g, '');
+        value = partes.join('@');
         emailInput.value = value;
-        if (value === '') {
-            emailError.style.display = 'none';
-            return;
-        }
+
+        if (value === '') return emailError.style.display = 'none';
+
         const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailRegex.test(value)) {
-            emailError.textContent = 'Correo inválido. Debe tener formato ejemplo@gmail.com';
-            emailError.style.display = 'block';
-        } else {
-            emailError.style.display = 'none';
-        }
+        emailError.style.display = emailRegex.test(value) ? 'none' : 'block';
+        if (!emailRegex.test(value)) emailError.textContent = 'Correo inválido. Debe tener formato ejemplo@gmail.com';
     });
 
     // =====================
@@ -125,29 +91,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const telefonoError = document.getElementById('error-telefono');
 
     telefonoInput.addEventListener('input', () => {
-        let value = telefonoInput.value.replace(/[^0-9]/g, '');
+        let value = telefonoInput.value.replace(/[^0-9]/g, ''); // Solo números
         telefonoInput.value = value;
+
+        // Reiniciar error
+        telefonoError.textContent = '';
+        telefonoError.style.display = 'none';
+
         if (value.length === 0) {
             telefonoError.textContent = "El teléfono es obligatorio.";
-            telefonoError.style.display = 'block';
-            return;
-        }
-        if (value.length > 8) {
+        } else if (value.length < 8) {
             telefonoError.textContent = "El teléfono debe tener exactamente 8 números.";
-            telefonoInput.value = value.slice(0, 8);
-            return;
-        }
-        if (value.length === 8 && !["6", "7"].includes(value[0])) {
+        } else if (value.length > 8) {
+            telefonoError.textContent = "El teléfono debe tener exactamente 8 números.";
+            telefonoInput.value = value.slice(0, 8); // Limitar a 8 dígitos
+        } else if (!["6", "7"].includes(value[0])) {
             telefonoError.textContent = "El teléfono debe empezar con 6 o 7.";
-            telefonoError.style.display = 'block';
-            return;
         }
-        if (value.length < 8) {
-            telefonoError.textContent = "El teléfono debe tener exactamente 8 números.";
+
+        // Mostrar error si hay texto
+        if (telefonoError.textContent) {
             telefonoError.style.display = 'block';
-            return;
         }
-        telefonoError.style.display = 'none';
     });
 
     // =====================
@@ -156,81 +121,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const rolSelect = document.getElementById('id_rol');
     const rolError = document.getElementById('error-rol');
 
-    rolSelect.addEventListener('change', () => {
-        if (!rolSelect.value) {
-            rolError.textContent = "Debes seleccionar un rol.";
-            rolError.style.display = 'block';
-        } else {
-            rolError.style.display = 'none';
-        }
-    });
+    // Variables pasadas desde el template (inyectadas con Django)
+    const usuarioLogueadoId = window.usuarioContext.logueadoId;
+    const usuarioEditadoId = window.usuarioContext.editadoId;
+    const rolEditado = window.usuarioContext.rolEditado;
 
+    // ✅ Si el usuario que se edita es Director y es el mismo usuario logueado
+    if (rolEditado === "Director" && usuarioLogueadoId === usuarioEditadoId) {
+        rolSelect.disabled = true;
+        rolError.textContent = "No puedes cambiar tu propio rol si eres Director.";
+        rolError.style.display = 'block';
+
+        // opcional, mejora visual
+        rolSelect.title = "No puedes editar tu propio rol siendo Director";
+        rolSelect.classList.add('disabled-field');
+    } else {
+        // 🔁 Validación normal
+        rolSelect.addEventListener('change', () => {
+            if (!rolSelect.value) {
+                rolError.textContent = "Debes seleccionar un rol.";
+                rolError.style.display = 'block';
+            } else {
+                rolError.textContent = '';
+                rolError.style.display = 'none';
+            }
+        });
+    }
     // =====================
-    //        Activo
+    // Activo
     // =====================
     const activoInput = document.getElementById('id_is_activo');
     const estadoTexto = document.getElementById('estado-texto');
-
-    // Mostrar texto según estado inicial
     estadoTexto.textContent = activoInput.checked ? "Activo" : "Inactivo";
 
-    // Permitir modificar y actualizar el texto
     activoInput.addEventListener('change', () => {
         estadoTexto.textContent = activoInput.checked ? "Activo" : "Inactivo";
     });
-
-    // =====================
-    // Validación de Contraseña (funcional y probada)
-    // =====================
-    const newPassInput = document.getElementById('new_password1');
-
-    // Crear el bloque de requisitos dinámicamente
-    const passMsg = document.createElement('div');
-    passMsg.id = 'pass-msg';
-    passMsg.style.marginTop = '8px';
-    passMsg.style.fontSize = '0.9rem';
-    passMsg.style.display = 'none'; // oculto hasta que escriba algo
-
-    passMsg.innerHTML = `
-    <p id="req-length" class="pass-req">• Al menos 9 caracteres</p>
-    <p id="req-uppercase" class="pass-req">• Una letra mayúscula</p>
-    <p id="req-lowercase" class="pass-req">• Una letra minúscula</p>
-    <p id="req-number" class="pass-req">• Un número</p>
-    <p id="req-special" class="pass-req">• Un carácter especial</p>
-    <p id="req-space" class="pass-req">• No puede contener espacios</p>
-    `;
-
-    // Insertar justo debajo del campo de contraseña
-    newPassInput.insertAdjacentElement('afterend', passMsg);
-
-    newPassInput.addEventListener('input', () => {
-    const value = newPassInput.value;
-
-    // Si está vacío, ocultamos el bloque
-    if (value.trim() === '') {
-        passMsg.style.display = 'none';
-        return;
-    }
-
-    // Mostrar los requisitos
-    passMsg.style.display = 'block';
-
-    // Requisitos individuales
-    const reqLength = document.getElementById('req-length');
-    const reqUpper = document.getElementById('req-uppercase');
-    const reqLower = document.getElementById('req-lowercase');
-    const reqNumber = document.getElementById('req-number');
-    const reqSpecial = document.getElementById('req-special');
-    const reqSpace = document.getElementById('req-space');
-
-    // Cambiar colores según los requisitos
-    reqLength.style.color = value.length >= 9 ? 'green' : '#dc3545';
-    reqUpper.style.color = /[A-Z]/.test(value) ? 'green' : '#dc3545';
-    reqLower.style.color = /[a-z]/.test(value) ? 'green' : '#dc3545';
-    reqNumber.style.color = /\d/.test(value) ? 'green' : '#dc3545';
-    reqSpecial.style.color = /[^A-Za-z0-9]/.test(value) ? 'green' : '#dc3545';
-    reqSpace.style.color = /\s/.test(value) ? '#dc3545' : 'green';
-    });
-
 });
-

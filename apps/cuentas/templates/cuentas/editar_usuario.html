@@ -7,7 +7,6 @@
 {% endblock %}
 
 {% block content %}
-
   <form id="editar-usuario-form" method="post" class="form-usuario">
     <h2 class="titulo-form">Editar Usuario</h2>
     {% csrf_token %}
@@ -49,6 +48,7 @@
 
     <!-- ROL -->
     <p>{{ form.rol.label_tag }} {{ form.rol }}</p>
+    <span id="error-rol" class="error-msg"></span>
 
     <!-- ACTIVO -->
     <div class="form-group">
@@ -112,9 +112,16 @@
   </form>
 
 {% block scripts %}
+<script>
+  window.usuarioContext = {
+    logueadoId: "{{ request.user.id }}",
+    editadoId: "{{ usuario.id }}",
+    rolEditado: "{{ usuario.rol|escapejs }}"
+  };
+</script>
 <script src="{% static 'cuentas/js/editar_usuario.js' %}"></script>
 <script>
-  // Si el checkbox está habilitado, actualiza el texto "Activo/Inactivo" al vuelo.
+  // Si el checkbox está habilitado, actualiza el texto "Activo/Inactivo".
   (function(){
     var cb = document.getElementById('id_is_activo');
     var label = document.getElementById('estado-texto');

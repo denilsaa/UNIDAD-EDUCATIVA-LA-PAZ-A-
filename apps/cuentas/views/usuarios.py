@@ -15,6 +15,29 @@ from apps.cuentas.roles import es_director, total_directores_activos
 from apps.estudiantes.models.estudiante import Estudiante
 from apps.cursos.models import Curso
 
+from django.db.models import Q
+
+# ======================================
+# 🔎 Buscar usuarios (antes lista_usuarios)
+# ======================================
+@role_required("director")
+def buscar_usuarios(request):
+    query = request.GET.get("q", "").strip()
+    usuarios = Usuario.objects.all().order_by("-id")
+
+    if query:
+        usuarios = usuarios.filter(
+            Q(rol__nombre__icontains=query) |
+            Q(ci__icontains=query) |
+            Q(apellidos__icontains=query) |
+            Q(nombres__icontains=query)
+        )
+
+    context = {
+        "usuarios": usuarios,
+        "query": query
+    }
+    return render(request, "cuentas/lista_usuarios.html", context)
 
 @role_required("director")
 def lista_usuarios(request):
@@ -182,3 +205,4 @@ def verificar_ci(request):
     ci = request.GET.get("ci", "")
     existe = Usuario.objects.filter(ci=ci).exists()
     return JsonResponse({"existe": existe})
+

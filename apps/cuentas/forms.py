@@ -38,15 +38,15 @@ class UsuarioCreateForm(forms.ModelForm):
         if not ci.isdigit():
             raise forms.ValidationError("El CI solo debe contener números.")
         
-        if len(ci) < 6 or len(ci) > 8:
-            raise forms.ValidationError("El CI debe tener entre 6 y 8 números.")
+        if len(ci) < 6 or len(ci) > 9:
+            raise forms.ValidationError("El CI debe tener entre 6 y 9 números.")
         
         if Usuario.objects.filter(ci=ci).exists():
             raise forms.ValidationError("Este CI ya está registrado.")
         
         return ci
     def clean_nombres(self):
-        nombres = self.cleaned_data.get("nombres", "").strip()
+        nombres = self.cleaned_data.get("nombres", "").strip()  # Eliminar espacios al inicio/final
 
         # No puede estar vacío
         if not nombres:
@@ -56,8 +56,8 @@ class UsuarioCreateForm(forms.ModelForm):
         if not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$', nombres):
             raise forms.ValidationError("Solo se permiten letras y espacios.")
 
-        # Quitar espacios múltiples y validar estructura
-        palabras = [p for p in nombres.split(" ") if p]  # Eliminar dobles espacios
+        # Eliminar dobles espacios internos
+        palabras = [p for p in nombres.split(" ") if p]  # Elimina espacios dobles
 
         # Mínimo 1 palabra, máximo 3
         if len(palabras) < 1 or len(palabras) > 3:
@@ -68,33 +68,38 @@ class UsuarioCreateForm(forms.ModelForm):
             if len(palabra) < 3:
                 raise forms.ValidationError("Cada palabra debe tener al menos 3 letras.")
 
-        # Verificar que no haya espacios al inicio o final
-        if nombres != nombres.strip():
-            raise forms.ValidationError("No se permiten espacios al inicio o al final.")
-
-        # Reconstruir el valor limpio (sin dobles espacios)
+        # Reconstruir valor limpio (sin dobles espacios)
         nombres_limpios = " ".join(palabras)
         return nombres_limpios
-    
+
+
     def clean_apellidos(self):
-        apellidos = self.cleaned_data['apellidos'].strip()
+        apellidos = self.cleaned_data.get("apellidos", "").strip()  # Eliminar espacios al inicio/final
 
-        # Validar solo letras y espacios
+        # No puede estar vacío
+        if not apellidos:
+            raise forms.ValidationError("El campo Apellidos es obligatorio.")
+
+        # Solo letras y espacios
         if not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$', apellidos):
-            raise ValidationError("Solo se permiten letras y espacios.")
+            raise forms.ValidationError("Solo se permiten letras y espacios.")
 
-        # Dividir en palabras
-        palabras = apellidos.split()
+        # Eliminar dobles espacios internos
+        palabras = [p for p in apellidos.split(" ") if p]
 
         # Mínimo 1 palabra, máximo 2
         if len(palabras) < 1 or len(palabras) > 2:
-            raise ValidationError("Debes ingresar uno o dos apellidos.")
+            raise forms.ValidationError("Debes ingresar uno o dos apellidos.")
 
         # Cada palabra debe tener al menos 3 letras
-        if any(len(p) < 3 for p in palabras):
-            raise ValidationError("Cada apellido debe tener al menos 3 letras.")
+        for palabra in palabras:
+            if len(palabra) < 3:
+                raise forms.ValidationError("Cada apellido debe tener al menos 3 letras.")
 
-        return apellidos
+        # Reconstruir valor limpio (sin dobles espacios)
+        apellidos_limpios = " ".join(palabras)
+        return apellidos_limpios
+
     def clean_email(self):
         email = (self.cleaned_data.get("email") or "").strip()
         if email == "":

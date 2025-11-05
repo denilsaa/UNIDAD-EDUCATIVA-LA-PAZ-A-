@@ -4,40 +4,138 @@
   background: #f9fafe;
 }
 
-/* ================== TITULOS ================== */
-.director-dashboard h2 {
-  color: #004a99;
-  margin-bottom: 10px;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 4px;
-}
-
-/* ================== GESTION DE ACCIONES ================== */
-.gestion-acciones {
+/* === ENCABEZADO DEL DASHBOARD === */
+.dashboard-header {
+  background: linear-gradient(90deg, #0c2a57, #13386f); /* degradado azul elegante */
+  color: #fff;
+  padding: 1.8rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-bottom: 1.5rem;
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin: 12px 0 20px 0;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.gestion-acciones a.btn-nuevo {
-  display: inline-block;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 500;
-  text-align: center;
-  font-size: 0.9rem;
+/* Opcional: puntitos sutiles animados como el header principal */
+.dashboard-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: moveDots 12s linear infinite;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.dashboard-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-header p {
+  font-size: 1rem;
+  color: #dce6ff; /* subtítulo suave */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 1;
+}
+
+/* Animación de puntitos compartida con el header */
+@keyframes moveDots {
+  from { background-position: 0 0; }
+  to { background-position: 40px 40px; }
+}
+
+/* ================== FORMULARIO Y BOTONES ================== */
+/* Contenedor del formulario */
+.form-cursos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Input de búsqueda */
+.form-cursos .input-busqueda {
+  flex: 1;
+  padding: 12px 14px;  /* altura consistente con botones */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
   transition: all 0.2s ease;
+  min-height: 44px; /* asegura altura uniforme */
+}
+
+.form-cursos .input-busqueda:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0,123,255,0.5);
+}
+
+/* Botones (Buscar y Nuevo) */
+.form-cursos .btn-buscar,
+.form-cursos .btn-nuevo {
+  padding: 12px 18px;  /* altura consistente */
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  min-height: 44px; /* misma altura que input */
+  flex-shrink: 0;   /* evita que se encojan */
+}
+
+/* Botón de buscar */
+.form-cursos .btn-buscar {
+  border: none;
   background-color: #28a745;
   color: #fff;
-  border: 1px solid #28a745;
+}
+
+.form-cursos .btn-buscar:hover {
+  background-color: #19692c;
+}
+
+/* Botón de nuevo curso */
+.form-cursos .btn-nuevo {
+  background-color: #007bff;
+  color: #fff;
+  border: 1px solid #007bff;
   text-decoration: none;
 }
 
-.gestion-acciones a.btn-nuevo:hover {
-  background-color: #19692c;
-  border-color: #19692c;
-  transform: translateY(-1px);
+.form-cursos .btn-nuevo:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+}
+
+/* Responsive: Apila elementos en móvil */
+@media (max-width: 700px) {
+  .form-cursos {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-cursos .input-busqueda,
+  .form-cursos .btn-buscar,
+  .form-cursos .btn-nuevo {
+    width: 100%;
+  }
 }
 
 /* ================== TABLAS ================== */

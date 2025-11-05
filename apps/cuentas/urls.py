@@ -5,8 +5,9 @@ from django.views.generic import TemplateView, RedirectView
 from .views.login import login_view, logout_view
 from .views.director_dashboard import director_dashboard
 from .views.usuarios import (
-    crear_usuario, lista_usuarios, ver_usuario, editar_usuario, eliminar_usuario, verificar_ci
+    crear_usuario, lista_usuarios, ver_usuario, editar_usuario, eliminar_usuario, verificar_ci,buscar_usuarios
 )
+
 from apps.cuentas.views.dashboards import padre_dashboard, regente_dashboard, secretaria_dashboard
 
 app_name = "cuentas"
@@ -41,7 +42,7 @@ urlpatterns = [
 
     # CRUD usuarios
     path("usuarios/crear/", crear_usuario, name="crear_usuario"),
-    path("usuarios/", lista_usuarios, name="lista_usuarios"),
+    path("usuarios/", buscar_usuarios, name="lista_usuarios"),
     path("usuarios/<int:user_id>/", ver_usuario, name="ver_usuario"),
     path("usuarios/<int:user_id>/editar/", editar_usuario, name="editar_usuario"),
     path("usuarios/<int:user_id>/eliminar/", eliminar_usuario, name="eliminar_usuario"),

@@ -8,16 +8,25 @@
 {% endblock %}
 
 {% block content %}
-<h2>Lista de usuarios</h2>
-
-<div class="gestion-acciones">
-  <a href="{% url 'cuentas:crear_usuario' %}" class="btn-nuevo">Crear usuario</a>
-</div>
+  <!-- === ENCABEZADO === -->
+  <div class="dashboard-header">
+    <h2 class="hdr-sub">
+      Lista de usuarios
+    </h2>
+    <p>Listado de los usuarios: Director, Secretaria, Regentes.</p>
+  </div>
+  <form method="get" action="{% url 'cuentas:lista_usuarios' %}" class="form-cursos">
+    <input type="text" name="q" placeholder="Buscar usuario por Rol, CI, Nombre o Apellido" value="{{ query }}" class="input-busqueda">
+    <button type="submit" class="btn-buscar">Buscar</button>
+    <a href="{% url 'cuentas:crear_usuario' %}" class="btn-nuevo">Nuevo usuario</a>
+  </form>
 
 <div class="table-wrapper">
+  {% if usuarios %}
   <table>
     <thead>
       <tr>
+        <th>Rol</th>
         <th>CI</th>
         <th>Nombres</th>
         <th>Apellidos</th>
@@ -28,28 +37,30 @@
     </thead>
     <tbody>
       {% for u in usuarios %}
-      <tr>
-        <td>{{ u.ci }}</td>
-        <td>{{ u.nombres }}</td>
-        <td>{{ u.apellidos }}</td>
-        <td>{{ u.email }}</td>
-        <td>{{ u.is_activo|yesno:"Activo,Inactivo" }}</td>
-        <td class="acciones">
-          <a href="{% url 'cuentas:ver_usuario' u.id %}" class="btn-ver">Ver</a>
-          <a href="{% url 'cuentas:editar_usuario' u.id %}" class="btn-editar">Editar</a>
-
-          {# 🚫 No mostrar eliminar si es el propio usuario autenticado #}
-          {% if u.id != request.user.id %}
-            <a href="{% url 'cuentas:eliminar_usuario' u.id %}" class="btn-eliminar">Eliminar</a>
-          {% else %}
-            <span class="btn-eliminar disabled" title="No puedes eliminarte a ti mismo">Eliminar</span>
-          {% endif %}
-        </td>
-      </tr>
+        {% if u.rol|default:''|lower != "padre de familia" %}
+          <tr>
+            <td>{{ u.rol }}</td>
+            <td>{{ u.ci }}</td>
+            <td>{{ u.nombres }}</td>
+            <td>{{ u.apellidos }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.is_activo|yesno:"Activo,Inactivo" }}</td>
+            <td class="acciones">
+              <a href="{% url 'cuentas:ver_usuario' u.id %}" class="btn-ver">Ver</a>
+              <a href="{% url 'cuentas:editar_usuario' u.id %}" class="btn-editar">Editar</a>
+              {% if u.id != request.user.id %}
+                  <a href="{% url 'cuentas:eliminar_usuario' u.id %}" class="btn-eliminar">Eliminar</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% endif %}
       {% empty %}
-      <tr><td colspan="6">Sin usuarios</td></tr>
+        <tr><td colspan="7">Sin usuarios</td></tr>
       {% endfor %}
     </tbody>
   </table>
+  {% else %}
+    <p>No se encontraron usuarios con ese criterio.</p>
+  {% endif %}
 </div>
 {% endblock %}

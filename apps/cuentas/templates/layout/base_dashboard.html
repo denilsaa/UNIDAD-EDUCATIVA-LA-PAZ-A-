@@ -12,55 +12,6 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-
-  <!-- Estilos mínimos para campana, badge y panel (puedes moverlos a tu CSS) -->
-  <style>
-    .topbar {
-      display:flex; align-items:center; justify-content:flex-end;
-      gap:8px; padding:10px 12px; border-bottom:1px solid #eee;
-      background:#fff; position:sticky; top:0; z-index:20;
-    }
-    .notif-bell {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px; height: 40px;
-      border: 0; border-radius: 999px;
-      background: transparent;
-      cursor: pointer;
-      transition: background .2s ease;
-    }
-    .notif-bell:hover { background: rgba(0,0,0,.06); }
-    .notif-bell svg { width: 22px; height: 22px; fill: currentColor; color: #333; }
-
-    .notif-badge {
-      position: absolute; top: -4px; right: -2px;
-      min-width: 18px; height: 18px; padding: 0 6px;
-      border-radius: 999px; background: #e11; color: #fff;
-      font-size: 12px; line-height: 18px; text-align: center;
-      box-shadow: 0 0 0 2px #fff;
-      display:none;
-    }
-
-    .notif-panel {
-      position: fixed; top: 0; right: 0; bottom: 0;
-      width: min(380px, 92vw); background: #fff;
-      box-shadow: -12px 0 30px rgba(0,0,0,.12);
-      z-index: 10000; display: flex; flex-direction: column;
-    }
-    .notif-panel[hidden] { display:none; }
-    .notif-panel__hdr {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 14px; border-bottom: 1px solid #eee;
-    }
-    .notif-panel__content { padding: 12px 14px; overflow: auto; flex: 1; }
-    .notif-close {
-      border:none; background:transparent; font-size:18px; cursor:pointer;
-      padding:4px 8px; border-radius:8px;
-    }
-    .notif-close:hover { background:rgba(0,0,0,.06); }
-  </style>
 </head>
 
 {% with role=request.user.rol.nombre|default_if_none:""|default:""|lower %}
@@ -151,7 +102,16 @@
       {% if messages %}
         <div class="msgs">
           {% for message in messages %}
-            <div class="msg msg-{{ message.tags }}">{{ message }}</div>
+            <div class="msg msg-{{ message.tags }}">
+              {% if message.tags == 'success' %}
+                <img src="{% static 'img/logo.png' %}" alt="ok">
+              {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <img src="{% static 'img/logo.png' %}" alt="error">
+              {% elif message.tags == 'info' %}
+                <img src="{% static 'img/logo.png' %}" alt="info">
+              {% endif %}
+              {{ message }}
+            </div>
           {% endfor %}
         </div>
       {% endif %}
@@ -170,223 +130,19 @@
       <p style="opacity:.7">Sin notificaciones aún.</p>
     </div>
   </aside>
+  {{ request.user.id|default:0|json_script:"user-id" }}
+  {{ request.user.rol.nombre|default:''|json_script:"user-role" }}
 
+  <script>
+    window.userData = {
+      id: JSON.parse(document.getElementById('user-id').textContent),
+      role: JSON.parse(document.getElementById('user-role').textContent)
+    };
+  </script>
   <!-- Scripts -->
-  <script>
-    // Abrir/cerrar sidebar (si lo usas en responsive)
-    function toggleSidebar() {
-      const sidenav = document.querySelector('.sidenav');
-      if (sidenav) sidenav.classList.toggle('open');
-    }
-
-    /*
-      Evitar "volver atrás" en páginas autenticadas:
-      - Si el usuario presiona Atrás, recargamos la misma URL (location.replace).
-      - Si la página viene del back/forward cache (bfcache), forzamos recarga.
-      Con headers no-store, si la sesión expiró, Django te enviará al login.
-    */
-    (function () {
-      try {
-        var navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
-        if (navEntries && navEntries[0] && navEntries[0].type === 'back_forward') {
-          location.replace(location.href);
-          return;
-        }
-      } catch (_) {}
-
-      window.addEventListener('pageshow', function (evt) {
-        if (evt.persisted) {
-          location.replace(location.href);
-        }
-      });
-
-      try { history.replaceState({ locked: true }, '', location.href); } catch (_) {}
-
-      window.addEventListener('popstate', function () {
-        location.replace(location.href);
-      });
-    })();
-  </script>
-
-  <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // ------- Overlay SOLO cuando hay salida de la página (navegación real) ------
-    function showOverlay() {
-      if (document.getElementById("ui-lock")) return;
-      const ov = document.createElement("div");
-      ov.id = "ui-lock";
-      ov.innerHTML = '<div class="ui-lock__box"><div class="ui-lock__spinner"></div><p>Procesando…</p></div>';
-      Object.assign(ov.style, {
-        position:"fixed", inset:"0", zIndex:"9999",
-        background:"rgba(255,255,255,.6)",
-        display:"flex", alignItems:"center", justifyContent:"center",
-        backdropFilter:"saturate(180%) blur(2px)"
-      });
-      document.body.appendChild(ov);
-      document.body.style.overflow = "hidden";
-    }
-    window.addEventListener("beforeunload", showOverlay);
-
-    // ------- 1) Anti double-submit por formulario (no tocar disabled/value) ----
-    document.querySelectorAll("form").forEach(form => {
-      let submitting = false;
-      form.addEventListener("submit", function (e) {
-        if (submitting) { e.preventDefault(); e.stopPropagation(); return false; }
-        submitting = true;
-        const btn = form.querySelector("button[type=submit], input[type=submit]");
-        if (btn) btn.classList.add("is-loading");
-      }, true);
-    });
-
-    // ------- 2) Debounce para ENLACES y overlay sólo si navegan -----------------
-    document.querySelectorAll("a[href]").forEach(link => {
-      link.addEventListener("click", function (e) {
-        const href = link.getAttribute("href") || "";
-        if (href.startsWith("#")) return;
-
-        if (link.dataset.clicked === "true") {
-          e.preventDefault(); e.stopPropagation(); return false;
-        }
-        link.dataset.clicked = "true";
-        setTimeout(() => { link.dataset.clicked = "false"; }, 4000);
-      }, { capture:true });
-    });
-
-    // Limpieza si el navegador usa bfcache
-    window.addEventListener("pageshow", function (evt) {
-      if (evt.persisted) {
-        const ov = document.getElementById("ui-lock");
-        if (ov) ov.remove();
-        document.body.style.overflow = "";
-      }
-    });
-
-    // Toggle panel notificaciones
-    (function(){
-      const bell = document.getElementById('notif-bell');
-      const panel = document.getElementById('notif-panel');
-      const closeBtn = document.getElementById('notif-close');
-
-      if (bell && panel) {
-        bell.addEventListener('click', () => { panel.hidden = !panel.hidden; });
-      }
-      if (closeBtn && panel) {
-        closeBtn.addEventListener('click', () => { panel.hidden = true; });
-      }
-    })();
-  });
-  </script>
-
-<script>
-(function(){
-  const uid = {{ request.user.id|default:0 }};
-  const role = "{{ request.user.rol.nombre|default_if_none:''|lower }}";
-
-  const $ = (sel) => document.querySelector(sel);
-  const badge = $("#notif-badge");
-  const panel = $("#notif-panel");
-  const panelContent = panel ? panel.querySelector(".notif-panel__content") : null;
-
-  function incBadge(n=1){
-    if (!badge) return;
-    const curr = parseInt(badge.textContent || "0", 10) || 0;
-    const val = curr + (parseInt(n,10)||0);
-    badge.textContent = String(val);
-    badge.style.display = val > 0 ? "inline-block" : "none";
-  }
-  function addNotifRow(html){
-    if (!panelContent) return;
-    const row = document.createElement("div");
-    row.style.padding = "8px 0";
-    row.style.borderBottom = "1px solid #f3f3f3";
-    row.innerHTML = html;
-    panelContent.prepend(row);
-  }
-
-  const WS = (path) => {
-    const proto = (location.protocol === "https:") ? "wss" : "ws";
-    return `${proto}://${location.host}${path}`;
-  };
-
-  // NOTIFS
-  if (uid) {
-    const notifs = new WebSocket(WS(`/ws/notifs/?uid=${uid}`));
-    notifs.onopen = () => console.log("[WS NOTIFS] OPEN");
-    notifs.onclose = (e) => console.log("[WS NOTIFS] CLOSE", e.code, e.reason);
-    notifs.onerror = (e) => console.warn("[WS NOTIFS] ERROR", e);
-    notifs.onmessage = (e) => {
-      let msg; try { msg = JSON.parse(e.data); } catch { return; }
-      if (msg.type === "notify.unread" && msg.event === "citacion") {
-        incBadge(msg.unread || 1);
-        addNotifRow(`
-          <strong>Citación #${msg.citacion_id || "—"}</strong><br>
-          <small>${msg.estudiante || ""} — ${msg.mensaje || "Nueva citación"}</small><br>
-          <small>${msg.cuando ? new Date(msg.cuando).toLocaleString() : ""}</small>
-        `);
-        return;
-      }
-      if (msg.type === "director.citacion" && msg.data) {
-        const d = msg.data;
-        addNotifRow(`
-          <strong>Propuesta de citación</strong><br>
-          <small>#${d.citacion_id || "—"} · ${d.estudiante || ""}</small><br>
-          <small>${d.motivo || ""} · ${d.razon || ""}</small><br>
-          <small>ρ≈${(d.rho||0).toFixed(2)} · Wq≈${d.Wq? d.Wq.toFixed(1) : "—"} min</small><br>
-          <small>Sugerido: ${d.sugerido ? new Date(d.sugerido).toLocaleString() : "—"}</small><br>
-          <a href="${location.origin}/citaciones/pendientes/" class="btn btn-sm btn-primary" style="margin-top:6px; display:inline-block;">Revisar</a>
-        `);
-        return;
-      }
-      console.log("[WS NOTIFS RAW]", msg);
-    };
-  }
-
-  // COLA
-  (function(){
-    const s = new WebSocket(WS("/ws/cola/"));
-    s.onopen = () => console.log("[WS COLA] OPEN");
-    s.onmessage = (e) => {
-      try { console.log("[WS COLA]", JSON.parse(e.data)); }
-      catch { console.log("[WS COLA]", e.data); }
-    };
-    s.onclose = () => console.log("[WS COLA] CLOSE");
-  })();
-
-  // DASHBOARD
-  (function(){
-    const s = new WebSocket(WS("/ws/dashboard/"));
-    s.onopen = () => console.log("[WS DASH] OPEN");
-    s.onmessage = (e) => {
-      try { console.log("[WS DASH]", JSON.parse(e.data)); }
-      catch { console.log("[WS DASH]", e.data); }
-    };
-    s.onclose = () => console.log("[WS DASH] CLOSE");
-  })();
-})();
-</script>
-<script>
-(function(){
-  const uid = "{{ request.user.id }}";
-  if (!uid) return;
-  const proto = location.protocol === "https:" ? "wss" : "ws";
-  const ws = new WebSocket(`${proto}://${location.host}/ws/notifs/?uid=${uid}`);
-  ws.onmessage = (ev) => {
-    try {
-      const data = JSON.parse(ev.data);
-      const badge = document.querySelector('#notif-badge');
-      if (badge) {
-        const n = parseInt(badge.innerText || "0", 10) + 1;
-        badge.innerText = n;
-        badge.style.display = 'inline-block';
-      }
-      // opcional: mostrar toast/panel con "data"
-      console.log("Notif WS:", data);
-    } catch (e) { console.error(e); }
-  };
-})();
-</script>
-
-
+  {% block extra_js %}
+    <script src="{% static 'cuentas/js/base_dashboard.js' %}"></script>
+  {% endblock %}
 </body>
 {% endwith %}
 </html>

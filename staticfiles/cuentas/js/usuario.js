@@ -22,10 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (value.length < 6) {
             ciError.textContent = "El CI debe tener al menos 6 números.";
             ciError.style.display = 'block';
-        } else if (value.length > 8) {
-            ciError.textContent = "El CI debe tener máximo 8 números.";
+        } else if (value.length > 9) {
+            ciError.textContent = "El CI debe tener máximo 9 números.";
             ciError.style.display = 'block';
-            ciInput.value = value.slice(0, 8);
+            ciInput.value = value.slice(0, 9);
         } else {
             ciError.style.display = 'none';
         }
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ciInput.addEventListener('blur', () => {
         const ci = ciInput.value.trim();
 
-        if (ci.length >= 6 && ci.length <= 8) {
+        if (ci.length >= 6 && ci.length <= 9) {
             fetch(`/cuentas/verificar-ci/?ci=${ci}`)
                 .then(response => response.json())
                 .then(data => {
@@ -66,7 +66,7 @@ nombresInput.addEventListener('input', () => {
         nombresError.style.display = 'block';
         return;
     }
-    // Eliminar espacios múltiples o al inicio/final
+    // Eliminar espacios múltiples o al inicio/final (solo inicio aquí)
     value = value.replace(/\s+/g, ' ').trimStart();
     
     // Solo permitir letras y espacios
@@ -109,6 +109,14 @@ nombresInput.addEventListener('input', () => {
     nombresError.style.display = 'none';
     nombresInput.value = value;
 });
+
+// ============================
+// ELIMINAR ESPACIOS AL INICIO/FINAL AL SALIR DEL CAMPO
+// ============================
+nombresInput.addEventListener('blur', () => {
+    nombresInput.value = nombresInput.value.trim();
+});
+
 // =====================
 // Validación: Apellidos
 // =====================
@@ -122,7 +130,7 @@ apellidosInput.addEventListener('input', () => {
         apellidosError.style.display = 'block';
         return;
     }
-    // Eliminar espacios múltiples o al inicio/final
+    // Eliminar espacios múltiples o al inicio/final (solo inicio aquí)
     value = value.replace(/\s+/g, ' ').trimStart();
     
     // Solo permitir letras y espacios
@@ -165,6 +173,14 @@ apellidosInput.addEventListener('input', () => {
     apellidosError.style.display = 'none';
     apellidosInput.value = value;
 });
+
+// ============================
+// ELIMINAR ESPACIOS AL INICIO/FINAL AL SALIR DEL CAMPO
+// ============================
+apellidosInput.addEventListener('blur', () => {
+    apellidosInput.value = apellidosInput.value.trim();
+});
+
 // =====================
 // Validación: Gmail
 // =====================
