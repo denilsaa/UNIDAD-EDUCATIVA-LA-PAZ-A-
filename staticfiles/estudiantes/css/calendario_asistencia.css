@@ -1,0 +1,166 @@
+/* === ENCABEZADO DEL DASHBOARD === */
+.dashboard-header {
+  background: linear-gradient(90deg, #0c2a57, #13386f); /* degradado azul elegante */
+  color: #fff;
+  padding: 1.8rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Opcional: puntitos sutiles animados como el header principal */
+.dashboard-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: moveDots 12s linear infinite;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.dashboard-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-header p {
+  font-size: 1rem;
+  color: #dce6ff; /* subtítulo suave */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 1;
+}
+
+/* Animación de puntitos compartida con el header */
+@keyframes moveDots {
+  from { background-position: 0 0; }
+  to { background-position: 40px 40px; }
+}
+
+/* ================== FORMULARIO ================== */
+.form-calendario {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.form-calendario .form-label {
+  font-weight: 500;
+}
+
+.btn-guardar {
+  background-color: #28a745;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-guardar:hover {
+  background-color: #19692c;
+  transform: translateY(-1px);
+}
+
+/* ================== RESUMEN ================== */
+.resumen-card {
+  background: #f6f9ff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.resumen-card div {
+  margin-bottom: 6px;
+}
+
+.badge {
+  font-size: 0.9rem;
+  padding: 4px 8px;
+}
+
+/* ================== TABLA ================== */
+.table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background: #fff;
+}
+
+.tabla-calendarios {
+  width: 100%;
+  min-width: 500px;
+  border-collapse: collapse;
+}
+
+.tabla-calendarios th, .tabla-calendarios td {
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.tabla-calendarios thead th {
+  background-color: #d0e7ff;
+  color: #004a99;
+  font-weight: 600;
+}
+
+.tabla-calendarios tbody tr:nth-child(even) {
+  background: #f6f9ff;
+}
+
+.tabla-calendarios tbody tr:hover {
+  background: #dbe7ff;
+}
+
+/* ================== BOTONES EN TABLA ================== */
+.btn-accion {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  background-color: #007bff;
+  color: #fff;
+  border: 1px solid #007bff;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.btn-accion:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+  transform: translateY(-1px);
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 768px) {
+  .form-calendario .row {
+    flex-direction: column;
+  }
+  .table-wrapper {
+    overflow-x: auto;
+  }
+  .tabla-calendarios th, .tabla-calendarios td {
+    padding: 6px 8px;
+  }
+}

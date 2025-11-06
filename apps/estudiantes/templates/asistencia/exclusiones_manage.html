@@ -1,8 +1,18 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Exclusiones{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'estudiantes/css/exclusiones_manage.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>Exclusiones — {{ calendario.fecha_inicio }} → {{ calendario.fecha_fin }}</h2>
+  <div class="dashboard-header">
+    <h2 class="hdr-sub">
+      Exclusiones — {{ calendario.fecha_inicio }} → {{ calendario.fecha_fin }}
+    </h2>
+  </div>
 
 <form method="post" class="card p-3 mb-3">
   {% csrf_token %}

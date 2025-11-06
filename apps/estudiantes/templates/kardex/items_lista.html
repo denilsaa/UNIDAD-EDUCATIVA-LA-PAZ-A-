@@ -8,7 +8,12 @@
 {% endblock %}
 
 {% block content %}
-<h2 style="text-align:center">Catálogo de Ítems de Kárdex</h2>
+  <div class="dashboard-header">
+    <h2 class="hdr-sub">
+      Catálogo de Ítems de Kárdex
+    </h2>
+    <p>Listado de los items creados para Kardex.</p>
+  </div>
 
 <form method="get" class="form-filtros">
   <div class="filtros-principal">
@@ -29,7 +34,7 @@
     </select>
 
     <button type="submit">Filtrar</button>
-    <a href="{% url 'estudiantes:kardex_items_nuevo' %}" class="btn-nuevo">+ Nuevo ítem</a>
+    <a href="{% url 'estudiantes:kardex_items_nuevo' %}" class="btn-nuevo">Nuevo ítem</a>
   </div>
 </form>
 <div class="filtros-links">
