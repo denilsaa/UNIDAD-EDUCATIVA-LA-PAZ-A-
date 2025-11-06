@@ -8,8 +8,13 @@
 {% endblock %}
 
 {% block content %}
-<h2 style="text-align:center">Kárdex diario del estudiante</h2>
-
+  <!-- === ENCABEZADO === -->
+  <div class="dashboard-header">
+    <h2 class="hdr-sub">
+      Kárdex
+    </h2>
+    <p>Listado Kárdex por estudiante</p>
+  </div>
 <!-- Cabecera -->
 <div class="card-info">
   <div class="card-row">
@@ -20,15 +25,15 @@
     <span class="label">Curso:</span>
     <span class="value">{{ estudiante.curso }}</span>
     <span class="label">Nº Lista:</span>
-    <span class="value">{{ estudiante.nro_lista|default:"—" }}</span>
+    <span class="value">{{ estudiante.nro_lista|default:"  " }}</span>
     <span class="label">Año:</span>
-    <span class="value">{{ estudiante.anio|default:"—" }}</span>
+    <span class="value">{{ estudiante.anio|default:"  " }}</span>
   </div>
   <div class="card-row">
     <span class="label">Padre/Madre/Tutor:</span>
     <span class="value">{{ estudiante.padre|default:"—" }}</span>
-    <span class="label">Tel./Cel.:</span>
-    <span class="value">{{ estudiante.tel_celular|default:"—" }}</span>
+<!--    <span class="label">Tel./Cel.:</span>
+    <span class="value">{{ estudiante.tel_celular|default:"—" }}</span>-->
   </div>
 </div>
 
