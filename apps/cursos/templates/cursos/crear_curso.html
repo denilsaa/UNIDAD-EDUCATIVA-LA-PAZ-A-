@@ -9,7 +9,7 @@
 
 {% block content %}
 <form method="post" class="form-curso">
-  <h2 class="titulo-form">Crear nuevo curso</h2>
+  <h2 class="titulo-form">Crear Curso</h2>
   {% csrf_token %}
 
   <div class="form-group">
@@ -49,6 +49,9 @@
   </div>
 </form>
 {% block scripts %}
+<script>
+  const cursosExistentes = JSON.parse('{{ cursos_json|safe }}');
+</script>
 <script src="{% static 'cursos/js/crear_curso.js' %}"></script>
 {% endblock %}
 {% endblock %}

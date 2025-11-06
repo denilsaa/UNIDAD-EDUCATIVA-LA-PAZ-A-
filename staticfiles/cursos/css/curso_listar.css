@@ -1,26 +1,62 @@
 /* ================== CONTENEDOR PRINCIPAL ================== */
-.cursos-dashboard {
+body {
   font-family: Arial, sans-serif;
   background: #f9fafe;
   padding: 16px;
 }
 
-/* ================== TITULOS ================== */
-.cursos-dashboard h2 {
-  color: #004a99;
-  margin-bottom: 10px;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 4px;
+/* === ENCABEZADO DEL DASHBOARD === */
+.dashboard-header {
+  background: linear-gradient(90deg, #0c2a57, #13386f);
+  color: #fff;
+  padding: 1.8rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.cursos-dashboard h3 {
-  color: #007bff;
-  margin-top: 20px;
-  margin-bottom: 8px;
+.dashboard-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: moveDots 12s linear infinite;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.dashboard-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-header p {
+  font-size: 1rem;
+  color: #dce6ff;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes moveDots {
+  from { background-position: 0 0; }
+  to { background-position: 40px 40px; }
 }
 
 /* ================== FORMULARIO Y BOTONES ================== */
-/* Contenedor del formulario */
 .form-cursos {
   display: flex;
   flex-wrap: wrap;
@@ -29,15 +65,14 @@
   margin-bottom: 20px;
 }
 
-/* Input de búsqueda */
 .form-cursos .input-busqueda {
   flex: 1;
-  padding: 12px 14px;  /* altura consistente con botones */
+  padding: 12px 14px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s ease;
-  min-height: 44px; /* asegura altura uniforme */
+  min-height: 44px;
 }
 
 .form-cursos .input-busqueda:focus {
@@ -46,10 +81,9 @@
   box-shadow: 0 0 5px rgba(0,123,255,0.5);
 }
 
-/* Botones (Buscar y Nuevo) */
 .form-cursos .btn-buscar,
 .form-cursos .btn-nuevo {
-  padding: 12px 18px;  /* altura consistente */
+  padding: 12px 18px;
   border-radius: 8px;
   font-weight: 600;
   font-size: 1rem;
@@ -58,11 +92,10 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  min-height: 44px; /* misma altura que input */
-  flex-shrink: 0;   /* evita que se encojan */
+  min-height: 44px;
+  flex-shrink: 0;
 }
 
-/* Botón de buscar */
 .form-cursos .btn-buscar {
   border: none;
   background-color: #28a745;
@@ -73,7 +106,6 @@
   background-color: #19692c;
 }
 
-/* Botón de nuevo curso */
 .form-cursos .btn-nuevo {
   background-color: #007bff;
   color: #fff;
@@ -86,7 +118,7 @@
   border-color: #004a99;
 }
 
-/* Responsive: Apila elementos en móvil */
+/* Responsive: apila los elementos en pantallas pequeñas */
 @media (max-width: 700px) {
   .form-cursos {
     flex-direction: column;
@@ -101,7 +133,7 @@
 }
 
 /* ================== TABLA ================== */
-.cursos-dashboard .table-wrapper {
+.table-wrapper {
   overflow-x: auto;
   margin-bottom: 16px;
   border-radius: 8px;
@@ -109,14 +141,13 @@
   background: #fff;
 }
 
-.cursos-dashboard table {
+table {
   width: 100%;
   min-width: 700px;
   border-collapse: collapse;
 }
 
-.cursos-dashboard th,
-.cursos-dashboard td {
+th, td {
   border: 1px solid #ddd;
   padding: 10px 12px;
   text-align: left;
@@ -124,22 +155,22 @@
   white-space: nowrap;
 }
 
-.cursos-dashboard thead th {
+thead th {
   background-color: #d0e7ff;
   color: #004a99;
   font-weight: 600;
 }
 
-.cursos-dashboard tbody tr:nth-child(even) {
+tbody tr:nth-child(even) {
   background: #f6f9ff;
 }
 
-.cursos-dashboard tbody tr:hover {
+tbody tr:hover {
   background: #dbe7ff;
 }
 
-/* ================== LINKS / BOTONES DENTRO DE TABLA ================== */
-.cursos-dashboard table a {
+/* ================== BOTONES DENTRO DE TABLA ================== */
+table a {
   display: inline-block;
   padding: 4px 10px;
   margin: 2px 2px 2px 0;
@@ -153,67 +184,73 @@
 }
 
 /* Ver */
-.cursos-dashboard table a.btn-ver {
+table a.btn-ver {
   background-color: #007bff;
   color: #fff;
   border-color: #007bff;
 }
 
-.cursos-dashboard table a.btn-ver:hover {
+table a.btn-ver:hover {
   background-color: #004a99;
   border-color: #004a99;
   transform: translateY(-1px);
 }
 
 /* Editar */
-.cursos-dashboard table a.btn-editar {
+table a.btn-editar {
   background-color: #17a2b8;
   color: #fff;
   border-color: #17a2b8;
 }
 
-.cursos-dashboard table a.btn-editar:hover {
+table a.btn-editar:hover {
   background-color: #0d6771;
   border-color: #0d6771;
   transform: translateY(-1px);
 }
 
 /* Eliminar */
-.cursos-dashboard table a.btn-eliminar {
+table a.btn-eliminar {
   background-color: #dc3545;
   color: #fff;
   border-color: #dc3545;
 }
 
-.cursos-dashboard table a.btn-eliminar:hover {
+table a.btn-eliminar:hover {
   background-color: #a71d2a;
   border-color: #a71d2a;
   transform: translateY(-1px);
 }
 
 /* Ver estudiantes */
-.cursos-dashboard table a.btn-estudiantes {
+table a.btn-estudiantes {
   background-color: #28a745;
   color: #fff;
   border-color: #28a745;
 }
 
-.cursos-dashboard table a.btn-estudiantes:hover {
+table a.btn-estudiantes:hover {
   background-color: #19692c;
   border-color: #19692c;
   transform: translateY(-1px);
 }
 
+/* Llamar asistencia */
+table a.btn-llamar-asistencia {
+  background-color: #6f42c1;
+  color: #fff;
+  border-color: #6f42c1;
+}
+
+table a.btn-llamar-asistencia:hover {
+  background-color: #4b2d91;
+  border-color: #4b2d91;
+  transform: translateY(-1px);
+}
+
 /* ================== RESPONSIVE ================== */
 @media (max-width: 900px) {
-  .cursos-dashboard form {
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .cursos-dashboard table,
-  .cursos-dashboard th,
-  .cursos-dashboard td {
+  table, th, td {
     padding: 8px 10px;
   }
 }

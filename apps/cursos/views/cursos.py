@@ -4,14 +4,15 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.db.models import Q
-
 from apps.cursos.models import Curso
 from apps.cursos.forms import CursoForm
-
+import json
 # 🔒 utilidades de rol
 from apps.cuentas.decorators import role_required
 from apps.cuentas.roles import es_director, es_regente
-
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.contrib import messages
 
 # ============================
 #   SOLO DIRECTOR
@@ -37,7 +38,17 @@ def crear_curso(request):
         messages.error(request, "Por favor corrija los errores.")
     else:
         form = CursoForm()
-    return render(request, "cursos/crear_curso.html", {"form": form})
+
+    # 🔹 Obtener todos los cursos existentes para la validación JS
+    cursos_existentes = list(Curso.objects.values("nivel", "paralelo"))
+
+    # 🔹 Pasar los datos al contexto
+    context = {
+        "form": form,
+        "cursos_json": json.dumps(cursos_existentes)
+    }
+
+    return render(request, "cursos/crear_curso.html", context)
 
 
 @login_required
@@ -62,7 +73,9 @@ def ver_curso(request, curso_id):
 
 @role_required("director")
 def editar_curso(request, curso_id):
+
     curso = get_object_or_404(Curso, id=curso_id)
+
     if request.method == "POST":
         form = CursoForm(request.POST, instance=curso)
         if form.is_valid():
@@ -72,8 +85,19 @@ def editar_curso(request, curso_id):
         messages.error(request, "Por favor corrija los errores.")
     else:
         form = CursoForm(instance=curso)
-    return render(request, "cursos/editar_curso.html", {"form": form, "curso": curso})
 
+    # 🔹 Obtener todos los cursos excepto el actual, para verificar duplicados desde JS
+    cursos_existentes = list(
+        Curso.objects.exclude(id=curso.id).values("nivel", "paralelo")
+    )
+
+    context = {
+        "form": form,
+        "curso": curso,
+        "cursos_json": json.dumps(cursos_existentes),  # 👈 esto se usará en el JS
+    }
+
+    return render(request, "cursos/editar_curso.html", context)
 
 @role_required("director")
 def eliminar_curso(request, curso_id):

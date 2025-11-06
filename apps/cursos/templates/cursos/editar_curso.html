@@ -60,7 +60,9 @@
   </div>
 </div>
 {% block scripts %}
+<script>
+  const cursosExistentes = JSON.parse('{{ cursos_json|safe }}');
+</script>
 <script src="{% static 'cursos/js/editar_curso.js' %}"></script>
 {% endblock %}
-
 {% endblock %}

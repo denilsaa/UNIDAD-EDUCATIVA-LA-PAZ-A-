@@ -9,20 +9,23 @@
 
 {% block content %}
 {% now "Y-m-d" as hoy %}
-<div class="cursos-dashboard">
-  <h2>Cursos</h2>
+  <div class="dashboard-header">
+    <h2 class="hdr-sub">
+      Cursos
+    </h2>
+    <p>Listado de los cursos Vigentes</p>
+  </div>
 
   <form method="get" class="form-cursos">
     <input type="text" name="q" value="{{ q }}" placeholder="Buscar por nivel o paralelo" class="input-busqueda">
     <button type="submit" class="btn-buscar">Buscar</button>
     <a href="{% url 'cursos:crear_curso' %}" class="btn-nuevo">Nuevo curso</a>
   </form>
-
+ 
   <div class="table-wrapper">
     <table>
       <thead>
         <tr>
-          <th>ID</th>
           <th>Nivel</th>
           <th>Paralelo</th>
           <th>Regente</th>
@@ -32,7 +35,6 @@
       <tbody>
         {% for curso in cursos %}
         <tr>
-          <td>{{ curso.id }}</td>
           <td>{{ curso.nivel }}</td>
           <td>{{ curso.paralelo }}</td>
           <td>{{ curso.regente }}</td>
@@ -52,5 +54,4 @@
       </tbody>
     </table>
   </div>
-</div>
 {% endblock %}
