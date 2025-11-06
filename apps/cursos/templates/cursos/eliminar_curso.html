@@ -1,13 +1,53 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Eliminar curso{% endblock %}
 
-{% block content %}
-<h2>Eliminar curso</h2>
-<p>¿Está seguro de eliminar el curso <strong>{{ curso.nivel }} {{ curso.paralelo }}</strong>?</p>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cursos/css/eliminar_curso.css' %}">
+{% endblock %}
 
-<form method="post">
-  {% csrf_token %}
-  <button type="submit">Sí, eliminar</button>
-  <a href="{% url 'cursos:ver_curso' curso.id %}">Cancelar</a>
-</form>
+{% block content %}
+<div class="detalle-usuario">
+  <h2 class="titulo-detalle">Eliminar curso</h2>
+
+  <div class="card-detalle">
+    <p>Está a punto de eliminar el curso <strong>{{ curso.nivel }} {{ curso.paralelo }}</strong>.</p>
+
+    {# Mostrar regente si existe #}
+    {% if curso.regente %}
+      <p><strong>Regente asignado:</strong> {{ curso.regente.get_full_name|default:curso.regente.ci }}</p>
+    {% else %}
+      <p><strong>Regente asignado:</strong> No tiene regente asignado.</p>
+    {% endif %}
+
+    {# Mostrar estudiantes vinculados #}
+    {% if estudiantes %}
+      <p>Este curso tiene los siguientes estudiantes asignados:</p>
+      <div class="estudiantes-lista">
+        {% for estudiante in estudiantes %}
+          <div class="estudiante-card">
+            <p><span class="valor">{{ estudiante.apellidos }} {{ estudiante.nombres }}</span></p>
+            <p><span class="label">{{ estudiante.ci|default:"Sin cédula" }}</span></p>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="alert alert-warning" style="margin-top: 1rem;">
+        ⚠️ Al eliminar este curso, los estudiantes quedarán sin curso asignado.
+      </div>
+    {% else %}
+      <p>No hay estudiantes registrados en este curso.</p>
+    {% endif %}
+  </div>
+
+  <div class="acciones-detalle">
+    <form method="post" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn-eliminar">
+        Sí, eliminar curso
+      </button>
+    </form>
+    <a href="{% url 'cursos:lista_cursos' %}" class="btn-volver">Cancelar</a>
+  </div>
+</div>
 {% endblock %}

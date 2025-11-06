@@ -107,13 +107,22 @@ def eliminar_curso(request, curso_id):
     """
     curso = get_object_or_404(Curso, id=curso_id)
 
+    # Obtener estudiantes asociados usando related_name "estudiantes"
+    estudiantes = curso.estudiantes.all()
+
     if request.method == "POST":
         curso.delete()
         messages.success(request, "Curso eliminado permanentemente.")
         return redirect(reverse("cursos:lista_cursos"))
 
-    return render(request, "cursos/eliminar_curso.html", {"curso": curso})
-
+    return render(
+        request,
+        "cursos/eliminar_curso.html",
+        {
+            "curso": curso,
+            "estudiantes": estudiantes,
+        },
+    )
 
 # ============================
 #   REGENTE: SOLO SUS CURSOS

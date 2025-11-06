@@ -41,3 +41,7 @@ class Usuario(SelladoTiempo, models.Model):
     def is_anonymous(self):
         """Override is_anonymous to return False if the user is active."""
         return not self.is_activo
+    # 👈 NUEVO: obtener nombre completo
+    @property
+    def get_full_name(self):
+        return f"{self.nombres} {self.apellidos}"
