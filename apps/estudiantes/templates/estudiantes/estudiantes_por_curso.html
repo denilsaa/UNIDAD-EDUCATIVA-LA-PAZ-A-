@@ -7,13 +7,17 @@
 {% endblock %}
 
 {% block content %}
-<div class="cursos-dashboard">
-
-  <h2>Estudiantes de {{ curso }}</h2>
+  <!-- === ENCABEZADO === -->
+  <div class="dashboard-header">
+    <h2 class="hdr-sub">
+      Estudiantes de {{ curso }}
+    </h2>
+    <p>Listado de los estudiantes del curso correspondiente.</p>
+  </div>
 
   {% with role=request.user.rol.nombre|default_if_none:""|default:""|lower %}
   <form method="get" class="form-cursos">
-    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por apellidos, nombres o CI" class="input-busqueda">
+    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por CI, Nombre o Apellido" class="input-busqueda">
     <button type="submit" class="btn-buscar">Buscar</button>
 
     {% if 'regente' in role %}
@@ -66,6 +70,4 @@
     </table>
   </div>
   {% endwith %}
-
-</div>
 {% endblock %}
