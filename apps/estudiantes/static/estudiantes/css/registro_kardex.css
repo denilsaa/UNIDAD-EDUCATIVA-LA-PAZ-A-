@@ -155,3 +155,11 @@
     gap: 8px;
   }
 }
+/* ================== Inputs Nativos ================== */
+/* Oculta inputs nativos pero siguen enviándose al backend */
+  #id_fecha, #id_hora { position: absolute; left: -9999px; }
+
+  /* UI visible */
+  .select-ui { padding: .5rem .75rem; border:1px solid #cfd8e3; border-radius:.5rem; }
+  .mes-label { font-weight:600; margin-right:.5rem; text-transform: capitalize; }
+  .fecha-ui { display:flex; gap:.5rem; align-items:center; }
