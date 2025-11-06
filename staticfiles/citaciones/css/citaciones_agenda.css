@@ -1,0 +1,183 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f9fafe;
+  padding: 16px;
+}
+
+/* ====== ENCABEZADO ====== */
+.dashboard-header {
+  background: linear-gradient(90deg, #0c2a57, #13386f);
+  color: #fff;
+  padding: 1.8rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-header p {
+  font-size: 1rem;
+  color: #dce6ff;
+}
+
+/* ====== FORMULARIO ====== */
+.form-citaciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin-bottom: 1.5rem;
+}
+
+.form-citaciones label {
+  font-weight: 600;
+  color: #333;
+}
+
+.form-citaciones input[type="date"],
+.form-citaciones input[type="number"] {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.form-citaciones input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0,123,255,0.3);
+  outline: none;
+}
+
+.btn-buscar, .btn-hoy, .btn-navegar {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.btn-buscar {
+  background: #28a745;
+}
+.btn-buscar:hover {
+  background: #19692c;
+}
+
+.btn-hoy {
+  background: #007bff;
+}
+.btn-hoy:hover {
+  background: #004a99;
+}
+
+.btn-navegar {
+  background: #6c757d;
+}
+.btn-navegar:hover {
+  background: #4a4f54;
+}
+
+.total {
+  font-weight: 600;
+  color: #333;
+  margin-left: auto;
+}
+
+/* ====== TABLA ====== */
+.table-wrapper {
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin-bottom: 1.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+th, td {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+  vertical-align: middle;
+}
+
+thead th {
+  background: #d0e7ff;
+  color: #004a99;
+  font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+  background: #f6f9ff;
+}
+
+tbody tr:hover {
+  background: #dbe7ff;
+}
+
+/* ====== BOTONES ====== */
+.btn-editar, .btn-eliminar {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-editar {
+  background-color: #17a2b8;
+  color: #fff;
+}
+.btn-editar:hover {
+  background-color: #0d6771;
+}
+
+.btn-eliminar {
+  background-color: #dc3545;
+  color: #fff;
+}
+.btn-eliminar:hover {
+  background-color: #a71d2a;
+}
+
+/* ====== TITULO DE DÍA ====== */
+.titulo-dia {
+  margin: 1rem 0 0.5rem;
+  color: #0c2a57;
+  font-weight: 700;
+  border-left: 4px solid #007bff;
+  padding-left: 10px;
+}
+
+/* ====== ALERTA ====== */
+.alerta {
+  background: #e7f1ff;
+  border-left: 5px solid #007bff;
+  color: #004a99;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 10px;
+  font-weight: 500;
+}

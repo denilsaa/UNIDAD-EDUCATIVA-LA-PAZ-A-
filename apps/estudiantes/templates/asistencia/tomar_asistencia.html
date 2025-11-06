@@ -1,9 +1,18 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Tomar asistencia{% endblock %}
 
-{% block content %}
-<h2>Tomar asistencia — {{ curso.nivel }} {{ curso.paralelo }}</h2>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'estudiantes/css/tomar_asistencia.css' %}">
+{% endblock %}
 
+{% block content %}
+<div class="dashboard-header">
+    <h2 class="hdr-sub">
+      Tomar asistencia — {{ curso.nivel }} {{ curso.paralelo }}
+    </h2>
+  </div>
 <div class="mb-3">
   <a class="btn btn-outline-secondary btn-sm" href="?modo=dia">Día</a>
   <a class="btn btn-outline-secondary btn-sm" href="?modo=mes">Mes</a>

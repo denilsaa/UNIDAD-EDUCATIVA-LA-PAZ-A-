@@ -1,0 +1,188 @@
+/* === ENCABEZADO DEL DASHBOARD === */
+.dashboard-header {
+  background: linear-gradient(90deg, #0c2a57, #13386f);
+  color: #fff;
+  padding: 1.8rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: moveDots 12s linear infinite;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.dashboard-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-header p {
+  font-size: 1rem;
+  color: #dce6ff;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes moveDots {
+  from { background-position: 0 0; }
+  to { background-position: 40px 40px; }
+}
+
+/* === FORMULARIO PRINCIPAL === */
+.form-editar {
+  background: #fff;
+  padding: 1.8rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+
+.form-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.form-column {
+  flex: 1 1 50%;
+  min-width: 300px;
+}
+
+.form-column p {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.form-column label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.form-column input,
+.form-column select,
+.form-column textarea {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.form-column input:focus,
+.form-column select:focus,
+.form-column textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0,123,255,0.3);
+  outline: none;
+}
+
+/* === TARJETA DE INFORMACIÓN === */
+.info-column {
+  flex: 1 1 40%;
+  min-width: 280px;
+}
+
+.card-info {
+  background: #f9fafe;
+  border-left: 4px solid #007bff;
+  border-radius: 10px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.card-info h5 {
+  font-weight: 700;
+  color: #0c2a57;
+  margin-bottom: 0.8rem;
+}
+
+.card-info p {
+  margin-bottom: 0.4rem;
+  color: #333;
+}
+
+.card-info small {
+  display: block;
+  color: #555;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* === BOTONES === */
+.botones {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-guardar {
+  background-color: #28a745;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-guardar:hover {
+  background-color: #19692c;
+  transform: translateY(-1px);
+}
+
+.btn-volver {
+  background-color: #007bff;
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-volver:hover {
+  background-color: #007bff;
+  transform: translateY(-1px);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .form-container {
+    flex-direction: column;
+  }
+  .form-column, .info-column {
+    width: 100%;
+  }
+  .botones {
+    flex-direction: column;
+  }
+  .btn-guardar, .btn-volver {
+    width: 100%;
+    text-align: center;
+  }
+}
