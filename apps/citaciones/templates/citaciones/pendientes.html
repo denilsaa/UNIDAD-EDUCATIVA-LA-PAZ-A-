@@ -1,7 +1,17 @@
 {% extends "layout/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Citaciones Pendientes{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'citaciones/css/pendientes.css' %}">
+{% endblock %}
 
 {% block content %}
-<h2>Citaciones pendientes de aprobación</h2>
+  <div class="dashboard-header">
+    <h2 class="hdr-sub">
+      Citaciones pendientes de aprobación
+    </h2>
+  </div>
 
 <table class="table mt-3">
   <thead>
