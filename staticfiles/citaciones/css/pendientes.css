@@ -1,6 +1,12 @@
+/* ================== CONTENEDOR PRINCIPAL ================== */
+.director-dashboard {
+  padding: 16px;
+  background: #f9fafe;
+}
+
 /* === ENCABEZADO DEL DASHBOARD === */
 .dashboard-header {
-  background: linear-gradient(90deg, #0c2a57, #13386f); /* degradado azul elegante */
+  background: linear-gradient(90deg, #0c2a57, #13386f);
   color: #fff;
   padding: 1.8rem 2rem;
   border-radius: 12px;
@@ -13,7 +19,6 @@
   overflow: hidden;
 }
 
-/* Opcional: puntitos sutiles animados como el header principal */
 .dashboard-header::before {
   content: "";
   position: absolute;
@@ -39,14 +44,141 @@
 
 .dashboard-header p {
   font-size: 1rem;
-  color: #dce6ff; /* subtítulo suave */
+  color: #dce6ff;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
   position: relative;
   z-index: 1;
 }
 
-/* Animación de puntitos compartida con el header */
 @keyframes moveDots {
   from { background-position: 0 0; }
   to { background-position: 40px 40px; }
+}
+
+/* ================== WRAPPER DE TABLA ================== */
+.table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background-color: #f8faff; /* fondo celeste suave */
+  margin-top: 20px;
+  padding: 12px;
+  animation: fadeIn 0.4s ease-in-out;
+  position: relative;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================== TABLA ================== */
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.tabla th, .tabla td {
+  padding: 12px 15px;
+  border: 1px solid #e2e8f0; /* borde celeste suave */
+  text-align: left;
+  vertical-align: middle;
+}
+
+.tabla thead th {
+  background-color: #cce0ff; /* celeste cabecera */
+  color: #004a99;
+  font-weight: 600;
+}
+
+.tabla tbody tr:nth-child(even) {
+  background: #e6f0ff; /* celeste claro */
+}
+
+.tabla tbody tr:hover {
+  background: #dbe7ff; /* celeste brillante */
+  transition: background 0.2s ease;
+}
+
+/* ================== BOTONES DENTRO DE LA TABLA ================== */
+.tabla button,
+.tabla a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  border: 1px solid transparent;
+  cursor: pointer;
+  margin: 2px 2px 2px 0;
+  height: 36px;
+}
+
+/* Botón Aprobar - Verde */
+.tabla .btn-aprobar {
+  background-color: #28a745;
+  color: #fff;
+  border-color: #28a745;
+}
+
+.tabla .btn-aprobar:hover {
+  background-color: #19692c;
+  border-color: #19692c;
+  transform: translateY(-1px);
+}
+
+/* Botón Editar - Azul */
+.tabla a.btn-secondary {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.tabla a.btn-secondary:hover {
+  background-color: #004a99;
+  border-color: #004a99;
+  transform: translateY(-1px);
+}
+
+/* Botón Rechazar - Rojo */
+.tabla .btn-rechazar {
+  background-color: #dc3545;
+  color: #fff;
+  border-color: #dc3545;
+}
+
+.tabla .btn-rechazar:hover {
+  background-color: #a71d2a;
+  border-color: #a71d2a;
+  transform: translateY(-1px);
+}
+
+/* ================== CELDAS VACÍAS ================== */
+.tabla td[colspan] {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 900px) {
+  .tabla th, .tabla td {
+    padding: 10px 8px;
+  }
+
+  .tabla button,
+  .tabla a {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 6px;
+  }
 }

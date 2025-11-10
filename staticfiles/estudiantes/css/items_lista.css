@@ -17,8 +17,8 @@
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
-  width: 100%;              /* asegura que el contenedor ocupe todo el ancho */
-  justify-content: space-between; /* distribuye los elementos si quieres que se separen */
+  width: 100%;             
+  justify-content: space-between; 
 }
 
 .filtros-principal input[type="text"],
@@ -33,7 +33,7 @@
 
 /* Input de búsqueda */
 .filtros-principal input[type="text"] {
-  flex: 1 1 250px; /* se expande según el espacio disponible */
+  flex: 1 1 250px;
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid #ccc;

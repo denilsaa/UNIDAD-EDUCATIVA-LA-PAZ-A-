@@ -2,91 +2,60 @@
 {% load static %}
 
 {% block title %}Citaciones Pendientes{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'citaciones/css/pendientes.css' %}">
 {% endblock %}
 
 {% block content %}
-  <div class="dashboard-header">
-    <h2 class="hdr-sub">
-      Citaciones pendientes de aprobación
-    </h2>
-  </div>
+<div class="dashboard-header">
+  <h2 class="hdr-sub">
+    Citaciones pendientes de aprobación
+  </h2>
+</div>
 
-<table class="table mt-3">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Estudiante</th>
-      <th>Motivo</th>
-      <th>ETA sugerida</th>
-      <th>ρ/Wq</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for c in rows %}
-    <tr>
-      <td>#{{ c.id }}</td>
-      <td>{{ c.estudiante }}</td>
-      <td>{{ c.motivo_resumen }}</td>
-      <td>
-        {% if c.eta_fecha and c.eta_hora %}
-          {{ c.eta_fecha|date:"Y-m-d" }} {{ c.eta_hora|time:"H:i" }}
-        {% else %}—{% endif %}
-      </td>
-      <td>
-        {% if mm1 and not mm1.saturada and mm1.rho is not None and mm1.Wq_min is not None %}
-          ρ={{ mm1.rho|floatformat:2 }} | Wq={{ mm1.Wq_min|floatformat:1 }} min
-        {% elif mm1 and mm1.saturada %}
-          ρ≥1 (saturada)
-        {% else %}—{% endif %}
-      </td>
-      <td>
-        <button class="btn btn-sm btn-success btn-aprobar" data-id="{{ c.id }}">Aprobar</button>
-        <a class="btn btn-sm btn-secondary" href="{% url 'citaciones:editar_form' c.id %}">Editar</a>
-        <button class="btn btn-sm btn-outline-danger btn-rechazar" data-id="{{ c.id }}">Rechazar</button>
-      </td>
-    </tr>
-  {% empty %}
-    <tr><td colspan="6">Sin pendientes.</td></tr>
-  {% endfor %}
-  </tbody>
-</table>
+  <table class="tabla mt-3">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Estudiante</th>
+        <th>Motivo</th>
+        <th>ETA sugerida</th>
+        <th>ρ/Wq</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in rows %}
+      <tr>
+        <td>#{{ c.id }}</td>
+        <td>{{ c.estudiante }}</td>
+        <td>{{ c.motivo_resumen }}</td>
+        <td>
+          {% if c.eta_fecha and c.eta_hora %}
+            {{ c.eta_fecha|date:"Y-m-d" }} {{ c.eta_hora|time:"H:i" }}
+          {% else %}—{% endif %}
+        </td>
+        <td>
+          {% if mm1 and not mm1.saturada and mm1.rho is not None and mm1.Wq_min is not None %}
+            ρ={{ mm1.rho|floatformat:2 }} | Wq={{ mm1.Wq_min|floatformat:1 }} min
+          {% elif mm1 and mm1.saturada %}
+            ρ≥1 (saturada)
+          {% else %}—{% endif %}
+        </td>
+        <td>
+          <button class="btn-aprobar" data-id="{{ c.id }}">Aprobar</button>
+          <a class="btn-secondary" href="{% url 'citaciones:editar_form' c.id %}">Editar</a>
+          <button class="btn-rechazar" data-id="{{ c.id }}">Rechazar</button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">Sin pendientes.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock content %}
 
-<script>
-console.log("[PENDIENTES] JS cargado");
-
-async function post(url, data) {
-  const body = new URLSearchParams(data || {});
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: {'X-CSRFToken': getCookie('csrftoken')},
-    credentials: 'same-origin',
-    body
-  });
-  return resp.json();
-}
-function getCookie(name){
-  const v = `; ${document.cookie}`.split(`; ${name}=`);
-  if (v.length === 2) return v.pop().split(';').shift();
-}
-
-document.addEventListener('click', async (e) => {
-  const b = e.target.closest('.btn-aprobar, .btn-rechazar');
-  if (!b) return;
-  const id = b.dataset.id;
-
-  if (b.classList.contains('btn-aprobar')) {
-    const r = await post(`/citaciones/${id}/aprobar/`);
-    if (r.ok) location.reload();
-    else alert(r.error || "Error al aprobar");
-  } else if (b.classList.contains('btn-rechazar')) {
-    if (!confirm('¿Cancelar esta citación?')) return;
-    const r = await post(`/citaciones/${id}/rechazar/`);
-    if (r.ok) location.reload();
-    else alert(r.error || "Error al cancelar");
-  }
-});
-</script>
+{% block scripts %}
+<script src="{% static 'citaciones/js/pendientes.js' %}"></script>
 {% endblock %}
