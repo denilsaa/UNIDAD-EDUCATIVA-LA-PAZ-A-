@@ -19,29 +19,57 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.style.overflow = "hidden";
   }
 
+  // === Función para ocultar overlay (por si otras páginas quisieran usarla) ===
+  function hideOverlay() {
+    const ov = document.getElementById("ui-lock");
+    if (ov) ov.remove();
+    document.body.style.overflow = "";
+  }
+
+  // Exponer mínimamente por si otro script quiere cerrarlo explícitamente
+  window.__uiLock = { show: showOverlay, hide: hideOverlay };
+
   // === Bloqueo global al hacer click en enlaces o botones ===
-  document.body.addEventListener("click", function(e) {
-    if (document.getElementById("ui-lock")) return; // Ya bloqueado
-    const target = e.target.closest("a, button, input[type=submit]");
-    if (!target) return;
+// === Bloqueo global al hacer click en enlaces o botones ===
+document.body.addEventListener("click", function(e) {
+  if (document.getElementById("ui-lock")) return; // Ya bloqueado
 
-    // Para enlaces internos con href
-    if (target.tagName === "A" && target.getAttribute("href")?.startsWith("#")) return;
+  // Detectar solo navegación real: <a href>, <button type=submit>, <input type=submit>
+  const target = e.target.closest("a[href], button[type=submit], input[type=submit]");
+  if (!target) return;
 
-    // Mostrar overlay
-    showOverlay();
+  // Evitar pseudo enlaces internos (#ancla)
+  if (target.tagName === "A" && (target.getAttribute("href") || "").startsWith("#")) return;
 
-    // Para enlaces, dejar que el navegador redireccione
-    if (target.tagName === "A") return;
+  // ⛔️ NO bloquear si es una acción AJAX (botones aprobar/rechazar u otros marcados)
+  if (e.target.closest('[data-ajax="1"], .btn-aprobar, .btn-rechazar')) return;
 
-    // Para formularios, agregar clase loading al botón
-    if (target.tagName === "BUTTON" || (target.tagName === "INPUT" && target.type === "submit")) {
-      target.classList.add("is-loading");
-      const form = target.closest("form");
-      if (form) form.submit();
-    }
+  // Mostrar overlay global SOLO para navegación/submit real
+  (window.__uiLock?.show || function(){
+    const ov = document.createElement("div");
+    ov.id = "ui-lock";
+    ov.innerHTML = '<div class="ui-lock__box"><div class="ui-lock__spinner"></div><p>Procesando…</p></div>';
+    Object.assign(ov.style, {
+      position:"fixed", inset:"0", zIndex:"9999",
+      background:"rgba(255,255,255,.6)",
+      display:"flex", alignItems:"center", justifyContent:"center",
+      backdropFilter:"saturate(180%) blur(2px)"
+    });
+    document.body.appendChild(ov);
+    document.body.style.overflow = "hidden";
+  })();
 
-  }, true);
+  // Para enlaces, dejamos que el navegador haga la navegación
+  if (target.tagName === "A") return;
+
+  // Para formularios, submit explícito (UX consistente)
+  if (target.tagName === "BUTTON" || (target.tagName === "INPUT" && target.type === "submit")) {
+    target.classList.add("is-loading");
+    const form = target.closest("form");
+    if (form) form.submit();
+  }
+}, true);
+
 
   // === Toggle panel notificaciones ===
   const bell = document.getElementById('notif-bell');
@@ -89,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // === WebSocket Notificaciones ===
   const notifs = new WebSocket(WS(`/ws/notifs/?uid=${uid}`));
 
-  notifs.onopen = () => console.log("[WS NOTIFS] OPEN");
+  notifs.onopen  = () => console.log("[WS NOTIFS] OPEN");
   notifs.onclose = (e) => console.log("[WS NOTIFS] CLOSE", e.code, e.reason);
   notifs.onerror = (e) => console.warn("[WS NOTIFS] ERROR", e);
 
@@ -115,8 +143,8 @@ document.addEventListener("DOMContentLoaded", function () {
         <small>${d.motivo || ""} · ${d.razon || ""}</small><br>
         <small>ρ≈${(d.rho || 0).toFixed(2)} · Wq≈${d.Wq ? d.Wq.toFixed(1) : "—"} min</small><br>
         <small>Sugerido: ${d.sugerido ? new Date(d.sugerido).toLocaleString() : "—"}</small><br>
-        <a href="${location.origin}/citaciones/pendientes/" 
-           class="btn btn-sm btn-primary" 
+        <a href="${location.origin}/citaciones/pendientes/"
+           class="btn btn-sm btn-primary"
            style="margin-top:6px; display:inline-block;">
            Revisar
         </a>
@@ -150,6 +178,7 @@ document.addEventListener("DOMContentLoaded", function () {
   })();
 
 })();
+
 // -----------------------------------------------
 //  Mensajes Django
 // -----------------------------------------------
@@ -160,6 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
       msg.style.opacity = '0';
       msg.style.transform = 'translateY(-20px)';
       setTimeout(() => msg.remove(), 500);
-    }, 5000); // desaparece a los 5 segundos
+    }, 5000);
   });
 });

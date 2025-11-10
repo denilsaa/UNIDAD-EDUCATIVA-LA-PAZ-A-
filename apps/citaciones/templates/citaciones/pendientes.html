@@ -34,9 +34,9 @@
           {% else %}—{% endif %}
         </td>
         <td>
-          <button class="btn-aprobar" data-id="{{ c.id }}">Aprobar</button>
+          <button type="button" class="btn-aprobar" data-id="{{ c.id }}" data-ajax="1">Aprobar</button>
           <a class="btn-secondary" href="{% url 'citaciones:editar_form' c.id %}">Editar</a>
-          <button class="btn-rechazar" data-id="{{ c.id }}">Rechazar</button>
+          <button type="button" class="btn-rechazar" data-id="{{ c.id }}" data-ajax="1">Rechazar</button>
         </td>
       </tr>
       {% empty %}
