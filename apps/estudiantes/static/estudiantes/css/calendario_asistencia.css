@@ -51,57 +51,462 @@
   to { background-position: 40px 40px; }
 }
 
-/* ================== FORMULARIO ================== */
+/* ==========================================
+   CONTENEDOR GENERAL: Configuración + Resumen
+   ========================================== */
+.asistencia-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;            
+  padding: 0 2rem;          
+  box-sizing: border-box;   
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 992px) {
+  .asistencia-container {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+  }
+}
+@media (max-width: 768px) {
+  .asistencia-container {
+    flex-direction: column;
+    padding: 0 1rem; /* Un poco menos en móvil */
+  }
+}
+
+.columna-calendario,
+.columna-resumen {
+  flex: 1;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================
+   IGUALAR ALTURA DE LOS BLOQUES
+   ========================================== */
+@media (min-width: 992px) {
+  .columna-calendario .form-calendario,
+  .columna-resumen .resumen-mensual {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .columna-calendario .form-calendario .form-body,
+  .columna-resumen .resumen-mensual .resumen-card {
+    flex: 1;
+  }
+}
+
+/* === CONFIGURACIÓN DEL CALENDARIO === */
 .form-calendario {
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  background: #ffffff;
+  border-radius: 1.2rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #e3e8ef;
 }
 
-.form-calendario .form-label {
-  font-weight: 500;
+.form-calendario:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
 }
 
-.btn-guardar {
-  background-color: #28a745;
+/* ===== HEADER ===== */
+.form-calendario .form-header {
+  background: linear-gradient(90deg, #0c2a57, #13386f);
   color: #fff;
-  padding: 10px 18px;
-  border-radius: 8px;
+  text-align: center;
+  padding: 1.8rem 1rem;
+}
+
+.form-calendario .form-header h4 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  margin-bottom: 0.3rem;
+}
+
+.form-calendario .form-header p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 0;
+}
+
+/* ===== BODY ===== */
+.form-calendario .form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: #f7f9fc;
+}
+
+@media (min-width: 768px) {
+  .form-calendario .form-body {
+    flex-direction: row;
+  }
+}
+
+/* ===== COLUMNAS ===== */
+.form-calendario .columna {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #e0e6ed;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 3px 10px rgba(12, 42, 87, 0.05);
+  transition: all 0.3s ease;
+}
+
+.form-calendario .columna:hover {
+  border-color: #13386f;
+  box-shadow: 0 6px 12px rgba(19, 56, 111, 0.1);
+}
+
+/* ===== TÍTULOS DE SECCIÓN ===== */
+.form-calendario .columna h5 {
+  text-align: center;
+  font-weight: 600;
+  color: #0c2a57;
+  margin-bottom: 1.2rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* ===== CAMPOS ===== */
+.form-calendario .form-label {
+  font-weight: 600;
+  color: #13386f;
+  margin-bottom: 0.4rem;
+}
+
+.form-calendario input[type="date"],
+.form-calendario input[type="checkbox"] {
+  border-radius: 0.5rem;
+  border: 1px solid #cfd8e3;
+  padding: 0.4rem 0.6rem;
+  width: 100%;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.form-calendario input[type="date"]:focus {
+  border-color: #13386f;
+  box-shadow: 0 0 0 2px rgba(19, 56, 111, 0.15);
+  outline: none;
+}
+
+/* ===== DÍAS HÁBILES ===== */
+.form-calendario .dias-habiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.8rem 1rem;
+  text-align: center;
+}
+
+.form-calendario .dias-habiles label {
+  font-weight: 500;
+  color: #0c2a57;
+  margin-left: 0.25rem;
+}
+
+/* ===== FOOTER ===== */
+.form-calendario .form-footer {
+  text-align: center;
+  background: #f1f4f9;
+  padding: 1.8rem;
+}
+
+.form-calendario .btn-guardar {
+  background: linear-gradient(90deg, #0c2a57, #13386f);
+  color: white;
   font-weight: 600;
   border: none;
-  cursor: pointer;
-  transition: 0.2s;
+  padding: 0.9rem 2.4rem;
+  border-radius: 2rem;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(19, 56, 111, 0.25);
+  transition: all 0.3s ease;
 }
 
-.btn-guardar:hover {
-  background-color: #19692c;
-  transform: translateY(-1px);
+.form-calendario .btn-guardar:hover {
+  background: linear-gradient(90deg, #13386f, #1a4c9c);
+  box-shadow: 0 6px 16px rgba(19, 56, 111, 0.35);
+  transform: translateY(-2px);
 }
 
-/* ================== RESUMEN ================== */
+.form-calendario .btn-guardar:active {
+  transform: translateY(1px);
+}
+
+/* === CONTENEDOR RESUMEN MENSUAL === */
+.resumen-mensual {
+  background: #ffffff;
+  border-radius: 1.2rem;
+  border: 1px solid #e3e8ef;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  box-shadow: 0 8px 20px rgba(12, 42, 87, 0.08);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === Animación al pasar el mouse === */
+.resumen-mensual:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 14px 30px rgba(12, 42, 87, 0.2);
+}
+
+/* === Brillo sutil animado === */
+.resumen-mensual::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 60%);
+  transform: rotate(25deg);
+  transition: opacity 0.5s ease;
+  opacity: 0;
+  pointer-events: none; 
+}
+
+.resumen-mensual:hover::before {
+  opacity: 1;
+}
+
+/* === HEADER DE RESUMEN MENSUAL (IGUAL AL DE CONFIGURACIÓN) === */
+.resumen-mensual .form-header {
+  background: linear-gradient(90deg, #0c2a57, #13386f);
+  color: #fff;
+  text-align: center;
+  padding: 1.8rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.resumen-mensual .form-header h4 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  margin-bottom: 0.3rem;
+}
+
+.resumen-mensual .form-header p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 0;
+}
+
+/* === FORMULARIO DE FILTRO === */
+.resumen-mensual form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: end;
+  padding: 1.5rem 1rem;
+  background: #f7f9fc;
+  border-bottom: 1px solid #e4e9f0;
+}
+
+.resumen-mensual .form-label {
+  font-weight: 600;
+  color: #0c2a57;
+  margin-bottom: 0.4rem;
+}
+
+.resumen-mensual input[type="number"],
+.resumen-mensual select {
+  border: 1px solid #cfd8e3;
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.95rem;
+  color: #0c2a57;
+  background-color: #fff;
+  transition: all 0.25s ease;
+  min-width: 120px;
+}
+
+.resumen-mensual input[type="number"]:focus,
+.resumen-mensual select:focus {
+  border-color: #13386f;
+  box-shadow: 0 0 0 3px rgba(19, 56, 111, 0.15);
+  outline: none;
+}
+
+/* === BOTÓN FILTRAR === */
+.resumen-mensual button {
+  border: none;
+  background: linear-gradient(90deg, #0c2a57, #13386f);
+  color: #fff;
+  padding: 0.6rem 1.6rem;
+  border-radius: 2rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(19, 56, 111, 0.25);
+}
+
+.resumen-mensual button:hover {
+  background: linear-gradient(90deg, #13386f, #1a4c9c);
+  box-shadow: 0 6px 14px rgba(19, 56, 111, 0.35);
+  transform: translateY(-2px);
+}
+
+/* === TARJETA CON ANIMACIÓN === */
 .resumen-card {
-  background: #f6f9ff;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background: linear-gradient(145deg, #f9fbff, #f0f4fa);
+  border-radius: 1.2rem;
+  margin: 1.8rem auto;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(12, 42, 87, 0.12);
+  max-width: 620px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.resumen-card div {
-  margin-bottom: 6px;
+/* ✨ Movimiento suave */
+.resumen-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 14px 30px rgba(12, 42, 87, 0.2);
 }
 
-.badge {
-  font-size: 0.9rem;
-  padding: 4px 8px;
+/* ✨ Efecto de brillo sutil animado */
+.resumen-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 60%);
+  transform: rotate(25deg);
+  transition: opacity 0.5s ease;
+  opacity: 0;
+}
+
+.resumen-card:hover::before {
+  opacity: 1;
+}
+
+/* === TEXTO === */
+.resumen-card strong {
+  color: #0c2a57;
+  font-size: 1.1rem;
+  display: block;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.3px;
+}
+
+/* === BADGES === */
+.resumen-card .badge {
+  display: inline-block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0.35rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 1.2rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.resumen-card .badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(12, 42, 87, 0.2);
+}
+
+.resumen-card .bg-success {
+  background-color: #0f8b4f !important;
+}
+
+.resumen-card .bg-danger {
+  background-color: #d84b4b !important;
+}
+
+.resumen-card .bg-warning {
+  background-color: #ffca3a !important;
+  color: #2b2b2b !important;
+}
+
+/* === ALERTA SIN CALENDARIO === */
+.resumen-mensual .alert {
+  border-radius: 0.8rem;
+  padding: 1rem 1.4rem;
+  font-weight: 500;
+  background: rgba(255, 202, 58, 0.15);
+  border: 1px solid #ffca3a;
+  color: #665600;
+  text-align: center;
+  margin: 1.5rem;
+}
+/* === SUBTÍTULO (Sub Header) === */
+.sub-header {
+  background: linear-gradient(90deg, #eaf1ff, #f5f8ff);
+  border-left: 6px solid #13386f;
+  border-radius: 0.8rem;
+  box-shadow: 0 2px 8px rgba(12, 42, 87, 0.08);
+
+  padding: 1.5rem 2rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.sub-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(12, 42, 87, 0.12);
+}
+
+.sub-header h4 {
+  color: #0c2a57;
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.4px;
+}
+
+.sub-header p {
+  color: #4a5d7c;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* === Mantener alineación con tabla en pantallas grandes === */
+@media (min-width: 992px) {
+  .sub-header,
+  .table-wrapper {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* === Asegura que se mantenga bien en móvil === */
+@media (max-width: 768px) {
+  .sub-header {
+    padding: 1rem 1.2rem;
+  }
 }
 
 /* ================== TABLA ================== */
 .table-wrapper {
-  overflow-x: auto;
-  margin-bottom: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  background: #fff;
+  padding: 2rem;
+  width: 100%;
+  height: auto;
+  border-radius: 20px;
 }
 
 .tabla-calendarios {

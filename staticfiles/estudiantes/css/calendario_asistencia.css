@@ -52,15 +52,148 @@
 }
 
 /* ================== FORMULARIO ================== */
+
 .form-calendario {
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  max-width: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 1.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
+.form-calendario:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== HEADER ===== */
+.form-calendario .form-header {
+  background: linear-gradient(135deg, #007bff, #4e9fff);
+  color: white;
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+.form-calendario .form-header h4 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  margin-bottom: 0.2rem;
+}
+
+.form-calendario .form-header p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ===== BODY ===== */
+.form-calendario .form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: #f9fafb;
+}
+
+@media (min-width: 768px) {
+  .form-calendario .form-body {
+    flex-direction: row;
+  }
+}
+
+/* ===== COLUMNAS ===== */
+.form-calendario .columna {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
+}
+
+.form-calendario .columna:hover {
+  border-color: #007bff;
+  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.08);
+}
+
+/* ===== TÍTULOS DE SECCIÓN ===== */
+.form-calendario .columna h5 {
+  text-align: center;
+  font-weight: 600;
+  color: #007bff;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* ===== CAMPOS ===== */
 .form-calendario .form-label {
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.4rem;
+}
+
+.form-calendario input[type="date"],
+.form-calendario input[type="checkbox"] {
+  border-radius: 0.5rem;
+  border: 1px solid #cbd5e1;
+  padding: 0.4rem 0.6rem;
+  width: 100%;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.form-calendario input[type="date"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+  outline: none;
+}
+
+/* ===== DÍAS HÁBILES ===== */
+.form-calendario .dias-habiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.6rem 1rem;
+  text-align: center;
+}
+
+.form-calendario .dias-habiles label {
   font-weight: 500;
+  color: #475569;
+  margin-left: 0.25rem;
+}
+
+/* ===== FOOTER ===== */
+.form-calendario .form-footer {
+  text-align: center;
+  background: #f1f5f9;
+  padding: 1.5rem;
+}
+
+.form-calendario .btn-guardar {
+  background: linear-gradient(135deg, #007bff, #5aa9ff);
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 0.8rem 2.2rem;
+  border-radius: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.25);
+  transition: all 0.3s ease;
+}
+
+.form-calendario .btn-guardar:hover {
+  background: linear-gradient(135deg, #0056d2, #007bff);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+.form-calendario .btn-guardar:active {
+  transform: translateY(1px);
 }
 
 .btn-guardar {

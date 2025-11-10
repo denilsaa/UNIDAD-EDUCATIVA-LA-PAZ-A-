@@ -13,49 +13,107 @@
     </h2>
   </div>
 
-<form method="post" class="card form-calendario mb-4">
-  {% csrf_token %}
-  <div class="row g-3">
-    {{ form.as_p }}
-  </div>
-  <button class="btn-guardar mt-2">Guardar y activar</button>
-</form>
+<div class="asistencia-container">
 
-<h4 class="mt-4">Resumen mensual</h4>
-<form method="get" class="row g-2 mb-3 align-items-end">
-  <div class="col-auto">
-    <label class="form-label">Año</label>
-    <input type="number" name="anio" value="{{ resumen.year }}" class="form-control" min="2000" max="2100">
-  </div>
-  <div class="col-auto">
-    <label class="form-label">Mes</label>
-    <select name="mes" class="form-select">
-      {% for m in meses %}
-        <option value="{{ m }}" {% if m == resumen.month %}selected{% endif %}>{{ m }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="col-auto">
-    <button class="btn btn-outline-secondary">Filtrar</button>
-  </div>
-</form>
+  <!-- =========================
+       Configuración del Calendario
+       ========================= -->
+  <div class="columna-calendario">
+    <form method="post" class="form-calendario card shadow-lg rounded-4 overflow-hidden">
+      {% csrf_token %}
+      <input type="hidden" name="activo" value="True">
 
-{% if resumen.tiene_calendario %}
-<div class="row g-3 mb-4">
-  <div class="col">
-    <div class="card resumen-card p-3">
-      <div><strong>Días hábiles:</strong> {{ resumen.dias_habiles }}</div>
-      <div><span class="badge bg-success">P: {{ resumen.cuenta_P }} ({{ resumen.pct_P }}%)</span></div>
-      <div><span class="badge bg-danger">F: {{ resumen.cuenta_F }} ({{ resumen.pct_F }}%)</span></div>
-      <div><span class="badge bg-warning text-dark">R: {{ resumen.cuenta_R }} ({{ resumen.pct_R }}%)</span></div>
+      <!-- HEADER -->
+      <div class="form-header">
+        <h4>Configuración del Calendario</h4>
+        <p>Define el rango y los días hábiles</p>
+      </div>
+
+      <!-- BODY -->
+      <div class="form-body">
+        <!-- DIV IZQUIERDO: Fechas -->
+        <div class="columna">
+          <h5>📅 Rango de fechas</h5>
+          <div class="mb-3">
+            <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label fw-semibold">Fecha inicio</label>
+            {{ form.fecha_inicio }}
+          </div>
+          <div>
+            <label for="{{ form.fecha_fin.id_for_label }}" class="form-label fw-semibold">Fecha fin</label>
+            {{ form.fecha_fin }}
+          </div>
+        </div>
+
+        <!-- DIV DERECHO: Días hábiles -->
+        <div class="columna">
+          <h5>🗓️ Días hábiles</h5>
+          <div class="dias-habiles">
+            <div>{{ form.lunes.label_tag }} {{ form.lunes }}</div>
+            <div>{{ form.martes.label_tag }} {{ form.martes }}</div>
+            <div>{{ form.miercoles.label_tag }} {{ form.miercoles }}</div>
+            <div>{{ form.jueves.label_tag }} {{ form.jueves }}</div>
+            <div>{{ form.viernes.label_tag }} {{ form.viernes }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="form-footer">
+        <button class="btn-guardar mt-2">Guardar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- =========================
+       Resumen mensual
+       ========================= -->
+  <div class="columna-resumen">
+    <div class="resumen-mensual">
+      <!-- HEADER -->
+      <div class="form-header">
+        <h4>Resumen mensual</h4>
+        <p>Reportes mensuales de la asistencia</p>
+      </div>
+
+      <!-- FILTRO -->
+      <form method="get" class="row g-2 mb-3 align-items-end">
+        <div class="col-auto">
+          <label class="form-label">Año</label>
+          <input type="number" name="anio" value="{{ resumen.year }}" class="form-control" min="2000" max="2100">
+        </div>
+        <div class="col-auto">
+          <label class="form-label">Mes</label>
+          <select name="mes" class="form-select">
+            {% for m in meses %}
+              <option value="{{ m }}" {% if m == resumen.month %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-outline-secondary">Filtrar</button>
+        </div>
+      </form>
+
+      <!-- TARJETA DE RESUMEN -->
+      {% if resumen.tiene_calendario %}
+      <div class="resumen-card">
+        <div><strong>Días hábiles:</strong> {{ resumen.dias_habiles }}</div>
+        <div><span class="badge bg-success">P: {{ resumen.cuenta_P }} ({{ resumen.pct_P }}%)</span></div>
+        <div><span class="badge bg-danger">F: {{ resumen.cuenta_F }} ({{ resumen.pct_F }}%)</span></div>
+        <div><span class="badge bg-warning text-dark">R: {{ resumen.cuenta_R }} ({{ resumen.pct_R }}%)</span></div>
+      </div>
+      {% else %}
+      <div class="alert alert-warning mt-2">No hay calendario activo.</div>
+      {% endif %}
     </div>
   </div>
-</div>
-{% else %}
-<div class="alert alert-warning mt-2">No hay calendario activo.</div>
-{% endif %}
 
-<h4 class="mt-4">Calendarios existentes</h4>
+</div>
+
+<div class="sub-header">
+  <h4>Calendarios existentes</h4>
+  <p>Define el rango y los días hábiles</p>
+</div>
 <div class="table-wrapper">
   <table class="tabla-calendarios table table-sm">
     <thead>

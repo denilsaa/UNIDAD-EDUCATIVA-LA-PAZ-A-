@@ -1,6 +1,6 @@
 /* === ENCABEZADO DEL DASHBOARD === */
 .dashboard-header {
-  background: linear-gradient(90deg, #0c2a57, #13386f); /* degradado azul elegante */
+  background: linear-gradient(90deg, #0c2a57, #13386f);
   color: #fff;
   padding: 1.8rem 2rem;
   border-radius: 12px;
@@ -13,7 +13,6 @@
   overflow: hidden;
 }
 
-/* Opcional: puntitos sutiles animados como el header principal */
 .dashboard-header::before {
   content: "";
   position: absolute;
@@ -39,21 +38,200 @@
 
 .dashboard-header p {
   font-size: 1rem;
-  color: #dce6ff; /* subtítulo suave */
+  color: #dce6ff;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
   position: relative;
   z-index: 1;
 }
 
-/* Animación de puntitos compartida con el header */
 @keyframes moveDots {
   from { background-position: 0 0; }
   to { background-position: 40px 40px; }
 }
 
-/* ================== BOTONES EN FORMULARIOS Y TABLAS ================== */
+/* ==========================================
+   CONTENEDOR GENERAL: formulario izquierda + tabla derecha
+   ========================================== */
+.asistencia-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  padding: 0 2rem;
+  margin-bottom: 2rem;
+  box-sizing: border-box;
+}
 
-/* Botones generales */
+@media (min-width: 992px) {
+  .asistencia-container {
+    flex-direction: row; /* lado a lado */
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  /* 🔹 Formulario a la izquierda (30%) */
+  .columna-form {
+    order: 1;
+    flex: 0 0 30%;
+    max-width: 30%;
+  }
+
+  /* 🔹 Tabla a la derecha (70%) */
+  .columna-tabla {
+    order: 2;
+    flex: 0 0 70%;
+    max-width: 70%;
+  }
+}
+
+/* ================================
+   SUBTÍTULO (Sub Header)
+   ================================ */
+.sub-header {
+  background: linear-gradient(90deg, #eaf1ff, #f5f8ff);
+  border-left: 6px solid #13386f;
+  border-radius: 0.8rem;
+  box-shadow: 0 2px 8px rgba(12, 42, 87, 0.08);
+  padding: 1.5rem 2rem;
+  width: 100%;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.sub-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(12, 42, 87, 0.12);
+}
+
+.sub-header h4 {
+  color: #0c2a57;
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.4px;
+}
+
+.sub-header p {
+  color: #4a5d7c;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ================================
+   FORMULARIO DE EXCLUSIÓN (izquierda)
+   ================================ */
+.form-calendario.card {
+  border: 1px solid #e3e8ef;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(12, 42, 87, 0.08);
+  background: #ffffff;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  height: fit-content;
+}
+
+.form-calendario.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(12, 42, 87, 0.15);
+}
+
+.form-calendario.card .form-header {
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+.form-calendario.card .form-header h4 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0c2a57;
+  margin-bottom: 0.3rem;
+}
+
+.form-calendario.card .form-header p {
+  color: #4a5d7c;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.form-calendario.card input[type="date"] {
+  border: 1px solid #cfd8e3;
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.95rem;
+  color: #0c2a57;
+  background-color: #fff;
+  transition: all 0.25s ease;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.form-calendario.card input[type="date"]:focus {
+  border-color: #13386f;
+  box-shadow: 0 0 0 3px rgba(19, 56, 111, 0.15);
+  outline: none;
+}
+
+.btn-guardar {
+  background: linear-gradient(90deg, #0c2a57, #13386f);
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 0.7rem 2rem;
+  border-radius: 2rem;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(19, 56, 111, 0.25);
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.btn-guardar:hover {
+  background: linear-gradient(90deg, #13386f, #1a4c9c);
+  box-shadow: 0 6px 16px rgba(19, 56, 111, 0.35);
+  transform: translateY(-2px);
+}
+
+/* ================================
+   TABLA DE EXCLUSIONES (derecha)
+   ================================ */
+.table-wrapper {
+  padding: 2rem;
+  width: 100%;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(12, 42, 87, 0.08);
+  border: 1px solid #e3e8ef;
+}
+
+.tabla-calendarios {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-calendarios th,
+.tabla-calendarios td {
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.tabla-calendarios thead th {
+  background-color: #d0e7ff;
+  color: #004a99;
+  font-weight: 600;
+}
+
+.tabla-calendarios tbody tr:nth-child(even) {
+  background: #f6f9ff;
+}
+
+.tabla-calendarios tbody tr:hover {
+  background: #dbe7ff;
+}
+
+/* ================================
+   BOTONES GENERALES
+   ================================ */
 .btn, 
 form .btn {
   display: inline-flex;
@@ -71,7 +249,6 @@ form .btn {
   box-sizing: border-box;
 }
 
-/* Botón primario */
 .btn-primary {
   background-color: #007bff;
   color: #fff;
@@ -84,43 +261,191 @@ form .btn {
   transform: translateY(-1px);
 }
 
-/* Botón de eliminar (outline-danger) */
-.btn-outline-danger {
-  background-color: transparent;
-  color: #dc3545;
-  border-color: #dc3545;
-}
 
-.btn-outline-danger:hover {
-  background-color: #dc3545;
+/* === BOTÓN ELIMINAR (nuevo estilo) === */
+.btn-eliminar {
+  background: linear-gradient(90deg, #b91616, #dc3545);
   color: #fff;
-  transform: translateY(-1px);
-}
-
-/* Botón tipo link */
-.btn-link {
-  background-color: transparent;
-  color: #007bff;
+  font-weight: 600;
   border: none;
-  padding: 0;
-  font-weight: 500;
-  text-decoration: none;
+  padding: 0.7rem 2rem;
+  border-radius: 2rem;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  transition: all 0.3s ease;
 }
 
-.btn-link:hover {
-  color: #004a99;
-  text-decoration: underline;
+.btn-eliminar:hover {
+  background: linear-gradient(90deg, #a10e0e, #b71c1c);
+  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.45);
+  transform: translateY(-2px);
 }
 
-/* Botones pequeños */
 .btn-sm {
   padding: 4px 10px;
   font-size: 0.875rem;
   height: 32px;
 }
 
-/* ================== RESPONSIVE ================== */
-@media (max-width: 700px) {
+/* Modal alerta */
+.alerta-modal {
+  display: none; /* Oculto por defecto */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5); /* Fondo oscuro */
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Contenido alerta */
+.alerta-contenido {
+  background: #dc3545; /* rojo intenso */
+  color: #fff;
+  padding: 2rem 2.5rem;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.alerta-contenido p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.alerta-botones {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+}
+
+.btn-cancel {
+  background: #fff;
+  color: #dc3545;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background: #f1f1f1;
+}
+
+.btn-eliminar-confirm {
+  background: #8b0000;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-eliminar-confirm:hover {
+  background: #a71d2a;
+}
+
+/* Modal alerta */
+.alerta-modal {
+  display: none; /* Oculto por defecto */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5); /* Fondo oscuro */
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Contenido alerta */
+.alerta-contenido {
+  background: #dc3545; /* rojo intenso */
+  color: #fff;
+  padding: 2rem 2.5rem;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.alerta-contenido p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.alerta-botones {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+}
+
+.btn-cancel {
+  background: #fff;
+  color: #dc3545;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background: #f1f1f1;
+}
+
+.btn-eliminar-confirm {
+  background: #8b0000;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-eliminar-confirm:hover {
+  background: #a71d2a;
+}
+
+/* ================================
+   RESPONSIVE
+   ================================ */
+@media (max-width: 992px) {
+  .asistencia-container {
+    flex-direction: column;
+    padding: 0 1rem;
+  }
+
+  .columna-form, .columna-tabla {
+    max-width: 100%;
+    flex: 1 1 100%;
+    order: unset;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    padding: 1rem;
+  }
+
+  .tabla-calendarios th, 
+  .tabla-calendarios td {
+    padding: 6px 8px;
+  }
+
   .btn, .btn-sm {
     width: 100%;
     justify-content: center;

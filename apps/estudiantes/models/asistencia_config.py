@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django import forms
+
 
 class AsistenciaCalendario(models.Model):
     """
@@ -29,11 +31,21 @@ class AsistenciaCalendario(models.Model):
         verbose_name_plural = "calendarios de asistencia"
 
     # --- Reglas de negocio básicas ---
+
     def clean(self):
-        if self.fecha_fin < self.fecha_inicio:
-            raise ValidationError("La fecha fin no puede ser menor a la fecha inicio.")
+        errors = {}
+        # Validar orden solo si ambos campos están llenos
+        if self.fecha_inicio and self.fecha_fin and self.fecha_fin < self.fecha_inicio:
+            errors['fecha_fin'] = "La fecha fin no puede ser menor a la fecha inicio"
+
+        # Días hábiles
         if not any([self.lunes, self.martes, self.miercoles, self.jueves, self.viernes]):
-            raise ValidationError("Habilita al menos un día entre lunes y viernes.")
+            errors['__all__'] = "Habilita al menos un día entre lunes y viernes"
+
+        if errors:
+            raise ValidationError(errors)
+
+
 
     def save(self, *args, **kwargs):
         """
@@ -67,7 +79,6 @@ class AsistenciaCalendario(models.Model):
             return False
         return True
 
-
 class AsistenciaExclusion(models.Model):
     """
     Días marcados por el Director como 'no se llama lista' dentro del rango.
@@ -75,7 +86,7 @@ class AsistenciaExclusion(models.Model):
     calendario = models.ForeignKey(
         AsistenciaCalendario, on_delete=models.CASCADE, related_name="exclusiones"
     )
-    fecha = models.DateField()
+    fecha = models.DateField(blank=False, null=False)  # Obligatorio
 
     class Meta:
         unique_together = [("calendario", "fecha")]
@@ -84,10 +95,19 @@ class AsistenciaExclusion(models.Model):
         verbose_name_plural = "exclusiones de asistencia"
 
     def clean(self):
-        # Nota: clean se usa con commit=False en la vista y ya se setea calendario antes de full_clean()
-        if not (self.calendario.fecha_inicio <= self.fecha <= self.calendario.fecha_fin):
-            raise ValidationError("La fecha excluida debe estar dentro del rango del calendario.")
+        errors = {}
+        # Validar que fecha no esté vacía
+        if not self.fecha:
+            errors['fecha'] = "Campo Obligatorio"
+
+        # Validar que la fecha esté dentro del rango del calendario
+        elif not (self.calendario.fecha_inicio <= self.fecha <= self.calendario.fecha_fin):
+            errors['fecha'] = "La fecha excluida debe estar dentro del rango del calendario."
+
+        if errors:
+            raise ValidationError(errors)
 
     def __str__(self):
         cal_id = getattr(self, "calendario_id", None)
         return f"{self.fecha} (sin lista) · cal:{cal_id or '—'}"
+

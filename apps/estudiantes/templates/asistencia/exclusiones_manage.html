@@ -8,40 +8,63 @@
 {% endblock %}
 
 {% block content %}
-  <div class="dashboard-header">
-    <h2 class="hdr-sub">
-      Exclusiones — {{ calendario.fecha_inicio }} → {{ calendario.fecha_fin }}
-    </h2>
-  </div>
+<div class="dashboard-header">
+  <h2 class="hdr-sub">
+    Exclusiones — {{ calendario.fecha_inicio }} → {{ calendario.fecha_fin }}
+  </h2>
+</div>
 
-<form method="post" class="card p-3 mb-3">
-  {% csrf_token %}
-  <div class="row g-2">
-    <div class="col-auto">{{ form.fecha }}</div>
-    <div class="col-auto">
-      <button class="btn btn-primary">Agregar día sin lista</button>
+<!-- =========================
+     SUBTÍTULO: Agregar día sin lista
+     ========================= -->
+<div class="sub-header">
+  <h4>Agregar día sin lista</h4>
+  <p>Selecciona la fecha que no se llamará lista</p>
+</div>
+
+<div class="asistencia-container">
+  <!-- Formulario (derecha) -->
+  <div class="columna-form">
+    <div class="form-calendario card">
+      <div class="form-header">
+        <h4>Agregar Exclusión</h4>
+        <p>Selecciona una fecha para excluirla del calendario.</p>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <input type="date" name="fecha" required class="form-control" />
+        </div>
+        <button class="btn-guardar" type="submit">Guardar</button>
+      </form>
     </div>
   </div>
-</form>
-
-<table class="table table-sm">
-  <thead><tr><th>Fecha</th><th></th></tr></thead>
-  <tbody>
-    {% for ex in exclusiones %}
-      <tr>
-        <td>{{ ex.fecha }}</td>
-        <td class="text-end">
-          <form method="post" action="{% url 'estudiantes:asistencia_exclusion_eliminar' calendario.id ex.id %}">
-            {% csrf_token %}
-            <button class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar exclusión?')">Eliminar</button>
-          </form>
-        </td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="2">No hay exclusiones.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-<a href="{% url 'estudiantes:asistencia_calendario' %}" class="btn btn-link">Volver</a>
+  <!-- Tabla (izquierda) -->
+  <div class="columna-tabla">
+    <div class="table-wrapper">
+      <table class="tabla-calendarios">
+        <thead>
+          <tr><th>Fecha</th><th>Acción</th></tr>
+        </thead>
+        <tbody>
+          {% for ex in exclusiones %}
+          <tr>
+            <td>{{ ex.fecha }}</td>
+            <td>
+              <form method="post" action="{% url 'estudiantes:asistencia_exclusion_eliminar' calendario.id ex.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-eliminar">Eliminar</button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="2" class="text-center">No hay exclusiones.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 {% endblock %}

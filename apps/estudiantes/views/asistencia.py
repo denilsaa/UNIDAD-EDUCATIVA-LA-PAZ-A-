@@ -64,7 +64,12 @@ def asistencia_calendario(request):
             cal.save()
             messages.success(request, "Calendario de asistencia guardado y activado.")
             return redirect("estudiantes:asistencia_calendario")
-        messages.error(request, "Revisa el formulario.")
+        else:
+            # Mostrar los errores reales del formulario
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{error}")
+
 
     calendarios = AsistenciaCalendario.objects.all()
 
