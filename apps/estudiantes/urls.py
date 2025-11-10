@@ -1,7 +1,7 @@
 from django.urls import path
 from apps.estudiantes.views.estudiante import (
     EstudianteListView, EstudianteCreateView, EstudianteUpdateView, EstudianteDeleteView,
-    EstudiantesPorCursoListView,
+    EstudiantesPorCursoListView, EstudianteEliminarCompletoView
 )
 from apps.estudiantes.views.forms_kardex import (
     kardex_registro_nuevo, kardex_registro_listar,
@@ -47,4 +47,6 @@ urlpatterns = [
     path("asistencia/calendario/<int:cal_id>/exclusiones/<int:excl_id>/eliminar/", asistencia_exclusion_eliminar, name="asistencia_exclusion_eliminar"),
     path("asistencia/tomar/<int:curso_id>/", asistencia_tomar, name="asistencia_tomar"),
     path("asistencia/hijo/<int:estudiante_id>/", asistencia_padre_detalle, name="asistencia_padre_detalle"),
+    path("<int:pk>/eliminar-completo/", EstudianteEliminarCompletoView.as_view(), name="eliminar_completo"),
+
 ]

@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 
 from apps.estudiantes.models.estudiante import Estudiante
 from apps.cursos.models.kardex import Kardex
@@ -17,7 +17,9 @@ from apps.cuentas.roles import es_regente, es_director, es_secretaria
 
 # 👇 importa la clase del formulario (NO string)
 from apps.estudiantes.forms import EstudianteForm
-
+from apps.citaciones.models.citacion import Citacion
+from django.contrib import messages
+from django.db.models import RestrictedError
 
 def trimestre_actual(hoy: date) -> int:
     """Devuelve el trimestre actual (ajusta si tu calendario es distinto)."""
@@ -115,9 +117,38 @@ class EstudianteDeleteView(RoleRequiredMixin, DeleteView):
     model = Estudiante
     template_name = "estudiantes/confirmar_eliminacion_estudiante.html"
     success_url = reverse_lazy("estudiantes:listar")
-    required_roles = ("director",)  # si prefieres, agrega secretaría aquí
+    required_roles = ("director",)
 
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            self.object.delete()
+            messages.success(request, f"El estudiante {self.object} fue eliminado correctamente.")
+            return redirect(self.success_url)
 
+        except RestrictedError:
+            # Si tiene citaciones relacionadas, mostramos una página especial
+            return render(
+                request,
+                "estudiantes/eliminar_estudiante_relaciones.html",
+                {"estudiante": self.object},
+            )
+
+class EstudianteEliminarCompletoView(RoleRequiredMixin, DeleteView):
+    model = Estudiante
+    required_roles = ("director",)
+
+    def post(self, request, *args, **kwargs):
+        estudiante = self.get_object()
+
+        # 🔥 Eliminar citaciones primero
+        Citacion.objects.filter(estudiante=estudiante).delete()
+
+        # Luego eliminar el estudiante
+        estudiante.delete()
+
+        messages.success(request, f"El estudiante {estudiante} y sus citaciones fueron eliminados completamente.")
+        return redirect(reverse_lazy("estudiantes:listar"))
 # =========================== LISTADO POR CURSO (Dir/Reg/Sec) ===========================
 
 class EstudiantesPorCursoListView(RoleRequiredMixin, ListView):
