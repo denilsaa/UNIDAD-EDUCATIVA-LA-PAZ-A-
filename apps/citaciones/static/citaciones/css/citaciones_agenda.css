@@ -60,38 +60,61 @@ body {
   outline: none;
 }
 
-.btn-buscar, .btn-hoy, .btn-navegar {
-  display: inline-block;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 0.9rem;
+/* ====== BOTONES ====== */
+button, .btn-buscar, .btn-hoy, .btn-navegar, .btn-editar, .btn-eliminar, .btn-cancelar {
+  border: none; /* elimina borde negro predeterminado */
+  outline: none; /* elimina foco predeterminado */
+  cursor: pointer;
   font-weight: 600;
-  text-decoration: none;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  padding: 10px 14px;
   color: #fff;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s ease;
+  margin: 2px 2px 2px 0;
 }
 
+/* Botones específicos */
 .btn-buscar {
-  background: #28a745;
+  background-color: #28a745;
 }
 .btn-buscar:hover {
-  background: #19692c;
+  background-color: #19692c;
 }
 
 .btn-hoy {
-  background: #007bff;
+  background-color: #007bff;
 }
 .btn-hoy:hover {
-  background: #004a99;
+  background-color: #004a99;
 }
 
 .btn-navegar {
-  background: #6c757d;
+  background-color: #6c757d;
 }
 .btn-navegar:hover {
-  background: #4a4f54;
+  background-color: #4a4f54;
 }
 
+.btn-editar {
+  background-color: #17a2b8;
+}
+.btn-editar:hover {
+  background-color: #0d6771;
+}
+
+.btn-eliminar, .btn-cancelar {
+  background-color: #dc3545;
+}
+.btn-eliminar:hover, .btn-cancelar:hover {
+  background-color: #a71d2a;
+}
+
+/* ====== TOTAL FORM ====== */
 .total {
   font-weight: 600;
   color: #333;
@@ -134,34 +157,6 @@ tbody tr:hover {
   background: #dbe7ff;
 }
 
-/* ====== BOTONES ====== */
-.btn-editar, .btn-eliminar {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-editar {
-  background-color: #17a2b8;
-  color: #fff;
-}
-.btn-editar:hover {
-  background-color: #0d6771;
-}
-
-.btn-eliminar {
-  background-color: #dc3545;
-  color: #fff;
-}
-.btn-eliminar:hover {
-  background-color: #a71d2a;
-}
-
 /* ====== TITULO DE DÍA ====== */
 .titulo-dia {
   margin: 1rem 0 0.5rem;
@@ -180,4 +175,22 @@ tbody tr:hover {
   border-radius: 8px;
   margin-top: 10px;
   font-weight: 500;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 700px) {
+  .form-citaciones {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  button, .btn-buscar, .btn-hoy, .btn-navegar, .btn-editar, .btn-eliminar, .btn-cancelar {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 6px;
+  }
+
+  th, td {
+    padding: 8px 10px;
+  }
 }
