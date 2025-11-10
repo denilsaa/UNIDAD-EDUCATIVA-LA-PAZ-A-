@@ -20,14 +20,14 @@
     <input type="text" name="q" value="{{ q }}" placeholder="Buscar por descripción…">
 
     <select name="area">
-      <option value="">— Área —</option>
+      <option value=""> Área </option>
       {% for v,label in areas %}
         <option value="{{ v }}" {% if area_sel == v %}selected{% endif %}>{{ v }}</option>
       {% endfor %}
     </select>
 
     <select name="sentido">
-      <option value="">— Sentido —</option>
+      <option value=""> Sentido </option>
       {% for v,label in sentidos %}
         <option value="{{ v }}" {% if sentido_sel == v %}selected{% endif %}>{{ v }}</option>
       {% endfor %}
@@ -47,7 +47,6 @@
   <table>
     <thead>
       <tr>
-        <th style="width:70px;">ID</th>
         <th style="width:120px;">Área</th>
         <th>Descripción</th>
         <th style="width:120px;">Sentido</th>
@@ -57,7 +56,6 @@
     <tbody>
       {% for it in items %}
       <tr>
-        <td>{{ it.id }}</td>
         <td>{{ it.area }}</td>
         <td>{{ it.descripcion }}</td>
         <td>{{ it.sentido }}</td>
