@@ -17,30 +17,20 @@
   <table class="tabla mt-3">
     <thead>
       <tr>
-        <th>ID</th>
         <th>Estudiante</th>
         <th>Motivo</th>
-        <th>ETA sugerida</th>
-        <th>ρ/Wq</th>
+        <th>Fecha y Hora sugerida</th>
         <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
       {% for c in rows %}
       <tr>
-        <td>#{{ c.id }}</td>
         <td>{{ c.estudiante }}</td>
         <td>{{ c.motivo_resumen }}</td>
         <td>
           {% if c.eta_fecha and c.eta_hora %}
             {{ c.eta_fecha|date:"Y-m-d" }} {{ c.eta_hora|time:"H:i" }}
-          {% else %}—{% endif %}
-        </td>
-        <td>
-          {% if mm1 and not mm1.saturada and mm1.rho is not None and mm1.Wq_min is not None %}
-            ρ={{ mm1.rho|floatformat:2 }} | Wq={{ mm1.Wq_min|floatformat:1 }} min
-          {% elif mm1 and mm1.saturada %}
-            ρ≥1 (saturada)
           {% else %}—{% endif %}
         </td>
         <td>
