@@ -1,84 +1,87 @@
 // -----------------------------------------------
-//  BASE DASHBOARD JS - OVERLAY GLOBAL
+//  BASE DASHBOARD JS - COMPLETO
 // -----------------------------------------------
+
 document.addEventListener("DOMContentLoaded", function () {
 
-  // === Función para mostrar overlay ===
+  // === Overlay global ===
   function showOverlay() {
     if (document.getElementById("ui-lock")) return;
     const ov = document.createElement("div");
     ov.id = "ui-lock";
     ov.innerHTML = '<div class="ui-lock__box"><div class="ui-lock__spinner"></div><p>Procesando…</p></div>';
     Object.assign(ov.style, {
-      position:"fixed", inset:"0", zIndex:"9999",
+      position:"fixed",
+      inset:"0",
+      zIndex:"9999",
       background:"rgba(255,255,255,.6)",
-      display:"flex", alignItems:"center", justifyContent:"center",
+      display:"flex",
+      alignItems:"center",
+      justifyContent:"center",
       backdropFilter:"saturate(180%) blur(2px)"
     });
     document.body.appendChild(ov);
     document.body.style.overflow = "hidden";
   }
 
-  // === Función para ocultar overlay (por si otras páginas quisieran usarla) ===
   function hideOverlay() {
     const ov = document.getElementById("ui-lock");
     if (ov) ov.remove();
     document.body.style.overflow = "";
   }
 
-  // Exponer mínimamente por si otro script quiere cerrarlo explícitamente
   window.__uiLock = { show: showOverlay, hide: hideOverlay };
 
   // === Bloqueo global al hacer click en enlaces o botones ===
-// === Bloqueo global al hacer click en enlaces o botones ===
-document.body.addEventListener("click", function(e) {
-  if (document.getElementById("ui-lock")) return; // Ya bloqueado
+  document.body.addEventListener("click", function(e) {
+    if (document.getElementById("ui-lock")) return; // Ya bloqueado
+    const target = e.target.closest("a[href], button[type=submit], input[type=submit]");
+    if (!target) return;
+    if (target.tagName === "A" && (target.getAttribute("href") || "").startsWith("#")) return;
+    if (e.target.closest('[data-ajax="1"], .btn-aprobar, .btn-rechazar')) return;
 
-  // Detectar solo navegación real: <a href>, <button type=submit>, <input type=submit>
-  const target = e.target.closest("a[href], button[type=submit], input[type=submit]");
-  if (!target) return;
+    (window.__uiLock?.show || showOverlay)();
 
-  // Evitar pseudo enlaces internos (#ancla)
-  if (target.tagName === "A" && (target.getAttribute("href") || "").startsWith("#")) return;
+    if (target.tagName === "A") return;
 
-  // ⛔️ NO bloquear si es una acción AJAX (botones aprobar/rechazar u otros marcados)
-  if (e.target.closest('[data-ajax="1"], .btn-aprobar, .btn-rechazar')) return;
+    if (target.tagName === "BUTTON" || (target.tagName === "INPUT" && target.type === "submit")) {
+      target.classList.add("is-loading");
+      const form = target.closest("form");
+      if (form) form.submit();
+    }
+  }, true);
 
-  // Mostrar overlay global SOLO para navegación/submit real
-  (window.__uiLock?.show || function(){
-    const ov = document.createElement("div");
-    ov.id = "ui-lock";
-    ov.innerHTML = '<div class="ui-lock__box"><div class="ui-lock__spinner"></div><p>Procesando…</p></div>';
-    Object.assign(ov.style, {
-      position:"fixed", inset:"0", zIndex:"9999",
-      background:"rgba(255,255,255,.6)",
-      display:"flex", alignItems:"center", justifyContent:"center",
-      backdropFilter:"saturate(180%) blur(2px)"
-    });
-    document.body.appendChild(ov);
-    document.body.style.overflow = "hidden";
-  })();
-
-  // Para enlaces, dejamos que el navegador haga la navegación
-  if (target.tagName === "A") return;
-
-  // Para formularios, submit explícito (UX consistente)
-  if (target.tagName === "BUTTON" || (target.tagName === "INPUT" && target.type === "submit")) {
-    target.classList.add("is-loading");
-    const form = target.closest("form");
-    if (form) form.submit();
-  }
-}, true);
-
-
-  // === Toggle panel notificaciones ===
+  // === Toggle panel notificaciones con animación ===
   const bell = document.getElementById('notif-bell');
   const panel = document.getElementById('notif-panel');
   const closeBtn = document.getElementById('notif-close');
-  if (bell && panel) bell.addEventListener('click', () => panel.hidden = !panel.hidden);
-  if (closeBtn && panel) closeBtn.addEventListener('click', () => panel.hidden = true);
 
-});
+  if (bell && panel && closeBtn) {
+    // Mostrar el panel
+    bell.addEventListener('click', () => {
+      panel.removeAttribute('hidden');
+      panel.classList.add('show'); // Asegúrate de tener transición en CSS
+    });
+
+    // Cerrar el panel
+    closeBtn.addEventListener('click', () => {
+      panel.classList.remove('show');
+      setTimeout(() => panel.setAttribute('hidden', ''), 300); // Duración de transición
+    });
+  }
+
+  // === Mensajes Django que desaparecen ===
+  const mensajes = document.querySelectorAll('.msg');
+  mensajes.forEach(msg => {
+    setTimeout(() => {
+      msg.style.opacity = '0';
+      msg.style.transform = 'translateY(-20px)';
+      setTimeout(() => msg.remove(), 500);
+    }, 5000);
+  });
+
+}); // Fin DOMContentLoaded
+
 
 // -----------------------------------------------
 //  WEBSOCKET NOTIFICACIONES
@@ -114,9 +117,7 @@ document.body.addEventListener("click", function(e) {
     panelContent.prepend(row);
   }
 
-  // === WebSocket Notificaciones ===
   const notifs = new WebSocket(WS(`/ws/notifs/?uid=${uid}`));
-
   notifs.onopen  = () => console.log("[WS NOTIFS] OPEN");
   notifs.onclose = (e) => console.log("[WS NOTIFS] CLOSE", e.code, e.reason);
   notifs.onerror = (e) => console.warn("[WS NOTIFS] ERROR", e);
@@ -178,17 +179,3 @@ document.body.addEventListener("click", function(e) {
   })();
 
 })();
-
-// -----------------------------------------------
-//  Mensajes Django
-// -----------------------------------------------
-document.addEventListener('DOMContentLoaded', () => {
-  const mensajes = document.querySelectorAll('.msg');
-  mensajes.forEach(msg => {
-    setTimeout(() => {
-      msg.style.opacity = '0';
-      msg.style.transform = 'translateY(-20px)';
-      setTimeout(() => msg.remove(), 500);
-    }, 5000);
-  });
-});

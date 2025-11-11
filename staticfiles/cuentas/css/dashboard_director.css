@@ -1,41 +1,41 @@
-/* === RESET Y CONTENEDOR PRINCIPAL === */
+/* === DASHBOARD DIRECTOR === */
+
+/* === RESETEO BASE === */
 * {
   margin: 0;
-  padding-top: 00;
+  padding: 0;
   box-sizing: border-box;
 }
+
 html, body {
   width: 100%;
   height: 100%;
   font-family: "Inter", system-ui, sans-serif;
+  background: #fff;
+  color: #0f172a;
 }
 
-/* === CONTENEDOR DASHBOARD === */
-.dashboard-container {
+/* === CONTENEDOR PRINCIPAL === */
+.dashboard-main-grid {
   display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #f8fafc;
+  flex: 1;
+  gap: 1rem;
+  padding: 0 2rem 2rem;
+  min-height: 80vh;
 }
 
-/* === ENCABEZADO DEL DASHBOARD === */
+/* === ENCABEZADO === */
 .dashboard-header {
-  background: linear-gradient(90deg, #0c2a57, #13386f); /* degradado azul elegante */
+  background: linear-gradient(90deg, #0c2a57, #13386f);
   color: #fff;
   padding: 1.8rem 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  margin: 1.5rem 2rem 1rem;
   position: relative;
   overflow: hidden;
 }
 
-/* Opcional: puntitos sutiles animados como el header principal */
 .dashboard-header::before {
   content: "";
   position: absolute;
@@ -53,7 +53,6 @@ html, body {
 .dashboard-header h2 {
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
   position: relative;
   z-index: 1;
@@ -61,29 +60,18 @@ html, body {
 
 .dashboard-header p {
   font-size: 1rem;
-  color: #dce6ff; /* subtítulo suave */
+  color: #dce6ff;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
   position: relative;
   z-index: 1;
 }
 
-/* Animación de puntitos compartida con el header */
 @keyframes moveDots {
   from { background-position: 0 0; }
   to { background-position: 40px 40px; }
 }
 
-
 /* === GRID PRINCIPAL === */
-.dashboard-main-grid {
-  display: flex;
-  flex: 1; /* ocupa todo el espacio restante */
-  gap: 1rem;
-  padding: 0 2rem 1rem 2rem;
-  min-height: 0; /* muy importante */
-}
-
-/* === COLUMNAS === */
 .column {
   display: flex;
   flex-direction: column;
@@ -92,7 +80,6 @@ html, body {
   min-height: 0;
 }
 
-/* === FILAS === */
 .row {
   display: flex;
   gap: 1rem;
@@ -100,39 +87,76 @@ html, body {
   min-height: 0;
 }
 
-/* === PROPORCIONES EXACTAS === */
-.left-column .top-row { flex: 6; }       /* Asistencia hoy grande */
+/* Proporciones */
+.left-column .top-row { flex: 6; }
 .left-column .bottom-row { flex: 4; }
 .right-column .top-row { flex: 4; }
-.right-column .bottom-row { flex: 6; }   /* Usuarios por rol grande */
+.right-column .bottom-row { flex: 6; }
 
 /* === TARJETAS === */
-.chart-card, .kpi-card {
-  background: white;
+.chart-card {
+  background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   padding: 1rem;
   transition: transform 0.2s ease;
   flex: 1;
   min-height: 0;
 }
-.chart-card:hover, .kpi-card:hover { transform: translateY(-3px); }
 
-/* === TARJETAS GRANDES DESTACADAS === */
-.large-card, /* Asistencia hoy */
-.right-column .bottom-row .chart-card { /* Usuarios por rol */
-  flex: 1.3; /* 30% más grande que otras tarjetas dentro de la fila */
+.chart-card:hover {
+  transform: translateY(-3px);
 }
 
-/* Tarjetas normales dentro de filas */
-.left-column .bottom-row .chart-card,
-.right-column .top-row .chart-card,
-.right-column .top-row .kpi-card { flex: 1; }
-.right-column .bottom-row .chart-card { width: 100%; height: 100%; }
+.large-card {
+  flex: 1.3;
+}
+
+/* === CONTENEDOR DE CHARTS === */
+.chart-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.5rem 0.8rem;
+  background: #fff;
+}
+
+.chart-header {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.4rem;
+  text-align: center;
+}
+
+.chart-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+.chart-body,
+.pie-chart-body {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+}
+
+.pie-chart-body canvas {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1 / 1;
+}
 
 /* === KPI CIRCULAR === */
 .kpi-chart-body {
@@ -143,12 +167,18 @@ html, body {
   height: 100%;
   position: relative;
 }
+
 .kpi-canvas-wrapper {
   position: relative;
   width: 200px;
   height: 200px;
 }
-.kpi-canvas-wrapper canvas { width: 100% !important; height: 100% !important; }
+
+.kpi-canvas-wrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 .kpi-canvas-wrapper .kpi-value {
   position: absolute;
   top: 50%;
@@ -159,116 +189,76 @@ html, body {
   color: #0c2a57;
 }
 
-/* === BOTONES === */
-.btn-azul, .btn-outline {
-  padding: 0.4rem 0.8rem;
+/* === BOTONES GENÉRICOS (por si se agregan) === */
+.btn {
+  padding: 0.45rem 0.9rem;
   border-radius: 6px;
   font-size: 0.9rem;
-  text-decoration: none;
-  transition: 0.2s;
-}
-.btn-azul { background: #0c2a57; color: white; }
-.btn-azul:hover { background: #13386f; }
-.btn-outline { background: white; border: 1px solid #0c2a57; color: #0c2a57; }
-.btn-outline:hover { background: #0c2a57; color: white; }
-
-/* Accesos rápidos */
-.kpi-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
-/* === CHARTS === */
-.chart-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  border: 2px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 0.5rem 0.8rem;
+.btn-primary {
+  background: #0c2a57;
+  color: #fff;
 }
-.chart-header {
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 0.4rem;
+
+.btn-primary:hover {
+  background: #13386f;
+}
+
+.btn-outline {
+  background: #fff;
+  border: 1px solid #0c2a57;
+  color: #0c2a57;
+}
+
+.btn-outline:hover {
+  background: #0c2a57;
+  color: #fff;
+}
+
+/* === FOOTER === */
+.ftr {
   text-align: center;
-}
-.chart-header h4 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #0f172a;
-  margin: 0;
-}
-.chart-body, .pie-chart-body {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 0;
-}
-.pie-chart-body canvas {
-  width: 100%;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  aspect-ratio: 1/1;
+  padding: 1rem;
+  color: #64748b;
+  font-size: 0.9rem;
 }
 
 /* === RESPONSIVO === */
 @media (max-width: 1300px) {
-  .dashboard-main-grid { flex-direction: column; }
-  .row { flex-direction: column; }
-  .row .chart-card, .row .kpi-card { width: 100%; }
-}
-@media (max-width: 900px) {
-  .dashboard-container { padding: 0.5rem; }
-  .chart-card { height: 300px; }
-}
+  .dashboard-main-grid {
+    flex-direction: column;
+  }
 
-/* === BOTÓN HAMBURGUESA DENTRO DEL HEADER - FORZADO === */
-.dashboard-header { position: relative; z-index: 2; }
+  .row {
+    flex-direction: column;
+  }
 
-/* estilos base del botón */
-.menu-toggle {
-  display: none;
-  background: rgba(255,255,255,0.08);
-  color: #fff;
-  border: none;
-  font-size: 1.4rem;
-  border-radius: 8px;
-  padding: 0.35rem 0.6rem;
-  cursor: pointer;
-  z-index: 6; /* encima de pseudo-elementos del header */
-  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  .chart-card {
+    width: 100%;
+  }
 }
 
-/* asegurar que el botón esté visible en mobile (forzado) */
 @media (max-width: 900px) {
   .dashboard-header {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 1rem !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.2rem;
   }
 
-  .header-left { display: flex; flex-direction: column; gap: 0.25rem; }
-
-  .dashboard-header p { display: none !important; } /* opcional */
-
-  .menu-toggle {
-    display: inline-flex !important;
-    margin-left: 1rem;
-    align-self: center;
-    background: rgba(255,255,255,0.12) !important;
+  .dashboard-header h2 {
+    font-size: 1.6rem;
   }
-}
 
-/* Forzar que no quede oculto por overflow o transform del padre */
-.menu-toggle {
-  position: relative;
-  transform: none !important;
-  pointer-events: auto;
+  .dashboard-header p {
+    font-size: 0.9rem;
+  }
+
+  .chart-card {
+    height: auto;
+  }
 }
