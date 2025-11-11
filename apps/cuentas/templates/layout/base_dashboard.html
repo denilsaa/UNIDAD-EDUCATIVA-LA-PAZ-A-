@@ -106,11 +106,11 @@
           {% for message in messages %}
             <div class="msg msg-{{ message.tags }}">
               {% if message.tags == 'success' %}
-                <img src="{% static 'img/logo.png' %}" alt="ok">
+                <img src="{% static 'img/Correcto_Img.png' %}" alt="ok">
               {% elif message.tags == 'error' or message.tags == 'danger' %}
-                <img src="{% static 'img/logo.png' %}" alt="error">
+                <img src="{% static 'img/Error_Img.png' %}" alt="error">
               {% elif message.tags == 'info' %}
-                <img src="{% static 'img/logo.png' %}" alt="info">
+                <img src="{% static 'img/Informacion.png' %}" alt="info">
               {% endif %}
               {{ message }}
             </div>

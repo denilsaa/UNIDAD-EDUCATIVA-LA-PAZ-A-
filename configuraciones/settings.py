@@ -9,8 +9,8 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # === SEGURIDAD / LOGIN ===
-DEBUG = True
-#ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+DEBUG = False
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 SECRET_KEY = "django-insecure-if^n0ab85w_-8nsbz5!o^t=dk4%+ml^v&72vpez383d_ohdncf"
 
