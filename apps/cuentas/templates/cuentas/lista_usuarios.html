@@ -1,7 +1,7 @@
 {% extends "layout/base_dashboard.html" %}
 {% load static %}
 
-{% block title %}Usuarios{% endblock %}
+{% block title %}{{ titulo|default:"Usuarios" }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'cuentas/css/dashboard_direc_usu.css' %}">
@@ -11,56 +11,94 @@
   <!-- === ENCABEZADO === -->
   <div class="dashboard-header">
     <h2 class="hdr-sub">
-      Lista de usuarios
+      {{ titulo|default:"Lista de usuarios" }}
     </h2>
-    <p>Listado de los usuarios: Director, Secretaria, Regentes.</p>
+
+    {% if tipo == 'padres' %}
+      <p>Listado de usuarios: Padres de familia.</p>
+    {% else %}
+      <p>Listado de los usuarios: Director, Secretaria, Regentes.</p>
+    {% endif %}
   </div>
-  <form method="get" action="{% url 'cuentas:lista_usuarios' %}" class="form-cursos">
-    <input type="text" name="q" placeholder="Buscar usuario por Rol, CI, Nombre o Apellido" value="{{ query }}" class="input-busqueda">
+
+  <form method="get"
+        action="{% if tipo == 'padres' %}{% url 'cuentas:lista_padres' %}{% else %}{% url 'cuentas:lista_personal' %}{% endif %}"
+        class="form-cursos">
+    <input type="text"
+           name="q"
+           placeholder="Buscar usuario por Rol, CI, Nombre o Apellido"
+           value="{{ query }}"
+           class="input-busqueda">
     <button type="submit" class="btn-buscar">Buscar</button>
-    <a href="{% url 'cuentas:crear_usuario' %}" class="btn-nuevo">Nuevo usuario</a>
+
+    {% if tipo == 'padres' %}
+      <a href="{% url 'cuentas:crear_padre' %}" class="btn-nuevo">Nuevo Padre</a>
+    {% else %}
+      <a href="{% url 'cuentas:crear_personal' %}" class="btn-nuevo">Nuevo usuario</a>
+    {% endif %}
   </form>
 
-<div class="table-wrapper">
-  {% if usuarios %}
-  <table>
-    <thead>
-      <tr>
-        <th>Rol</th>
-        <th>CI</th>
-        <th>Nombres</th>
-        <th>Apellidos</th>
-        <th>Email</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for u in usuarios %}
-        {% if u.rol|default:''|lower != "padre de familia" %}
+  <div class="table-wrapper">
+    {% if usuarios %}
+      <table>
+        <thead>
           <tr>
-            <td>{{ u.rol }}</td>
-            <td>{{ u.ci }}</td>
-            <td>{{ u.nombres }}</td>
-            <td>{{ u.apellidos }}</td>
-            <td>{{ u.email }}</td>
-            <td>{{ u.is_activo|yesno:"Activo,Inactivo" }}</td>
-            <td class="acciones">
-              <a href="{% url 'cuentas:ver_usuario' u.id %}" class="btn-ver">Ver</a>
-              <a href="{% url 'cuentas:editar_usuario' u.id %}" class="btn-editar">Editar</a>
-              {% if u.id != request.user.id %}
-                  <a href="{% url 'cuentas:eliminar_usuario' u.id %}" class="btn-eliminar">Eliminar</a>
-              {% endif %}
-            </td>
+            <th>Rol</th>
+            <th>CI</th>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th>Acciones</th>
           </tr>
-        {% endif %}
-      {% empty %}
-        <tr><td colspan="7">Sin usuarios</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-    <p>No se encontraron usuarios con ese criterio.</p>
-  {% endif %}
-</div>
+        </thead>
+        <tbody>
+        {% for u in usuarios %}
+          {# Salvaguarda extra por si el view no filtró #}
+          {% if tipo == 'padres' %}
+            {% if u.rol|default:''|lower == "padre de familia" %}
+              <tr>
+                <td>{{ u.rol }}</td>
+                <td>{{ u.ci }}</td>
+                <td>{{ u.nombres }}</td>
+                <td>{{ u.apellidos }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.is_activo|yesno:"Activo,Inactivo" }}</td>
+                <td class="acciones">
+                  <a href="{% url 'cuentas:ver_usuario' u.id %}" class="btn-ver">Ver</a>
+                  <a href="{% url 'cuentas:editar_padre' u.id %}" class="btn-editar">Editar</a>
+                  {% if u.id != request.user.id %}
+                    <a href="{% url 'cuentas:eliminar_usuario' u.id %}" class="btn-eliminar">Eliminar</a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endif %}
+          {% else %}
+            {% if u.rol|default:''|lower != "padre de familia" %}
+              <tr>
+                <td>{{ u.rol }}</td>
+                <td>{{ u.ci }}</td>
+                <td>{{ u.nombres }}</td>
+                <td>{{ u.apellidos }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.is_activo|yesno:"Activo,Inactivo" }}</td>
+                <td class="acciones">
+                  <a href="{% url 'cuentas:ver_usuario' u.id %}" class="btn-ver">Ver</a>
+                  <a href="{% url 'cuentas:editar_personal' u.id %}" class="btn-editar">Editar</a>
+                  {% if u.id != request.user.id %}
+                    <a href="{% url 'cuentas:eliminar_usuario' u.id %}" class="btn-eliminar">Eliminar</a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endif %}
+          {% endif %}
+        {% empty %}
+          <tr><td colspan="7">Sin usuarios</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No se encontraron usuarios con ese criterio.</p>
+    {% endif %}
+  </div>
 {% endblock %}

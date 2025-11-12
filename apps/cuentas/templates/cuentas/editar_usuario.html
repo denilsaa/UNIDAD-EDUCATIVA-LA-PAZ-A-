@@ -1,6 +1,6 @@
 {% extends "layout/base_dashboard.html" %}
 {% load static %}
-{% block title %}Editar Usuario{% endblock %}
+{% block title %}{{ titulo|default:"Editar Usuario" }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'cuentas/css/editar_usuario.css' %}">
@@ -8,7 +8,9 @@
 
 {% block content %}
   <form id="editar-usuario-form" method="post" class="form-usuario">
-    <h2 class="titulo-form">Editar Usuario</h2>
+    <h2 class="titulo-form">
+      {% if tipo == 'padres' %}Editar Usuario (Padre de familia){% else %}Editar Usuario (Personal){% endif %}
+    </h2>
     {% csrf_token %}
 
     <!-- CI -->
@@ -54,7 +56,6 @@
     <div class="form-group">
       <label for="id_is_activo" class="form-check-label">Estado del usuario:</label>
       <div>
-        {# 🚫 Si estoy editando mi propio usuario, no permito inactivarme #}
         {% if usuario.id == request.user.id %}
           <input
             type="checkbox"
@@ -65,7 +66,6 @@
             disabled
             title="No puedes inactivarte a ti mismo"
           >
-          {# Importante: como el checkbox está disabled, envío un hidden para mantener 'on' en el POST #}
           <input type="hidden" name="is_activo" value="on">
           <small class="text-muted">No puedes inactivarte a ti mismo.</small>
         {% else %}
@@ -88,15 +88,12 @@
     <fieldset class="fieldset-password">
       <legend>Nueva contraseña (opcional)</legend>
 
-      <!-- Nueva contraseña -->
       <div class="form-group">
         <label for="new_password1">Nueva contraseña:</label>
         <input type="password" id="new_password1" name="new_password1" class="form-control">
-        <!-- Bloque donde se insertarán los requisitos -->
         <div id="pass-msg"></div>
       </div>
 
-      <!-- Confirmación -->
       <div class="form-group">
         <label for="new_password2">Confirmar nueva contraseña:</label>
         <input type="password" id="new_password2" name="new_password2" class="form-control">
@@ -107,7 +104,11 @@
     <p class="form-actions">
       <button type="submit">Guardar</button>
       <a href="{% url 'cuentas:ver_usuario' usuario.id %}">Ver</a>
-      <a href="{% url 'cuentas:lista_usuarios' %}">Volver</a>
+      {% if tipo == 'padres' %}
+        <a href="{% url 'cuentas:lista_padres' %}">Volver</a>
+      {% else %}
+        <a href="{% url 'cuentas:lista_personal' %}">Volver</a>
+      {% endif %}
     </p>
   </form>
 
@@ -121,7 +122,6 @@
 </script>
 <script src="{% static 'cuentas/js/editar_usuario.js' %}"></script>
 <script>
-  // Si el checkbox está habilitado, actualiza el texto "Activo/Inactivo".
   (function(){
     var cb = document.getElementById('id_is_activo');
     var label = document.getElementById('estado-texto');

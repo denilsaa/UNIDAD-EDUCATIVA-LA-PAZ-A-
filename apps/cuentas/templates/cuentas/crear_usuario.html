@@ -1,7 +1,7 @@
 {% extends "layout/base_dashboard.html" %}
 {% load static %}
 
-{% block title %}Crear usuario{% endblock %}
+{% block title %}{{ titulo|default:"Crear usuario" }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'cuentas/css/crear_usuario.css' %}">
@@ -10,7 +10,9 @@
 {% block content %}
 
 <form method="post" class="form-usuario">
-  <h2 class="titulo-form">Registrar nuevo usuario</h2>
+  <h2 class="titulo-form">
+    {% if tipo == 'padres' %}Registrar nuevo Padre de familia{% else %}Registrar nuevo usuario{% endif %}
+  </h2>
   {% csrf_token %}
 
   <div class="form-group">
@@ -34,11 +36,9 @@
   <div class="form-group">
     <label for="{{ form.email.id_for_label }}">Gmail (opcional)</label>
     {{ form.email }}
-    {# error del form (servidor) #}
     {% if form.email.errors %}
       <small class="error">{{ form.email.errors.0 }}</small>
     {% endif %}
-    {# mensaje de tu JS (cliente) #}
     <small id="error-email" style="color:red; display:none;"></small>
   </div>
 
@@ -54,7 +54,6 @@
       <small id="error-rol" style="color:red; display:none;"></small>
   </div>
 
-  <!-- No se muestra, pero se incluye para enviar el valor -->
   {{ form.is_activo }}
 
   <div class="form-group">
@@ -72,9 +71,14 @@
 
   <div class="form-actions">
     <button type="submit" class="btn-guardar">Guardar</button>
-    <a href="{% url 'cuentas:lista_usuarios' %}" class="btn-volver">Volver a la lista</a>
+    {% if tipo == 'padres' %}
+      <a href="{% url 'cuentas:lista_padres' %}" class="btn-volver">Volver a la lista</a>
+    {% else %}
+      <a href="{% url 'cuentas:lista_personal' %}" class="btn-volver">Volver a la lista</a>
+    {% endif %}
   </div>
 </form>
+
 {% block scripts %}
 <script src="{% static 'cuentas/js/usuario.js' %}"></script>
 {% endblock %}

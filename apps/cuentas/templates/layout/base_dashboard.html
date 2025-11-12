@@ -36,13 +36,13 @@
           {# --- Director --- #}
           {% if "director" in role %}
             <li><a href="{% url 'cuentas:director_dashboard' %}">📊 Resumen</a></li>
-            <li><a href="{% url 'cuentas:lista_usuarios' %}">👤 Usuarios</a></li>
+            <li><a href="{% url 'cuentas:lista_personal' %}">👤 Usuarios</a></li>
             <li><a href="{% url 'cursos:lista_cursos' %}">📚 Cursos</a></li>
 
             <li><a href="{% url 'estudiantes:asistencia_calendario' %}">🗓️ Calendario asistencia</a></li>
             <li><a href="{% url 'cursos:lista_cursos' %}">📋 Tomar asistencia</a></li>
 
-            <li><a href="{% url 'cuentas:crear_usuario' %}">➕ Nuevo usuario</a></li>
+            <li><a href="{% url 'cuentas:crear_personal' %}">➕ Nuevo usuario</a></li>
             <li><a href="{% url 'cursos:crear_curso' %}">➕ Nuevo curso</a></li>
             <li><a href="{% url 'estudiantes:kardex_items_listar' %}">🗂️ Kárdex</a></li>
 
@@ -54,8 +54,8 @@
             <li class="sep"></li>
             <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
             <li><a href="{% url 'estudiantes:crear' %}">➕ Nuevo estudiante</a></li>
-            <li><a href="{% url 'estudiantes:listar' %}">👥 Padre de Familia</a></li>
-            <li><a href="{% url 'estudiantes:crear' %}">➕ Nuevo Padre</a></li>
+            <li><a href="{% url 'cuentas:lista_padres' %}">👥 Padre de Familia</a></li>
+            <li><a href="{% url 'cuentas:crear_padre' %}">➕ Nuevo Padre</a></li>
           {# --- Regente --- #}
           {% elif "regente" in role %}
             <li><a href="{% url 'cuentas:regente_dashboard' %}">📊 Resumen</a></li>
