@@ -16,50 +16,97 @@
     <div class="alert alert-warning">
       No puedes eliminarte a ti mismo.
     </div>
-    <a href="{% url 'cuentas:lista_usuarios' %}" class="btn btn-volver">Volver</a>
+
+    <a
+      href="{% if tipo == 'padres' %}{% url 'cuentas:lista_padres' %}{% elif tipo == 'personal' %}{% url 'cuentas:lista_personal' %}{% else %}{% url 'cuentas:lista_usuarios' %}{% endif %}"
+      class="btn btn-volver">Volver</a>
+
   {% else %}
 
     <div class="card-detalle">
-      <p>Está a punto de eliminar al usuario <strong>{{ usuario.nombres }}</strong>.</p>
+      <p>
+        Está a punto de eliminar al usuario
+        <strong>{{ usuario.get_full_name|default:usuario.nombres }}</strong>
+        {% if usuario.rol %} <span class="label">({{ usuario.rol }})</span>{% endif %}.
+      </p>
 
+      {# Si tu view manda 'estudiantes', se listan; si no, se muestran contadores #}
       {% if estudiantes %}
         <p>Este usuario tiene los siguientes estudiantes asignados:</p>
         <ul class="lista-detalle">
           {% for estudiante in estudiantes %}
             <li>
               <span class="valor">{{ estudiante.apellidos }} {{ estudiante.nombres }}</span>
-              <span class="label">{{ estudiante.curso.nivel }} {{ estudiante.curso.paralelo }}</span>
+              {% if estudiante.curso %}
+                <span class="label">{{ estudiante.curso.nivel }} {{ estudiante.curso.paralelo }}</span>
+              {% endif %}
             </li>
           {% endfor %}
         </ul>
       {% else %}
-        <p>No tiene estudiantes asignados.</p>
+        <ul class="lista-detalle">
+          {% if n_estudiantes_asociados %}
+            <li>
+              <span class="valor">{{ n_estudiantes_asociados }}</span>
+              <span class="label">estudiante(s) asociado(s)</span>
+            </li>
+          {% endif %}
+          {% if n_cursos_regente %}
+            <li>
+              <span class="valor">{{ n_cursos_regente }}</span>
+              <span class="label">curso(s) donde es regente</span>
+            </li>
+          {% endif %}
+          {% if n_calendarios %}
+            <li>
+              <span class="valor">{{ n_calendarios }}</span>
+              <span class="label">calendario(s) de asistencia creados por este usuario</span>
+            </li>
+          {% endif %}
+          {% if not n_estudiantes_asociados and not n_cursos_regente and not n_calendarios %}
+            <li><span class="label">No se encontraron dependencias relevantes.</span></li>
+          {% endif %}
+        </ul>
       {% endif %}
     </div>
 
-    {% if estudiantes %}
-      <p>¿Desea eliminar también a estos estudiantes junto con el usuario?</p>
-      <div class="acciones-detalle">
-        <form method="post" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" name="eliminar_todo" class="btn-editar">
-            Sí, eliminar usuario y estudiantes
-          </button>
-        </form>
-        <a href="{% url 'cuentas:lista_usuarios' %}" class="btn btn-volver">Cancelar</a>
+    <form method="post" class="acciones-detalle" style="display:block; margin-top:12px;">
+      {% csrf_token %}
+
+      {# === MODO FORZADO (DESTRUCTIVO) ===
+         Marca esta casilla para borrar todo lo que bloquea el delete:
+         - Citaciones del/los estudiante(s) (incl. las que referencian su Kárdex)
+         - Registros de Kárdex de esos estudiantes
+         - Estudiantes asociados al usuario (si es Padre o Regente)
+         - Calendarios de asistencia creados por el usuario (si es Director)
+      #}
+      {% if permite_forzado %}
+        <div class="alert alert-danger" style="margin:10px 0;">
+          <label style="cursor:pointer;">
+            <input type="checkbox" name="eliminar_todo" value="1">
+            <strong>Eliminar también dependencias históricas</strong> (Citaciones, Kárdex, Estudiantes asociados y/o Calendarios de asistencia).
+            <br>Esta acción es <u>permanente</u> y no se puede deshacer.
+          </label>
+        </div>
+      {% endif %}
+
+      <div class="btns-row" style="display:flex; gap:8px; align-items:center;">
+        <button type="submit" class="btn-eliminar">
+          Sí, eliminar usuario
+        </button>
+
+        <a
+          href="{% if tipo == 'padres' %}{% url 'cuentas:lista_padres' %}{% elif tipo == 'personal' %}{% url 'cuentas:lista_personal' %}{% else %}{% url 'cuentas:lista_usuarios' %}{% endif %}"
+          class="btn btn-volver">Cancelar</a>
       </div>
-    {% else %}
-      <p>Esta acción eliminará permanentemente al usuario.</p>
-      <div class="acciones-detalle">
-        {# El view elimina si NO hay estudiantes y es un POST (sin necesidad de name) #}
-        <form method="post" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" class="btn-eliminar">
-            Sí, eliminar usuario
-          </button>
-        </form>
-        <a href="{% url 'cuentas:lista_usuarios' %}" class="btn btn-volver">Cancelar</a>
-      </div>
+    </form>
+
+    {% if nota_integridad %}
+      <p class="nota" style="margin-top:10px; color:#666;">
+        * Para preservar la integridad, si no marcas la casilla de borrado total y existen dependencias
+        protegidas por el sistema, se intentará eliminar de forma segura; si no es posible, el usuario
+        se <strong>inactivará</strong> y se te informará.
+      </p>
     {% endif %}
 
   {% endif %}

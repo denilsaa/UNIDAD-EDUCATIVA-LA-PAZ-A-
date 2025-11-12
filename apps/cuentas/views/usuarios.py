@@ -22,6 +22,19 @@ from django.shortcuts import redirect, get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 from django.db import transaction
 from apps.cuentas.roles import es_director, total_directores_activos
+
+from django.db import transaction
+from django.db.models import Q
+from django.db.models.deletion import RestrictedError, ProtectedError
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+
+from apps.cuentas.models import Usuario
+from apps.cuentas.roles import es_director, total_directores_activos
+from apps.cuentas.decorators import role_required
+
+from apps.estudiantes.models.estudiante import Estudiante
+from apps.cursos.models import Curso
 # ======================================
 # 🔎 Buscar usuarios (antes lista_usuarios)
 # ======================================
@@ -153,54 +166,135 @@ def editar_usuario(request, user_id):
 
     return render(request, "cuentas/editar_usuario.html",
                   {"form": form, "usuario": usuario, "es_autoedicion": es_autoedicion})
+# Imports defensivos (por si cambia ruta de modelos)
+try:
+    from apps.estudiantes.models.kardex_registro import KardexRegistro
+except Exception:
+    KardexRegistro = None
 
+try:
+    # Intento 1: citaciones/citacion.py con clase Citacion
+    from apps.citaciones.models.citacion import Citacion
+except Exception:
+    try:
+        # Intento 2: __init__.py expone Citacion
+        from apps.citaciones.models import Citacion
+    except Exception:
+        Citacion = None
+
+try:
+    from apps.estudiantes.models.asistencia_config import AsistenciaCalendario
+except Exception:
+    AsistenciaCalendario = None
+
+
+def _es_padre_local(u: Usuario) -> bool:
+    return bool(u.rol and (u.rol.nombre or "").strip().lower() == "padre de familia")
 
 @role_required("director")
 @require_http_methods(["GET", "POST"])
 @transaction.atomic
 def eliminar_usuario(request, user_id):
     """
-    Elimina un usuario con confirmación.
-    Con SET_NULL activo en Curso.regente, los cursos quedarán sin regente automáticamente.
-    Si tiene estudiantes asociados como padre, sigue tu confirmación.
+    Dos modos:
+    - Seguro (por defecto): NO destruye historial; desvincula y, si hay bloqueos, inactiva.
+    - Forzado (eliminar_todo=1): borra dependencias bloqueantes (Citaciones/Kardex/Calendarios) y luego el Usuario.
     """
-    usuario = get_object_or_404(Usuario.objects.select_for_update(), id=user_id)
-
-    if usuario.id == request.user.id:
-        messages.error(request, "No puedes eliminarte a ti mismo.")
-        return redirect("cuentas:lista_usuarios")
-
-    estudiantes_padre = Estudiante.objects.filter(padre=usuario)
-    estudiantes_regente = Estudiante.objects.filter(curso__regente=usuario)
-    estudiantes_asociados = (estudiantes_padre | estudiantes_regente).distinct()
-
-    # Solo para feedback: cuántos cursos perderán regente (quedarán en NULL)
-    n_cursos = Curso.objects.filter(regente=usuario).count()
+    usuario = get_object_or_404(Usuario, pk=user_id)
 
     if request.method == "POST":
+        # Seguridad básica
+        if getattr(request.user, "pk", None) == usuario.pk:
+            messages.error(request, "No puedes eliminar tu propio usuario.")
+            return redirect("cuentas:ver_usuario", user_id=usuario.pk)
+
+        if es_director(usuario) and total_directores_activos(exclude_pk=usuario.pk) == 0:
+            messages.error(request, "No puedes eliminar al único Director activo.")
+            return redirect("cuentas:ver_usuario", user_id=usuario.pk)
+
+        force = request.POST.get("eliminar_todo") in ("1", "true", "True", "on")
+
+        # === MODO FORZADO (destructivo) ===
+        if force:
+            # 1) Si es Director: eliminar calendarios de asistencia creados por él (PROTECT)
+            if AsistenciaCalendario is not None and es_director(usuario):
+                AsistenciaCalendario.objects.filter(creado_por=usuario).delete()
+
+            # 2) Estudiantes asociados por ser PADRE o REGENTE
+            estudiantes_qs = Estudiante.objects.filter(
+                Q(padre=usuario) | Q(curso__regente=usuario)
+            ).distinct()
+
+            # 3) Eliminar CITACIONES de esos estudiantes (y citaciones que apunten a sus kardex)
+            if estudiantes_qs.exists() and Citacion is not None:
+                if KardexRegistro is not None:
+                    kdx_qs = KardexRegistro.objects.filter(estudiante__in=estudiantes_qs)
+                    # Borrar citaciones por estudiante o por kardex_registro de esos estudiantes
+                    Citacion.objects.filter(
+                        Q(estudiante__in=estudiantes_qs) | Q(kardex_registro__in=kdx_qs)
+                    ).delete()
+                else:
+                    Citacion.objects.filter(estudiante__in=estudiantes_qs).delete()
+
+            # 4) Eliminar KARDEX de esos estudiantes
+            if estudiantes_qs.exists() and KardexRegistro is not None:
+                KardexRegistro.objects.filter(estudiante__in=estudiantes_qs).delete()
+
+            # 5) Eliminar ESTUDIANTES asociados
+            if estudiantes_qs.exists():
+                estudiantes_qs.delete()
+
+            # 6) Cursos donde era REGENTE: soltarlos (no borramos cursos)
+            Curso.objects.filter(regente=usuario).update(regente=None)
+
+            # 7) Finalmente, borrar el USUARIO
+            usuario.delete()
+            messages.success(
+                request,
+                "Usuario y dependencias asociadas eliminados permanentemente (modo forzado)."
+            )
+            return redirect("cuentas:lista_padres" if _es_padre_local(usuario) else "cuentas:lista_personal")
+
+        # === MODO SEGURO (por defecto) ===
+        # Desvincular sin destruir historial
+        Estudiante.objects.filter(padre=usuario).update(padre=None)
+        Curso.objects.filter(regente=usuario).update(regente=None)
+
+        if AsistenciaCalendario is not None and es_director(usuario):
+            # Mejor intentar re-asignar a quien ejecuta
+            if getattr(request.user, "pk", None):
+                AsistenciaCalendario.objects.filter(creado_por=usuario).update(creado_por=request.user)
+
         try:
-            if "eliminar_todo" in request.POST:
-                estudiantes_asociados.delete()
-                usuario.delete()
-                extra = f" {n_cursos} curso(s) quedaron sin regente." if n_cursos else ""
-                messages.success(request, f"🗑️ Usuario eliminado junto a sus estudiantes.{extra}")
-                return redirect("cuentas:lista_usuarios")
+            usuario.delete()
+            messages.success(request, "Usuario eliminado correctamente.")
+            return redirect("cuentas:lista_padres" if _es_padre_local(usuario) else "cuentas:lista_personal")
+        except (RestrictedError, ProtectedError):
+            # Fallback: inactivar
+            Usuario.objects.filter(pk=usuario.pk).update(is_activo=False)
+            messages.warning(
+                request,
+                "No se pudo eliminar por dependencias. Se inactivó el usuario para preservar historial."
+            )
+            return redirect("cuentas:ver_usuario", user_id=usuario.pk)
 
-            elif not estudiantes_asociados.exists():
-                usuario.delete()
-                extra = f" {n_cursos} curso(s) quedaron sin regente." if n_cursos else ""
-                messages.success(request, f"🗑️ Usuario eliminado.{extra}")
-                return redirect("cuentas:lista_usuarios")
+    # GET: mostrar confirmación con opción de borrado forzado
+    n_estudiantes_asociados = Estudiante.objects.filter(
+        Q(padre=usuario) | Q(curso__regente=usuario)
+    ).distinct().count()
+    n_cursos_regente = Curso.objects.filter(regente=usuario).count()
+    n_calendarios = 0
+    if AsistenciaCalendario is not None:
+        n_calendarios = AsistenciaCalendario.objects.filter(creado_por=usuario).count()
 
-            # Si tenía estudiantes y no se marcó eliminar_todo, no hacer nada especial (tu flujo)
-            return redirect("cuentas:lista_usuarios")
-
-        except ValidationError as e:
-            messages.error(request, getattr(e, "message", str(e)))
-            return redirect("cuentas:lista_usuarios")
-
-    return render(request, "cuentas/eliminar_usuario.html",
-                  {"usuario": usuario, "estudiantes": estudiantes_asociados})
+    ctx = {
+        "usuario": usuario,
+        "n_estudiantes_asociados": n_estudiantes_asociados,
+        "n_cursos_regente": n_cursos_regente,
+        "n_calendarios": n_calendarios,
+        "permite_forzado": True,
+    }
+    return render(request, "cuentas/eliminar_usuario.html", ctx)
 
 
 # Nueva vista para verificar CI en tiempo real
