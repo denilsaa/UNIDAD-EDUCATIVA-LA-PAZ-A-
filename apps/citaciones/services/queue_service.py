@@ -5,15 +5,12 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 from apps.citaciones.models.citacion import Citacion
-from apps.citaciones.services.agenda_service import agendar
+from apps.citaciones.services.agenda_service import agendar, reordenar_dia_por_peso
 from apps.citaciones.services.metrics_service import metrics_payload
-from django.db import transaction
-from django.utils.timezone import now
-from apps.citaciones.models.citacion import Citacion
-from apps.citaciones.services.agenda_service import agendar
-from apps.citaciones.services.metrics_service import metrics_payload
-from apps.citaciones.ws import push_cola_state, push_dashboard_metrics, push_citacion_padre
 from apps.citaciones.services.notify_service import resolve_padres_ids
+from apps.citaciones.ws import push_citacion_padre
+
+
 COLA_GROUP = "cola_room"          # ← coincide con tu ColaConsumer
 DASH_GROUP = "dashboard_room"     # ← coincide con tu DashboardConsumer
 
@@ -36,10 +33,23 @@ def _broadcast_dashboard_metrics(data: dict):
 
 @transaction.atomic
 def aprobar(citacion_id: int, usuario) -> Citacion:
+    """Aprueba una citación, la agenda y reordena el día por peso (duracion_min)."""
     c = Citacion.objects.select_for_update().get(id=citacion_id)
+
+    # Solo tiene sentido aprobar si estaba ABIERTA
+    if c.estado != Citacion.Estado.ABIERTA:
+        return c
+
     c.aprobado_por = usuario
     c.aprobado_en = now()
-    agendar(c)  # cambia a AGENDADA y setea fecha/hora
+    c.save(update_fields=["aprobado_por", "aprobado_en", "actualizado_en"])
+
+    # Asignar primer slot libre (M/M/1 estándar)
+    agendar(c, c.duracion_min)
+
+    # Reordenar todo el día por peso: el que tiene más duración va primero
+    if c.fecha_citacion:
+        reordenar_dia_por_peso(c.fecha_citacion)
 
     # payload para la cola (bandeja/visor de cola)
     cola_payload = {
@@ -53,6 +63,15 @@ def aprobar(citacion_id: int, usuario) -> Citacion:
 
     # métricas para dashboard (M/M/1)
     _broadcast_dashboard_metrics(metrics_payload())
+
+    # Notificar a los padres por WS (si hay canal)
+    try:
+        for padre_id in resolve_padres_ids(c.estudiante):
+            push_citacion_padre(c, padre_id=padre_id)
+    except Exception:
+        # no queremos que un fallo de WS rompa la aprobación
+        pass
+
     return c
 
 
@@ -87,28 +106,4 @@ def rechazar(citacion_id: int, usuario) -> Citacion:
 
     _broadcast_cola({"id": c.id, "estado": c.estado})
     _broadcast_dashboard_metrics(metrics_payload())
-    return c
-
-
-@transaction.atomic
-def aprobar(citacion_id: int, usuario):
-    c = Citacion.objects.select_for_update().get(id=citacion_id)
-    c.aprobado_por = usuario
-    c.aprobado_en = now()
-    agendar(c, c.duracion_min)
-
-    # (tu lógica de broadcast para cola/dashboard)
-    try:
-        push_cola_state({"event": "agendada", "id": c.id})
-        push_dashboard_metrics(metrics_payload())
-    except Exception:
-        pass
-
-    # 🔔 Notificar a los padres por WS
-    try:
-        for padre_id in resolve_padres_ids(c.estudiante):
-            push_citacion_padre(c, padre_id=padre_id)
-    except Exception:
-        pass
-
     return c

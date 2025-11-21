@@ -7,32 +7,35 @@ from django.utils.timezone import now
 
 from apps.estudiantes.models.kardex_registro import KardexRegistro
 from apps.citaciones.models.citacion import Citacion
+from apps.citaciones.models.config import AtencionConfig
 
 # (Opcional) notificación por WS; si no está, no romper
 try:
     from apps.citaciones.ws import push_propuesta_director
 except Exception:  # en tests/ambientes sin WS
     def push_propuesta_director(_payload):
-        # En entornos donde no haya WebSockets configurados simplemente no hacemos nada
         return
 
 
 def _obtener_o_acumular_citacion(estudiante, kdx_registro, motivo_txt, duracion_base=30):
     """
-    Reutiliza una citación pendiente del estudiante (si ya tiene una
-    PARA EL MISMO DÍA del registro de kárdex), acumulando:
-      - la duración (duracion_min)
-      - el texto del motivo (motivo_resumen)
+    Si el estudiante YA tiene una citación (ABIERTA / AGENDADA / NOTIFICADA)
+    para el MISMO DÍA del registro de kárdex:
+        ➜ no crea nueva citación,
+        ➜ solo aumenta la duración de la misma (+15 min)
+        ➜ concatena el motivo.
 
-    Si no existe citación para ese día, crea una nueva.
+    Si NO tiene citación ese día:
+        ➜ crea una nueva con duración base (config).
 
-    Idea M/M/1: para un mismo día y estudiante tenemos un solo "cliente"
-    en la cola, pero con mayor tiempo de servicio.
+    Esto mantiene la idea M/M/1: un solo cliente en la cola por día,
+    pero con mayor tiempo de servicio cuando se acumulan faltas.
     """
     motivo_txt = (motivo_txt or "").strip()
+    cfg = AtencionConfig.objects.first()
+    dur_def = int(getattr(cfg, "duracion_por_defecto", duracion_base) or duracion_base)
 
     with transaction.atomic():
-        # Buscar citación del mismo estudiante y MISMO DÍA del kardex_registro
         existente = (
             Citacion.objects
             .select_for_update()
@@ -43,19 +46,20 @@ def _obtener_o_acumular_citacion(estudiante, kdx_registro, motivo_txt, duracion_
                     Citacion.Estado.AGENDADA,
                     Citacion.Estado.NOTIFICADA,
                 ],
-                kardex_registro__fecha=kdx_registro.fecha,  # 👈 clave: mismo día
+                kardex_registro__fecha=kdx_registro.fecha,
             )
             .order_by("creado_en")
             .first()
         )
 
         if existente is not None:
-            # --- ACUMULAR EN LA EXISTENTE ---
-            existente.duracion_min = (existente.duracion_min or 0) + int(duracion_base or 0)
+            # incremento fijo de 15 min por nueva falta en el mismo día
+            incremento = 15
+            base = int(existente.duracion_min or dur_def)
+            existente.duracion_min = base + incremento
 
             if motivo_txt:
                 if existente.motivo_resumen:
-                    # Evitar repetir exactamente el mismo texto muchas veces
                     if motivo_txt not in existente.motivo_resumen:
                         existente.motivo_resumen = (
                             f"{existente.motivo_resumen}; {motivo_txt}"
@@ -66,13 +70,13 @@ def _obtener_o_acumular_citacion(estudiante, kdx_registro, motivo_txt, duracion_
             existente.save(update_fields=["duracion_min", "motivo_resumen", "actualizado_en"])
             return existente, False
 
-        # --- NO HABÍA CITACIÓN PARA ESE DÍA → CREAMOS UNA NUEVA ---
+        # primera falta del día → duración base
         nueva = Citacion.objects.create(
             estudiante=estudiante,
             kardex_registro=kdx_registro,
             motivo_resumen=motivo_txt[:160] if motivo_txt else "",
             estado=Citacion.Estado.ABIERTA,
-            duracion_min=int(duracion_base or 0) or 30,
+            duracion_min=dur_def,
         )
         return nueva, True
 
@@ -87,25 +91,23 @@ def generar_citacion_desde_kardex(sender, instance: KardexRegistro, created, **k
       1) Citación DIRECTA (campo `directa` del KardexItem)
       2) Citación por ACUMULACIÓN (campos `umbral` y `ventana_dias`)
 
-    En ambos casos, si el estudiante ya tiene una citación
-    ABIERTA / AGENDADA / NOTIFICADA para el MISMO DÍA,
-    no se crea una nueva, sino que se acumula duración y motivo
-    en la existente.
+    En ambos casos se respeta:
+      ➜ si el estudiante ya tiene citación ABIERTA/AGENDADA/NOTIFICADA
+         para el MISMO DÍA, se acumula tiempo y motivo en esa misma citación
+         (no se crea una nueva).
     """
     if not created:
         return
 
-    est = instance.estudiante
-    item = instance.kardex_item
+    item = getattr(instance, "kardex_item", None)
+    est = getattr(instance, "estudiante", None)
+    if not item or not est or not getattr(item, "activo", True):
+        return
 
-    # Texto base del motivo (puedes ajustarlo si usas otro campo)
-    motivo_txt = str(item)
+    motivo_txt = (getattr(item, "descripcion", "") or "").strip() or "Motivo de citación"
 
-    # ------------------------------------------------------------------
-    # 1) REGLA DIRECTA
-    # ------------------------------------------------------------------
-    directa = bool(getattr(item, "directa", False))
-    if directa:
+    # 1) DIRECTA
+    if getattr(item, "directa", 0):
         # Por seguridad: si este registro YA tiene citación vinculada, no duplicar
         if Citacion.objects.filter(kardex_registro=instance).exists():
             return
@@ -116,7 +118,6 @@ def generar_citacion_desde_kardex(sender, instance: KardexRegistro, created, **k
             motivo_txt=motivo_txt,
             duracion_base=30,
         )
-
         try:
             razon = "Directa (nueva)" if creada else "Directa (acumulada)"
             push_propuesta_director({
@@ -129,28 +130,18 @@ def generar_citacion_desde_kardex(sender, instance: KardexRegistro, created, **k
                 "sugerido": None,
             })
         except Exception:
-            # No queremos que un fallo de WS rompa el flujo
             pass
-
-        # Si es directa, no seguimos con acumulación
         return
 
-    # ------------------------------------------------------------------
-    # 2) REGLA POR ACUMULACIÓN
-    # ------------------------------------------------------------------
+    # 2) ACUMULACIÓN
     umbral = int(getattr(item, "umbral", 0) or 0)
     ventana = int(getattr(item, "ventana_dias", 0) or 0)
-
     if umbral <= 0:
         return
-
     if ventana <= 0 or ventana > 15:
         ventana = 15
 
-    hoy = now().date()
-    desde = hoy - timedelta(days=ventana)
-
-    # Cuántos registros de este ítem tiene el estudiante en la ventana
+    desde = now().date() - timedelta(days=ventana)
     total = (
         KardexRegistro.objects
         .filter(
@@ -160,7 +151,6 @@ def generar_citacion_desde_kardex(sender, instance: KardexRegistro, created, **k
         )
         .count()
     )
-
     if total < umbral:
         # Todavía no alcanza el umbral
         return
@@ -180,7 +170,6 @@ def generar_citacion_desde_kardex(sender, instance: KardexRegistro, created, **k
             razon = f"{razon_base}, nueva)"
         else:
             razon = f"{razon_base}, acumulada)"
-
         push_propuesta_director({
             "citacion_id": c.id,
             "estudiante": str(est),
