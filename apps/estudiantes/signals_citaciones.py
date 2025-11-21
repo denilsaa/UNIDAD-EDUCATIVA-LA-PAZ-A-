@@ -19,21 +19,20 @@ except Exception:  # en tests/ambientes sin WS
 
 def _obtener_o_acumular_citacion(estudiante, kdx_registro, motivo_txt, duracion_base=30):
     """
-    Reutiliza una citación pendiente del estudiante (si ya tiene una)
-    acumulando:
+    Reutiliza una citación pendiente del estudiante (si ya tiene una
+    PARA EL MISMO DÍA del registro de kárdex), acumulando:
       - la duración (duracion_min)
       - el texto del motivo (motivo_resumen)
 
-    Si no existe citación pendiente, crea una nueva.
+    Si no existe citación para ese día, crea una nueva.
 
-    Mientras el estudiante tenga una citación ABIERTA / AGENDADA / NOTIFICADA,
-    los nuevos registros de kárdex no generan otra cita, sino que se suman a la misma
-    (idea de cola M/M/1: un solo cliente con mayor tiempo de servicio).
+    Idea M/M/1: para un mismo día y estudiante tenemos un solo "cliente"
+    en la cola, pero con mayor tiempo de servicio.
     """
     motivo_txt = (motivo_txt or "").strip()
 
     with transaction.atomic():
-        # Buscar alguna citación pendiente para este estudiante
+        # Buscar citación del mismo estudiante y MISMO DÍA del kardex_registro
         existente = (
             Citacion.objects
             .select_for_update()
@@ -44,6 +43,7 @@ def _obtener_o_acumular_citacion(estudiante, kdx_registro, motivo_txt, duracion_
                     Citacion.Estado.AGENDADA,
                     Citacion.Estado.NOTIFICADA,
                 ],
+                kardex_registro__fecha=kdx_registro.fecha,  # 👈 clave: mismo día
             )
             .order_by("creado_en")
             .first()
@@ -66,7 +66,7 @@ def _obtener_o_acumular_citacion(estudiante, kdx_registro, motivo_txt, duracion_
             existente.save(update_fields=["duracion_min", "motivo_resumen", "actualizado_en"])
             return existente, False
 
-        # --- NO HABÍA CITACIÓN PENDIENTE → CREAMOS UNA NUEVA ---
+        # --- NO HABÍA CITACIÓN PARA ESE DÍA → CREAMOS UNA NUEVA ---
         nueva = Citacion.objects.create(
             estudiante=estudiante,
             kardex_registro=kdx_registro,
@@ -87,8 +87,10 @@ def generar_citacion_desde_kardex(sender, instance: KardexRegistro, created, **k
       1) Citación DIRECTA (campo `directa` del KardexItem)
       2) Citación por ACUMULACIÓN (campos `umbral` y `ventana_dias`)
 
-    En ambos casos, si el estudiante ya tiene una citación ABIERTA/AGENDADA/NOTIFICADA,
-    no se crea una nueva, sino que se acumula duración y motivo en la existente.
+    En ambos casos, si el estudiante ya tiene una citación
+    ABIERTA / AGENDADA / NOTIFICADA para el MISMO DÍA,
+    no se crea una nueva, sino que se acumula duración y motivo
+    en la existente.
     """
     if not created:
         return
@@ -174,7 +176,11 @@ def generar_citacion_desde_kardex(sender, instance: KardexRegistro, created, **k
 
     try:
         razon_base = f"Acumulación (≥{umbral} en {ventana} días"
-        razon = razon_base + (", nueva)" if creada else ", acumulada)")
+        if creada:
+            razon = f"{razon_base}, nueva)"
+        else:
+            razon = f"{razon_base}, acumulada)"
+
         push_propuesta_director({
             "citacion_id": c.id,
             "estudiante": str(est),
