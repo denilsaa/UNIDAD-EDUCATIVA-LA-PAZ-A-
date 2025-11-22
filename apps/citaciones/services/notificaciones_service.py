@@ -8,11 +8,13 @@ from apps.notificaciones.models.notificacion import Notificacion
 
 def notificar_citacion_aprobada(citacion, receptor_id: int) -> Notificacion:
     """
-    Crea un registro en notificaciones_notificacion y envía un mensaje
-    por WebSocket al padre/madre/tutor.
+    Crea una notificación para la citación aprobada y la envía por WebSocket
+    al usuario padre/madre/tutor con id = receptor_id.
 
-    Se asegura de rellenar 'actualizado_en' para evitar el error
-    "Column 'actualizado_en' cannot be null".
+    - Guarda un registro en la tabla notificaciones_notificacion
+    - Marca estado_entrega = PENDIENTE (equivale a "no leída")
+    - Rellena actualizado_en para evitar errores NOT NULL en MySQL
+    - Publica un mensaje en el grupo "user-<id>" que consume el NotifConsumer
     """
     ts = now()
     mensaje = (
@@ -32,9 +34,9 @@ def notificar_citacion_aprobada(citacion, receptor_id: int) -> Notificacion:
             "estudiante_id": citacion.estudiante_id,
         },
         estado_entrega=Notificacion.Estado.PENDIENTE,
-        enviada_en=ts,        # ts_creacion
-        actualizado_en=ts,    # ⚠️ este campo es NOT NULL en MySQL
-        # entregada_en y leida_en los dejamos en NULL (permitido)
+        enviada_en=ts,       # ts_creacion
+        actualizado_en=ts,   # este campo es NOT NULL en la BD
+        # entregada_en y leida_en se dejan en NULL (permitido)
     )
 
     # 2) Payload que espera base_dashboard.js en el WebSocket
