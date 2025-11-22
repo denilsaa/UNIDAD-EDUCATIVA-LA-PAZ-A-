@@ -1,13 +1,15 @@
 # apps/citaciones/services/agenda_service.py
 from datetime import datetime, timedelta, time
-from django.utils.timezone import localdate
+
+from django.utils.timezone import localdate, now
+
 from apps.citaciones.models.config import AtencionConfig
 from apps.citaciones.models.citacion import Citacion
 
 HABILES = {0, 1, 2, 3, 4}  # L-V
 
 
-def _cfg() -> AtencionConfig:
+def _cfg() -> AtencionConfig | None:
     return AtencionConfig.objects.first()
 
 
@@ -49,7 +51,10 @@ def _hay_solape(fecha, hora_ini: time, duracion_min: int) -> bool:
     for c in qs:
         if not c.hora_citacion:
             continue
-        ini_exist, fin_exist = _ocupa_rango(c.hora_citacion, int(c.duracion_min or 30))
+        ini_exist, fin_exist = _ocupa_rango(
+            c.hora_citacion,
+            int(c.duracion_min or 30),
+        )
         if _se_solapa(ini_nuevo, fin_nuevo, ini_exist, fin_exist):
             return True
     return False
@@ -60,46 +65,73 @@ def _hay_solape(fecha, hora_ini: time, duracion_min: int) -> bool:
 # ======================
 def next_free_slot(duracion_min: int | None = None, desde: datetime | None = None):
     """
-    Busca el siguiente hueco libre a partir de hoy (o de `desde`)
-    respetando la configuración de atención y las citaciones ya agendadas.
+    Busca el siguiente hueco libre respetando:
 
+    - Horario de atención configurado (hora_inicio, hora_fin)
+    - Días hábiles (L-V)
+    - Citaciones ya AGENDADAS/NOTIFICADAS (no solapar)
+    - Momento actual: si ya pasó el horario de hoy, empieza desde el
+      siguiente día hábil.
+
+    Si `desde` es None, se toma como referencia la hora actual.
+    Si `desde` tiene valor, se simula como si la citación llegara en ese instante.
     Retorna: (fecha, hora)
     """
     cfg = _cfg()
     if cfg is None:
-        # Valores por defecto si no hay configuración
+        # Sin configuración: fallback básico
         duracion_min = duracion_min or 30
-        hoy = localdate()
-        return hoy, time(8, 0)
+        ref = desde or now()
+        return ref.date(), time(8, 0)
 
-    duracion_min = duracion_min or int(cfg.duracion_por_defecto or 30)
+    # Duración por defecto si no se especifica
+    duracion_min = duracion_min or int(
+        getattr(cfg, "duracion_por_defecto", 30) or 30
+    )
 
-    hoy = localdate()
-    if desde is not None:
-        # si se nos pasa un datetime de referencia, arrancamos desde ahí
-        hoy = desde.date()
+    # Punto de referencia: ahora mismo si no se pasa `desde`
+    ref: datetime = desde or now()
+    fecha_ref = ref.date()
+    minutos_ref = ref.hour * 60 + ref.minute
 
-    fecha = hoy
+    fecha = fecha_ref
     while True:
+        # Saltar días no hábiles
         if not _es_habil(fecha):
             fecha += timedelta(days=1)
             continue
 
         hi, hf = _rangohoras(cfg)
+        hi_min = _to_min(hi)
         hf_min = _to_min(hf)
 
-        # Empezar desde el inicio o desde la hora sugerida por `desde`
-        if desde is not None and fecha == desde.date():
-            current_min = max(_to_min(hi), _to_min(desde.time()))
+        if fecha == fecha_ref:
+            # Mismo día de la referencia:
+            # - Si aún no empieza la jornada -> hora_inicio
+            # - Si estamos dentro -> desde ahora
+            # - Si ya pasó la jornada -> este día no sirve
+            current_min = max(hi_min, minutos_ref)
         else:
-            current_min = _to_min(hi)
+            # Días siguientes empiezan en hora_inicio
+            current_min = hi_min
 
+        # Si ya no cabe en el día, pasar al siguiente hábil
+        if current_min + duracion_min > hf_min:
+            fecha += timedelta(days=1)
+            continue
+
+        # Buscar primer hueco libre de este día
         while current_min + duracion_min <= hf_min:
             h = time(current_min // 60, current_min % 60)
+
+            # No solapar con citaciones ya agendadas/notificadas
             if not _hay_solape(fecha, h, duracion_min):
                 return fecha, h
-            current_min += cfg.slot_min or 5
 
+            # Avanzar por slots (minutos_por_slot)
+            current_min += getattr(cfg, "minutos_por_slot", 5) or 5
+
+        # Si no cupo en este día, intentar con el siguiente
         fecha += timedelta(days=1)
 
 
@@ -111,7 +143,14 @@ def agendar(citacion: Citacion, duracion_min: int | None = None) -> Citacion:
     citacion.fecha_citacion = fecha
     citacion.hora_citacion = hora
     citacion.estado = Citacion.Estado.AGENDADA
-    citacion.save(update_fields=["fecha_citacion", "hora_citacion", "estado", "actualizado_en"])
+    citacion.save(
+        update_fields=[
+            "fecha_citacion",
+            "hora_citacion",
+            "estado",
+            "actualizado_en",
+        ]
+    )
     return citacion
 
 
@@ -131,9 +170,11 @@ def reordenar_dia_por_peso(fecha):
         # valores por defecto si no hay config
         hora_inicio = time(8, 0)
         hora_fin = time(12, 0)
+        dur_def = 30
     else:
         hora_inicio = getattr(cfg, "hora_inicio", time(8, 0))
         hora_fin = getattr(cfg, "hora_fin", time(12, 0))
+        dur_def = getattr(cfg, "duracion_por_defecto", 30) or 30
 
     def _to_min_local(t: time) -> int:
         return t.hour * 60 + t.minute
@@ -154,8 +195,8 @@ def reordenar_dia_por_peso(fecha):
     # Vamos asignando horas una tras otra desde la hora de inicio
     current_min = hi_min
     for c in citas:
-        dur = int(c.duracion_min or getattr(cfg, "duracion_por_defecto", 30))
-        # si ya no cabe en el día, salimos (opcional: podrías mandarla al día siguiente)
+        dur = int(c.duracion_min or dur_def)
+        # si ya no cabe en el día, salimos (opcional: podrías moverla al día siguiente)
         if current_min + dur > hf_min:
             break
 
