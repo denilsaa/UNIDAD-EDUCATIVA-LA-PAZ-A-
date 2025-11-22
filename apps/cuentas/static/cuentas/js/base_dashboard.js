@@ -110,12 +110,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function addNotifRow(html) {
     if (!panelContent) return;
+
+    // Quitar el texto "Sin notificaciones aún" si existe
+    const empty = panelContent.querySelector("[data-no-notifs]");
+    if (empty) empty.remove();
+
     const row = document.createElement("div");
     row.style.padding = "8px 0";
     row.style.borderBottom = "1px solid #f3f3f3";
     row.innerHTML = html;
     panelContent.prepend(row);
   }
+
 
   const notifs = new WebSocket(WS(`/ws/notifs/?uid=${uid}`));
   notifs.onopen  = () => console.log("[WS NOTIFS] OPEN");

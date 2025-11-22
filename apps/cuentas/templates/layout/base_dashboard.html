@@ -95,8 +95,14 @@
           <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
             <path d="M12 2a6 6 0 0 0-6 6v3.586l-.707.707A1 1 0 0 0 6 14h12a1 1 0 0 0 .707-1.707L18 11.586V8a6 6 0 0 0-6-6zm0 20a3 3 0 0 0 2.995-2.824L15 19h-6a3 3 0 0 0 2.824 2.995L12 22z"/>
           </svg>
-          <!-- Badge que el WS actualiza -->
-          <span id="notif-badge" class="notif-badge">0</span>
+          <!-- Badge que el WS actualiza + valor inicial desde BD -->
+          <span
+            id="notif-badge"
+            class="notif-badge"
+            {% if not notif_panel_unread %}style="display:none"{% endif %}
+          >
+            {{ notif_panel_unread|default:0 }}
+          </span>
         </button>
       </div>
 
@@ -123,15 +129,36 @@
   </div>
 
   <!-- Panel lateral de notificaciones (opcional) -->
-  <aside id="notif-panel" class="notif-panel" hidden>
-    <header class="notif-panel__hdr">
-      <strong>Notificaciones</strong>
-      <button type="button" id="notif-close" class="notif-close" aria-label="Cerrar">✕</button>
-    </header>
-    <div class="notif-panel__content">
-      <p style="opacity:.7">Sin notificaciones aún.</p>
-    </div>
-  </aside>
+<aside id="notif-panel" class="notif-panel" hidden>
+  <header class="notif-panel__hdr">
+    <strong>Notificaciones</strong>
+    <button type="button" id="notif-close" class="notif-close" aria-label="Cerrar">✕</button>
+  </header>
+  <div class="notif-panel__content">
+    {% if notif_panel_list %}
+      {% for n in notif_panel_list %}
+        <div class="notif-item" style="padding:8px 0; border-bottom:1px solid #f3f3f3">
+          <strong>
+            {% if n.citacion_id %}
+              Citación #{{ n.citacion_id }}
+            {% else %}
+              Notificación
+            {% endif %}
+          </strong><br>
+          {% if n.citacion and n.citacion.estudiante %}
+            {{ n.citacion.estudiante }} —
+          {% endif %}
+          {{ n.cuerpo }}
+          <br>
+          <small style="opacity:.7">{{ n.enviada_en }}</small>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p data-no-notifs="1" style="opacity:.7">Sin notificaciones aún.</p>
+    {% endif %}
+  </div>
+</aside>
+
   {{ request.user.id|default:0|json_script:"user-id" }}
   {{ request.user.rol.nombre|default:''|json_script:"user-role" }}
 
