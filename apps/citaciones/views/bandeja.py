@@ -30,8 +30,17 @@ from django.shortcuts import render
 
 from apps.cuentas.roles import es_director
 from apps.citaciones.models.citacion import Citacion
-
-
+from apps.citaciones.forms import CitacionEditForm
+from apps.citaciones.models.citacion import Citacion
+from apps.citaciones.models.config import AtencionConfig
+from apps.citaciones.services import queue_service
+from apps.citaciones.services.agenda_service import suggest_free_slot
+from apps.citaciones.services.metrics_service import metrics_payload
+from apps.citaciones.services.notify_service import resolve_padres_ids
+from apps.citaciones.services.notificaciones_service import notificar_citacion_aprobada
+from apps.cuentas.roles import es_director
+from apps.citaciones.services.notify_service import resolve_padres_ids
+from apps.citaciones.services.notificaciones_service import notificar_citacion_aprobada
 @login_required
 @require_http_methods(["GET"])
 def pendientes(request):
@@ -114,6 +123,29 @@ def rechazar(request, pk: int):
     c = queue_service.rechazar(pk, request.user)
     return JsonResponse({"ok": True, "id": c.id, "estado": c.estado})
 
+@login_required
+@require_POST
+def notificar(request, pk: int):
+    if not es_director(request.user):
+        return HttpResponseForbidden()
+
+    c = get_object_or_404(Citacion, id=pk)
+
+    if c.estado != Citacion.Estado.NOTIFICADA:
+        c.estado = Citacion.Estado.NOTIFICADA
+        c.save(update_fields=["estado", "actualizado_en"])
+
+    enviados = 0
+    for padre_id in resolve_padres_ids(c.estudiante):
+        notificar_citacion_aprobada(c, receptor_id=padre_id)
+        enviados += 1
+
+    if enviados == 0:
+        return JsonResponse(
+            {"ok": False, "error": "No se encontró ningún padre vinculado al estudiante."}
+        )
+
+    return JsonResponse({"ok": True, "id": c.id, "estado": c.estado, "enviados": enviados})
 
 # ==============================
 #  Vista rango de agendadas

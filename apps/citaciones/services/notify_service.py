@@ -1,47 +1,53 @@
 # apps/citaciones/services/notify_service.py
 from typing import List
-from django.apps import apps
+from apps.cuentas.roles import es_padre as es_rol_padre
+
 
 def _es_usuario_padre(u) -> bool:
+    """
+    Devuelve True si el usuario tiene un rol de padre y está activo.
+
+    Usa apps.cuentas.roles.es_padre, que funciona aunque el rol se llame
+    'Padre', 'Padre de familia', etc. (porque busca el texto 'padre').
+    """
     try:
-        rol = getattr(u, "rol", None)
-        nombre = (getattr(rol, "nombre", "") or "").strip().lower()
-        return bool(nombre == "padre" and getattr(u, "is_activo", False))
+        return es_rol_padre(u) and getattr(u, "is_activo", False)
     except Exception:
         return False
 
+
 def resolve_padres_ids(estudiante) -> List[int]:
     """
-    Devuelve los user_id de los padres/tutores que deben recibir notificación.
-    Está escrito para 'adivinar' tu modelo sin romper si falta algo.
-    Ajusta este método a tu esquema real cuando lo tengas claro.
+    Devuelve los IDs de usuarios que deben recibir notificaciones de este
+    estudiante. Adaptado a tu modelo actual:
+
+      Estudiante.padre -> Usuario  (rol: 'Padre de familia')
     """
     if estudiante is None:
         return []
 
-    ids = set()
+    ids: set[int] = set()
 
-    # 1) M2M clásico: estudiante.padres (-> Usuario)
+    # 1) FK directo: Estudiante.padre
     try:
-        padres_m2m = getattr(estudiante, "padres", None)
-        if padres_m2m is not None:
-            for u in padres_m2m.all():
-                if _es_usuario_padre(u):
-                    ids.add(u.id)
+        u = getattr(estudiante, "padre", None)
+        if u and _es_usuario_padre(u):
+            ids.add(u.id)
     except Exception:
         pass
 
-    # 2) Reverse M2M/related_name: estudiante.usuarios (si lo usas así)
-    try:
-        usuarios_rel = getattr(estudiante, "usuarios", None)
-        if usuarios_rel is not None:
-            for u in usuarios_rel.all():
-                if _es_usuario_padre(u):
-                    ids.add(u.id)
-    except Exception:
-        pass
+    # 2) Si en algún momento usas M2M padres/usuarios, también los tomamos
+    for attr in ("padres", "usuarios"):
+        try:
+            rel = getattr(estudiante, attr, None)
+            if rel is not None:
+                for u in rel.all():
+                    if _es_usuario_padre(u):
+                        ids.add(u.id)
+        except Exception:
+            pass
 
-    # 3) Atributos FK comunes en escuelas: apoderado / tutor_*  (si existen)
+    # 3) Otros posibles nombres de FK (por si los usas en el futuro)
     for attr in ("apoderado", "tutor", "tutor_principal", "tutor_secundario"):
         try:
             u = getattr(estudiante, attr, None)
@@ -49,8 +55,5 @@ def resolve_padres_ids(estudiante) -> List[int]:
                 ids.add(u.id)
         except Exception:
             pass
-
-    # 4) Si tenías emails/teléfonos y un modelo intermedio (muy opcional):
-    #    puedes mapearlos a Usuario aquí si es necesario.
 
     return list(ids)

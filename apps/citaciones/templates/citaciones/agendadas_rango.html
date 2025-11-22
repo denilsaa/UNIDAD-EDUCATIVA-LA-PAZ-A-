@@ -53,8 +53,9 @@
               <td>{{ c.duracion_min }} min</td>
               <td>
                 <a href="{% url 'citaciones:editar_form' c.id %}" class="btn-editar">Editar</a>
+                <button class="btn-notificar" data-id="{{ c.id }}">Mandar notificación</button>
                 <button class="btn-eliminar btn-cancelar" data-id="{{ c.id }}">Cancelar</button>
-              </td>
+               </td>
             </tr>
           {% endfor %}
           </tbody>
@@ -68,28 +69,52 @@
   {% endif %}
 
 <script>
+function getCookie(name) {
+  const v = `; ${document.cookie}`.split(`; ${name}=`);
+  if (v.length === 2) return v.pop().split(";").shift();
+}
+
 async function post(url, data) {
   const body = new URLSearchParams(data || {});
   const resp = await fetch(url, {
-    method: 'POST',
-    headers: {'X-CSRFToken': getCookie('csrftoken')},
-    credentials: 'same-origin',
-    body
+    method: "POST",
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+      "X-CSRFToken": getCookie("csrftoken"),
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body,
   });
   return resp.json();
 }
-function getCookie(name){
-  const v = `; ${document.cookie}`.split(`; ${name}=`);
-  if (v.length === 2) return v.pop().split(';').shift();
-}
-document.addEventListener('click', async (e) => {
-  const b = e.target.closest('.btn-cancelar');
-  if (!b) return;
-  const id = b.dataset.id;
-  if (!confirm('¿Cancelar esta citación?')) return;
-  const r = await post(`/citaciones/${id}/rechazar/`);
-  if (r.ok) location.reload();
-  else alert(r.error || "Error al cancelar");
+
+document.addEventListener("click", async (e) => {
+  // Cancelar
+  const cancelBtn = e.target.closest(".btn-cancelar");
+  if (cancelBtn) {
+    const id = cancelBtn.dataset.id;
+    if (!confirm("¿Cancelar esta citación?")) return;
+    const r = await post(`/citaciones/${id}/rechazar/`);
+    if (r.ok) {
+      location.reload();
+    } else {
+      alert(r.error || "Error al cancelar");
+    }
+    return;
+  }
+
+  // Mandar notificación
+  const notifBtn = e.target.closest(".btn-notificar");
+  if (notifBtn) {
+    const id = notifBtn.dataset.id;
+    const r = await post(`/citaciones/${id}/notificar/`);
+    if (r.ok) {
+      alert("Notificación enviada al padre de familia.");
+    } else {
+      alert(r.error || "Error al enviar la notificación");
+    }
+  }
 });
 </script>
+
 {% endblock %}
