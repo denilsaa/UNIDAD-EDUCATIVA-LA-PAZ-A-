@@ -132,6 +132,10 @@ class AuthRequiredMiddleware:
     def __call__(self, request):
         path = request.path_info
 
+         # Permitir rutas API sin redirección ni render HTML
+        if path.startswith("/api/"):
+            return self.get_response(request)
+
         # Permitir las rutas exentas
         if any(pattern.match(path) for pattern in EXEMPT_URLS):
             return self.get_response(request)

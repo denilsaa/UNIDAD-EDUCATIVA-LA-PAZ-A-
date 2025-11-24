@@ -23,6 +23,7 @@ from apps.cuentas.views_dev import dev_404
 from django.conf import settings
 
 urlpatterns = [
+    path("api/v1/", include("apps.api.urls")),
     path("", login_view, name="home"),                      # ⬅️ raíz = login
     path("login/", login_view, name="login"),
     path("dashboard/director/", director_dashboard, name="director_dashboard"),
@@ -33,6 +34,7 @@ urlpatterns = [
     path("dev/404/", dev_404, name="dev_404"),
     path("citaciones/", include("apps.citaciones.urls", namespace="citaciones")),
     path("notifs/", include("apps.notificaciones.urls", namespace="notificaciones")),
+    
 
 ]
 if settings.DEBUG:
