@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ==========================
-  // Overlay global
+  // Overlay global "Procesando..."
   // ==========================
   function showOverlay() {
     if (document.getElementById("ui-lock")) return;
@@ -69,13 +69,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
   window.__uiLock = { show: showOverlay, hide: hideOverlay };
 
-  // Bloqueo global al hacer click en enlaces o botones
-  document.body.addEventListener("click", function (e) {
-    if (document.getElementById("ui-lock")) return; // Ya bloqueado
-    const target = e.target.closest("a[href], button[type=submit], input[type=submit]");
+  // ==========================
+  // Bloqueo global al hacer submit/click en botones principales
+  // ==========================
+  document.addEventListener("click", function (e) {
+    const target = e.target.closest("[data-ui-lock], button[type=submit], input[type=submit]");
     if (!target) return;
-    if (target.tagName === "A" && (target.getAttribute("href") || "").startsWith("#")) return;
-    if (e.target.closest('[data-ajax="1"], .btn-aprobar, .btn-rechazar')) return;
+
+    // Evita doble clic
+    if (target.dataset.uiLocking === "1") {
+      e.preventDefault();
+      return;
+    }
+    target.dataset.uiLocking = "1";
 
     (window.__uiLock?.show || showOverlay)();
 
@@ -149,7 +155,10 @@ document.addEventListener("DOMContentLoaded", function () {
     let socket;
 
     try {
-      socket = new WebSocket(buildWsUrl("/ws/notifs/"));
+      // 👇 AQUI VA EL CAMBIO IMPORTANTE: mandamos ?uid=<id>
+      const uid = (window.userData && window.userData.id) ? String(window.userData.id) : "";
+      const path = uid ? `/ws/notifs/?uid=${encodeURIComponent(uid)}` : "/ws/notifs/";
+      socket = new WebSocket(buildWsUrl(path));
     } catch (err) {
       console.error("[WS NOTIFS] Error al crear socket:", err);
       return;
