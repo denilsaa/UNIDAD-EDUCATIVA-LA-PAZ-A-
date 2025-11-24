@@ -1,24 +1,61 @@
-// -----------------------------------------------
-//  BASE DASHBOARD JS - COMPLETO
-// -----------------------------------------------
-
+// static/cuentas/js/base_dashboard.js
 document.addEventListener("DOMContentLoaded", function () {
 
-  // === Overlay global ===
+  // ==========================
+  // Helpers generales
+  // ==========================
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return decodeURIComponent(parts.pop().split(";").shift());
+    }
+    return null;
+  }
+
+  function buildWsUrl(path) {
+    const scheme = window.location.protocol === "https:" ? "wss" : "ws";
+    return `${scheme}://${window.location.host}${path}`;
+  }
+
+  function resetBadge() {
+    const badge = document.querySelector("#notif-badge");
+    if (!badge) return;
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
+
+  function incrementBadge(delta) {
+    const badge = document.querySelector("#notif-badge");
+    if (!badge) return;
+    const current = parseInt(badge.textContent || "0", 10) || 0;
+    const next = current + delta;
+    if (next <= 0) {
+      badge.textContent = "0";
+      badge.style.display = "none";
+    } else {
+      badge.textContent = String(next);
+      badge.style.display = "inline-block";
+    }
+  }
+
+  // ==========================
+  // Overlay global
+  // ==========================
   function showOverlay() {
     if (document.getElementById("ui-lock")) return;
     const ov = document.createElement("div");
     ov.id = "ui-lock";
     ov.innerHTML = '<div class="ui-lock__box"><div class="ui-lock__spinner"></div><p>Procesando…</p></div>';
     Object.assign(ov.style, {
-      position:"fixed",
-      inset:"0",
-      zIndex:"9999",
-      background:"rgba(255,255,255,.6)",
-      display:"flex",
-      alignItems:"center",
-      justifyContent:"center",
-      backdropFilter:"saturate(180%) blur(2px)"
+      position: "fixed",
+      inset: "0",
+      zIndex: "9999",
+      background: "rgba(255,255,255,.6)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      backdropFilter: "saturate(180%) blur(2px)"
     });
     document.body.appendChild(ov);
     document.body.style.overflow = "hidden";
@@ -32,8 +69,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   window.__uiLock = { show: showOverlay, hide: hideOverlay };
 
-  // === Bloqueo global al hacer click en enlaces o botones ===
-  document.body.addEventListener("click", function(e) {
+  // Bloqueo global al hacer click en enlaces o botones
+  document.body.addEventListener("click", function (e) {
     if (document.getElementById("ui-lock")) return; // Ya bloqueado
     const target = e.target.closest("a[href], button[type=submit], input[type=submit]");
     if (!target) return;
@@ -51,65 +88,22 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }, true);
 
-  // === Toggle panel notificaciones con animación ===
-  const bell = document.getElementById('notif-bell');
-  const panel = document.getElementById('notif-panel');
-  const closeBtn = document.getElementById('notif-close');
-
-  if (bell && panel && closeBtn) {
-    // Mostrar el panel
-    bell.addEventListener('click', () => {
-      panel.removeAttribute('hidden');
-      panel.classList.add('show'); // Asegúrate de tener transición en CSS
-    });
-
-    // Cerrar el panel
-    closeBtn.addEventListener('click', () => {
-      panel.classList.remove('show');
-      setTimeout(() => panel.setAttribute('hidden', ''), 300); // Duración de transición
-    });
-  }
-
-  // === Mensajes Django que desaparecen ===
-  const mensajes = document.querySelectorAll('.msg');
-  mensajes.forEach(msg => {
-    setTimeout(() => {
-      msg.style.opacity = '0';
-      msg.style.transform = 'translateY(-20px)';
-      setTimeout(() => msg.remove(), 500);
-    }, 5000);
-  });
-
-}); // Fin DOMContentLoaded
-
-
-// -----------------------------------------------
-//  WEBSOCKET NOTIFICACIONES
-// -----------------------------------------------
-(function () {
-  const uid = window.userData?.id || 0;
-  if (!uid) return;
-
-  const $ = (sel) => document.querySelector(sel);
-  const badge = $("#notif-badge");
-  const panel = $("#notif-panel");
-  const panelContent = panel?.querySelector(".notif-panel__content") || null;
-
-  const WS = (path) => {
-    const proto = location.protocol === "https:" ? "wss" : "ws";
-    return `${proto}://${location.host}${path}`;
-  };
-
-  function incBadge(n = 1) {
-    if (!badge) return;
-    const current = parseInt(badge.textContent || "0", 10) || 0;
-    const total = current + (parseInt(n, 10) || 0);
-    badge.textContent = total;
-    badge.style.display = total > 0 ? "inline-block" : "none";
-  }
+  // ==========================
+  // Panel de notificaciones
+  // ==========================
+  const bell = document.getElementById("notif-bell");
+  const panel = document.getElementById("notif-panel");
+  const closeBtn = document.getElementById("notif-close");
+  const panelContent = panel ? panel.querySelector(".notif-panel__content") : null;
+  const notifBadge = document.getElementById("notif-badge");
 
   function addNotifRow(html) {
     if (!panelContent) return;
+
+    // Quitar mensaje "Sin notificaciones aún" si existe
+    const empty = panelContent.querySelector("[data-no-notifs]");
+    if (empty) empty.remove();
+
     const row = document.createElement("div");
     row.style.padding = "8px 0";
     row.style.borderBottom = "1px solid #f3f3f3";
@@ -117,65 +111,147 @@ document.addEventListener("DOMContentLoaded", function () {
     panelContent.prepend(row);
   }
 
-  const notifs = new WebSocket(WS(`/ws/notifs/?uid=${uid}`));
-  notifs.onopen  = () => console.log("[WS NOTIFS] OPEN");
-  notifs.onclose = (e) => console.log("[WS NOTIFS] CLOSE", e.code, e.reason);
-  notifs.onerror = (e) => console.warn("[WS NOTIFS] ERROR", e);
+  if (bell && panel && closeBtn) {
+    // Mostrar el panel
+    bell.addEventListener("click", () => {
+      panel.removeAttribute("hidden");
+      panel.classList.add("show");
 
-  notifs.onmessage = (e) => {
-    let msg;
-    try { msg = JSON.parse(e.data); } catch { return; }
+      // Marcar todas como leídas cuando se abre el panel
+      fetch("/notifs/marcar-leidas/", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+        .then(r => (r.ok ? r.json() : Promise.reject(r)))
+        .then(data => {
+          if (data.ok) {
+            resetBadge();
+            console.log("[NOTIFS] Marcadas como leídas:", data.marcadas);
+          }
+        })
+        .catch(err => console.error("Error marcando notificaciones:", err));
+    });
 
-    if (msg.type === "notify.unread" && msg.event === "citacion") {
-      incBadge(msg.unread || 1);
-      addNotifRow(`
-        <strong>Citación #${msg.citacion_id || "—"}</strong><br>
-        <small>${msg.estudiante || ""} — ${msg.mensaje || "Nueva citación"}</small><br>
-        <small>${msg.cuando ? new Date(msg.cuando).toLocaleString() : ""}</small>
-      `);
+    // Cerrar el panel
+    closeBtn.addEventListener("click", () => {
+      panel.classList.remove("show");
+      setTimeout(() => panel.setAttribute("hidden", ""), 300);
+    });
+  }
+
+  // ==========================
+  // WebSocket de notificaciones
+  // ==========================
+  (function initNotifSocket() {
+    let socket;
+
+    try {
+      socket = new WebSocket(buildWsUrl("/ws/notifs/"));
+    } catch (err) {
+      console.error("[WS NOTIFS] Error al crear socket:", err);
       return;
     }
 
-    if (msg.type === "director.citacion" && msg.data) {
-      const d = msg.data;
-      addNotifRow(`
-        <strong>Propuesta de citación</strong><br>
-        <small>#${d.citacion_id || "—"} · ${d.estudiante || ""}</small><br>
-        <small>${d.motivo || ""} · ${d.razon || ""}</small><br>
-        <small>ρ≈${(d.rho || 0).toFixed(2)} · Wq≈${d.Wq ? d.Wq.toFixed(1) : "—"} min</small><br>
-        <small>Sugerido: ${d.sugerido ? new Date(d.sugerido).toLocaleString() : "—"}</small><br>
-        <a href="${location.origin}/citaciones/pendientes/"
-           class="btn btn-sm btn-primary"
-           style="margin-top:6px; display:inline-block;">
-           Revisar
-        </a>
-      `);
+    socket.onopen = function () {
+      console.log("[WS NOTIFS] OPEN");
+    };
+
+    socket.onclose = function (e) {
+      console.warn("[WS NOTIFS] CLOSE", e.code, e.reason || "");
+      // Si quieres reconectar automáticamente, puedes hacerlo aquí.
+    };
+
+    socket.onerror = function (e) {
+      console.error("[WS NOTIFS] ERROR", e);
+    };
+
+    socket.onmessage = function (e) {
+      let data;
+      try {
+        data = JSON.parse(e.data);
+      } catch (err) {
+        console.error("[WS NOTIFS] Mensaje inválido:", e.data);
+        return;
+      }
+
+      // Esperamos el payload que mandamos desde notificar_citacion_aprobada
+      // {
+      //   "type": "notify.unread",
+      //   "event": "citacion",
+      //   "citacion_id": ...,
+      //   "estudiante": "...",
+      //   "mensaje": "...",
+      //   "cuando": "...",
+      //   "unread": 1
+      // }
+
+      if (data.type === "notify.unread") {
+        console.log("[WS NOTIFS] Nueva notificación:", data);
+
+        incrementBadge(data.unread || 1);
+
+        const html = `
+          <strong>${data.event === "citacion" ? "Citación #" + data.citacion_id : "Notificación"}</strong><br>
+          ${data.estudiante ? data.estudiante + " — " : ""}${data.mensaje}<br>
+          <small style="opacity:.7">${data.cuando}</small>
+        `;
+        addNotifRow(html);
+      }
+    };
+  })();
+
+  // ==========================
+  // Otros WebSockets opcionales (cola, dashboard)
+  // ==========================
+  (function initColaSocket() {
+    let socket;
+    try {
+      socket = new WebSocket(buildWsUrl("/ws/cola/"));
+    } catch (err) {
+      console.error("[WS COLA] Error al crear socket:", err);
       return;
     }
 
-    console.log("[WS NOTIFS RAW]", msg);
-  };
-
-  // === WebSocket COLA ===
-  (function () {
-    const s = new WebSocket(WS("/ws/cola/"));
-    s.onopen = () => console.log("[WS COLA] OPEN");
-    s.onmessage = (e) => {
-      try { console.log("[WS COLA]", JSON.parse(e.data)); }
-      catch { console.log("[WS COLA]", e.data); }
+    socket.onopen = () => console.log("[WS COLA] OPEN");
+    socket.onclose = (e) => console.warn("[WS COLA] CLOSE", e.code, e.reason || "");
+    socket.onerror = (e) => console.error("[WS COLA] ERROR", e);
+    socket.onmessage = (e) => {
+      // Aquí puedes manejar mensajes de la cola si tu proyecto los usa
+      // console.log("[WS COLA] MSG", e.data);
     };
-    s.onclose = () => console.log("[WS COLA] CLOSE");
   })();
 
-  // === WebSocket DASHBOARD ===
-  (function () {
-    const s = new WebSocket(WS("/ws/dashboard/"));
-    s.onopen = () => console.log("[WS DASH] OPEN");
-    s.onmessage = (e) => {
-      try { console.log("[WS DASH]", JSON.parse(e.data)); }
-      catch { console.log("[WS DASH]", e.data); }
+  (function initDashSocket() {
+    let socket;
+    try {
+      socket = new WebSocket(buildWsUrl("/ws/dashboard/"));
+    } catch (err) {
+      console.error("[WS DASH] Error al crear socket:", err);
+      return;
+    }
+
+    socket.onopen = () => console.log("[WS DASH] OPEN");
+    socket.onclose = (e) => console.warn("[WS DASH] CLOSE", e.code, e.reason || "");
+    socket.onerror = (e) => console.error("[WS DASH] ERROR", e);
+    socket.onmessage = (e) => {
+      // Mensajes del dashboard en tiempo real (si los usas)
+      // console.log("[WS DASH] MSG", e.data);
     };
-    s.onclose = () => console.log("[WS DASH] CLOSE");
   })();
 
-})();
+  // ==========================
+  // Mensajes Django que desaparecen
+  // ==========================
+  const mensajes = document.querySelectorAll(".msg");
+  mensajes.forEach(msg => {
+    setTimeout(() => {
+      msg.style.opacity = "0";
+      msg.style.transform = "translateY(-20px)";
+      setTimeout(() => msg.remove(), 500);
+    }, 5000);
+  });
+
+}); // Fin DOMContentLoaded

@@ -194,3 +194,64 @@ tbody tr:hover {
     padding: 8px 10px;
   }
 }
+
+/* ====== MODAL LIGERO (CONFIRM / ALERT) ====== */
+.modal-lite {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+}
+
+.modal-lite.show {
+  display: flex;
+}
+
+.modal-lite__box {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1.5rem 1.8rem;
+  min-width: 280px;
+  max-width: 420px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35);
+}
+
+.modal-lite__title {
+  margin: 0 0 .5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.modal-lite__body {
+  margin: 0 0 1.2rem;
+  font-size: .95rem;
+  color: #4b5563;
+}
+
+.modal-lite__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .5rem;
+}
+
+.modal-lite__btn {
+  border: none;
+  border-radius: 999px;
+  padding: .4rem 1.2rem;
+  font-size: .9rem;
+  cursor: pointer;
+}
+
+.modal-lite__btn--ghost {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.modal-lite__btn--primary {
+  background: #2563eb;
+  color: #ffffff;
+}

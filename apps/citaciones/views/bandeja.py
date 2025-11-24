@@ -40,7 +40,24 @@ from apps.citaciones.services.notify_service import resolve_padres_ids
 from apps.citaciones.services.notificaciones_service import notificar_citacion_aprobada
 from apps.cuentas.roles import es_director
 from apps.citaciones.services.notify_service import resolve_padres_ids
+from datetime import timedelta
+from django.utils.timezone import localdate
+from django.http import JsonResponse, HttpResponseForbidden
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.decorators.http import require_http_methods, require_POST
+from django.contrib.auth.decorators import login_required
+from django.utils.dateparse import parse_date, parse_time
+
+from apps.citaciones.models.citacion import Citacion
+from apps.citaciones.models.config import AtencionConfig
+from apps.citaciones.forms import CitacionEditForm
+from apps.citaciones.services import queue_service
+from apps.citaciones.services.metrics_service import metrics_payload
+from apps.citaciones.services.agenda_service import suggest_free_slot
+from apps.citaciones.services.notify_service import resolve_padres_ids
 from apps.citaciones.services.notificaciones_service import notificar_citacion_aprobada
+from apps.cuentas.roles import es_director
+
 @login_required
 @require_http_methods(["GET"])
 def pendientes(request):
@@ -157,21 +174,40 @@ def agendadas_rango(request):
     if not es_director(request.user):
         return HttpResponseForbidden()
 
-    # Rangos por defecto: hoy ±3 días
     hoy = localdate()
+
+    # Si hoy es sábado (5) o domingo (6), mover al lunes siguiente
+    if hoy.weekday() >= 5:
+        offset = (7 - hoy.weekday()) % 7  # 2 para sábado, 1 para domingo
+        if offset == 0:
+            offset = 1
+        desde_base = hoy + timedelta(days=offset)
+    else:
+        # Lunes–viernes: usar el día actual
+        desde_base = hoy
+
     dias = int(request.GET.get("dias", 3) or 3)
+
+    # Si el usuario manda "desde" por GET, respetarlo.
+    # Si no manda nada, usamos el día hábil calculado arriba.
     desde_str = request.GET.get("desde")
-    desde = parse_date(desde_str) if desde_str else hoy - timedelta(days=dias)
+    desde = parse_date(desde_str) if desde_str else desde_base
+    if desde is None:
+        desde = desde_base
+
     hasta = desde + timedelta(days=dias)
 
-    qs = Citacion.objects.filter(
-        estado__in=[Citacion.Estado.AGENDADA, Citacion.Estado.NOTIFICADA],
-        fecha_citacion__gte=desde,
-        fecha_citacion__lte=hasta,
-    ).order_by("fecha_citacion", "hora_citacion")
+    qs = (
+        Citacion.objects.filter(
+            estado__in=[Citacion.Estado.AGENDADA, Citacion.Estado.NOTIFICADA],
+            fecha_citacion__gte=desde,
+            fecha_citacion__lte=hasta,
+        )
+        .order_by("fecha_citacion", "hora_citacion")
+    )
 
     # Agrupar por día
-    por_dia = {}
+    por_dia: dict = {}
     for c in qs:
         por_dia.setdefault(c.fecha_citacion, []).append(c)
 
@@ -190,6 +226,7 @@ def agendadas_rango(request):
         "next_desde": next_desde,
     }
     return render(request, "citaciones/agendadas_rango.html", ctx)
+
 
 
 @login_required
