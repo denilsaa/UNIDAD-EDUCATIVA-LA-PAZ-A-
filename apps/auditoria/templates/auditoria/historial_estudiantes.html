@@ -60,13 +60,15 @@
                   {{ log.get_accion_display }}
                 </span>
               </td>
-              <td data-label="Estudiante">
-                {% if log.estudiante %}
-                  {{ log.estudiante }}
-                {% else %}
-                  <span class="audit-muted">—</span>
-                {% endif %}
-              </td>
+           <td data-label="Estudiante">
+              {% if log.estudiante %}
+                {{ log.estudiante }}
+              {% elif log.estudiante_nombre %}
+                {{ log.estudiante_nombre }}
+              {% else %}
+                <span class="audit-muted">—</span>
+              {% endif %}
+            </td>
               <td data-label="Descripción">{{ log.descripcion }}</td>
               <td data-label="IP">{{ log.ip|default:"—" }}</td>
               <td data-label="Navegador" class="audit-ua">{{ log.user_agent }}</td>
