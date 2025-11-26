@@ -34,7 +34,8 @@ urlpatterns = [
     path("dev/404/", dev_404, name="dev_404"),
     path("citaciones/", include("apps.citaciones.urls", namespace="citaciones")),
     path("notifs/", include("apps.notificaciones.urls", namespace="notificaciones")),
-    
+    path("auditoria/", include("apps.auditoria.urls", namespace="auditoria")),
+
 
 ]
 if settings.DEBUG:

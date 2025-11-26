@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     "apps.estudiantes.apps.EstudiantesConfig",
     "apps.citaciones.apps.CitacionesConfig",
     "apps.notificaciones.apps.NotificacionesConfig",
-
+    "apps.auditoria.apps.AuditoriaConfig",
     "django_extensions",
 ]
 
@@ -80,6 +80,7 @@ MIDDLEWARE = [
     "apps.cuentas.middleware.DisableClientCacheMiddleware",
     "apps.cuentas.middleware.AuthRequiredMiddleware",
     "apps.cuentas.middleware.LastOKURLMiddleware",
+    "apps.auditoria.middleware.CurrentRequestMiddleware",
 ]
 
 ROOT_URLCONF = "configuraciones.urls"

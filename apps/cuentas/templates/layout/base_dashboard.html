@@ -29,7 +29,6 @@
         <div class="sidebar-image">
           <img src="{% static 'img/logo.png' %}" alt="Logo UE" />
         </div>
-
         <!-- Secciones -->
         <h2 class="sidenav-title">Secciones</h2>
         <ul class="sidenav-list">
@@ -46,10 +45,12 @@
             <li><a href="{% url 'cursos:crear_curso' %}">➕ Nuevo curso</a></li>
             <li><a href="{% url 'estudiantes:kardex_items_listar' %}">🗂️ Kárdex</a></li>
 
-            <!-- 👇 NUEVO: Bandeja de aprobación de citaciones -->
+            <!-- 👇 Bandejas de citaciones -->
             <li><a href="{% url 'citaciones:pendientes' %}">📑 Citaciones por aprobar</a></li>
             <li><a href="{% url 'citaciones:agendadas_rango' %}">📑 Citaciones agendadas</a></li>
 
+            <!-- 👇 NUEVO: Historial de estudiantes (auditoría) -->
+            <li><a href="{% url 'auditoria:historial_estudiantes' %}">📝 Historial estudiantes</a></li>
 
             <li class="sep"></li>
             <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
@@ -82,6 +83,8 @@
           <li class="sep"></li>
           <li><a href="{% url 'cuentas:logout' %}">🚪 Cerrar sesión</a></li>
         </ul>
+
+
       </nav>
     </aside>
 

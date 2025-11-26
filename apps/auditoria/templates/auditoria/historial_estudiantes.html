@@ -1,0 +1,92 @@
+{% extends "layout/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Historial de acciones sobre estudiantes{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'auditoria/css/historial_estudiantes.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="audit-wrapper">
+  <div class="audit-card">
+    <div class="audit-header">
+      <h1 class="audit-title">Historial de acciones sobre estudiantes</h1>
+      <p class="audit-subtitle">
+        Aquí puedes ver quién creó, modificó o eliminó estudiantes, con fecha, hora, IP y navegador.
+      </p>
+    </div>
+
+    <div class="audit-filters">
+      <label for="audit-search" class="audit-label">Buscar:</label>
+      <input
+        id="audit-search"
+        type="text"
+        class="audit-input"
+        placeholder="Filtrar por usuario, estudiante, descripción, IP o navegador..."
+        value="{{ q }}"
+        data-server-value="{{ q }}"
+      >
+      <button id="audit-clear" type="button" class="audit-btn-secondary">Limpiar</button>
+    </div>
+
+    <div class="audit-table-wrapper">
+      <table class="audit-table" id="audit-table">
+        <thead>
+          <tr>
+            <th>Fecha y hora</th>
+            <th>Usuario</th>
+            <th>Acción</th>
+            <th>Estudiante</th>
+            <th>Descripción</th>
+            <th>IP</th>
+            <th>Navegador</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+            <tr>
+              <td data-label="Fecha y hora">{{ log.creado_en }}</td>
+              <td data-label="Usuario">
+                {% if log.usuario %}
+                  {{ log.usuario }}
+                {% else %}
+                  <span class="audit-muted">—</span>
+                {% endif %}
+              </td>
+              <td data-label="Acción">
+                <span class="audit-badge audit-badge-{{ log.accion|lower }}">
+                  {{ log.get_accion_display }}
+                </span>
+              </td>
+              <td data-label="Estudiante">
+                {% if log.estudiante %}
+                  {{ log.estudiante }}
+                {% else %}
+                  <span class="audit-muted">—</span>
+                {% endif %}
+              </td>
+              <td data-label="Descripción">{{ log.descripcion }}</td>
+              <td data-label="IP">{{ log.ip|default:"—" }}</td>
+              <td data-label="Navegador" class="audit-ua">{{ log.user_agent }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="audit-empty">
+                No hay registros aún.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <p class="audit-note">
+      Mostrando hasta 500 registros más recientes.
+    </p>
+  </div>
+</div>
+
+<script src="{% static 'auditoria/js/historial_estudiantes.js' %}"></script>
+{% endblock %}

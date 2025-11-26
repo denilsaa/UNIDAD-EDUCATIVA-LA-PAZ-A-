@@ -1,0 +1,209 @@
+/* Contenedor general */
+.audit-wrapper {
+  padding: 1.5rem;
+}
+
+/* Tarjeta principal */
+.audit-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem 1.75rem;
+}
+
+/* Encabezado */
+.audit-title {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #0b2f6a; /* azul similar al menú lateral */
+}
+
+.audit-subtitle {
+  margin: 0.35rem 0 0;
+  color: #4a4a4a;
+  font-size: 0.9rem;
+}
+
+/* Filtros */
+.audit-filters {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.audit-label {
+  font-size: 0.9rem;
+  color: #0b2f6a;
+  font-weight: 600;
+}
+
+.audit-input {
+  flex: 1 1 220px;
+  min-width: 0;
+  border-radius: 4px;
+  border: 1px solid #cbd2e1;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.audit-input:focus {
+  border-color: #0b2f6a;
+  box-shadow: 0 0 0 1px rgba(11, 47, 106, 0.2);
+}
+
+/* Botón secundario */
+.audit-btn-secondary {
+  border-radius: 4px;
+  border: 1px solid #cbd2e1;
+  background: #f4f6fb;
+  color: #0b2f6a;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.audit-btn-secondary:hover {
+  background: #e3e7f5;
+  border-color: #0b2f6a;
+}
+
+/* Tabla */
+.audit-table-wrapper {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+
+.audit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.audit-table thead {
+  background: #0b2f6a; /* mismo azul del menú */
+  color: #ffffff;
+}
+
+.audit-table th,
+.audit-table td {
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid #e1e5f0;
+  text-align: left;
+}
+
+.audit-table th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.audit-table tbody tr:nth-child(even) {
+  background-color: #f7f9fc;
+}
+
+.audit-table tbody tr:hover {
+  background-color: #e9f0ff;
+}
+
+/* Estado vacío */
+.audit-empty {
+  text-align: center;
+  padding: 1.2rem 0.5rem;
+  color: #6b7280;
+}
+
+/* Badge de acción */
+.audit-badge {
+  display: inline-block;
+  padding: 0.18rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.audit-badge-crear {
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+}
+
+.audit-badge-editar {
+  background: rgba(59, 130, 246, 0.12);
+  color: #1d4ed8;
+}
+
+.audit-badge-eliminar {
+  background: rgba(239, 68, 68, 0.15);
+  color: #b91c1c;
+}
+
+/* User agent recortado */
+.audit-ua {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Texto apagado */
+.audit-muted {
+  opacity: 0.6;
+}
+
+/* Nota final */
+.audit-note {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .audit-card {
+    padding: 1rem 1.1rem;
+  }
+
+  .audit-table thead {
+    display: none;
+  }
+
+  .audit-table,
+  .audit-table tbody,
+  .audit-table tr,
+  .audit-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .audit-table tr {
+    margin-bottom: 0.6rem;
+    border-radius: 6px;
+    border: 1px solid #e1e5f0;
+    overflow: hidden;
+    background: #ffffff;
+  }
+
+  .audit-table td {
+    border: none;
+    border-bottom: 1px solid #eef2ff;
+    position: relative;
+    padding-left: 40%;
+  }
+
+  .audit-table td:last-child {
+    border-bottom: none;
+  }
+
+  .audit-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0.6rem;
+    top: 0.45rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: #4b5563;
+  }
+}
