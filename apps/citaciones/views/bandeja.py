@@ -58,16 +58,33 @@ from apps.citaciones.services.notify_service import resolve_padres_ids
 from apps.citaciones.services.notificaciones_service import notificar_citacion_aprobada
 from apps.cuentas.roles import es_director
 
+
+def _es_secretaria(user):
+    """
+    Devuelve True si el usuario tiene rol Secretaría.
+    """
+    nombre = getattr(getattr(user, "rol", None), "nombre", "") or ""
+    return nombre.lower() in ("secretaria", "secretaría")
+
+
+def _puede_manejar_citaciones(user):
+    """
+    Director y Secretaría pueden ver y gestionar citaciones.
+    """
+    return es_director(user) or _es_secretaria(user)
+
+
 @login_required
 @require_http_methods(["GET"])
 def pendientes(request):
-    if not es_director(request.user):
+    if not _puede_manejar_citaciones(request.user):
         return HttpResponseForbidden()
 
     # Ordenar por peso: mayor duración primero, luego por fecha de creación
-    qs = (Citacion.objects
-          .filter(estado=Citacion.Estado.ABIERTA)
-          .order_by("-duracion_min", "-creado_en"))
+    qs = (
+        Citacion.objects.filter(estado=Citacion.Estado.ABIERTA)
+        .order_by("-duracion_min", "-creado_en")
+    )
 
     # Configuración de duración por defecto
     cfg = AtencionConfig.objects.first()
@@ -107,23 +124,27 @@ def pendientes(request):
 @login_required
 @require_POST
 def aprobar(request, pk: int):
-    if not es_director(request.user):
+    if not _puede_manejar_citaciones(request.user):
         return HttpResponseForbidden()
+
     c = queue_service.aprobar(pk, request.user)
-    return JsonResponse({
-        "ok": True,
-        "id": c.id,
-        "estado": c.estado,
-        "fecha": c.fecha_citacion.isoformat() if c.fecha_citacion else None,
-        "hora": c.hora_citacion.strftime("%H:%M") if c.hora_citacion else None,
-    })
+    return JsonResponse(
+        {
+            "ok": True,
+            "id": c.id,
+            "estado": c.estado,
+            "fecha": c.fecha_citacion.isoformat() if c.fecha_citacion else None,
+            "hora": c.hora_citacion.strftime("%H:%M") if c.hora_citacion else None,
+        }
+    )
 
 
 @login_required
 @require_POST
 def editar(request, pk: int):
-    if not es_director(request.user):
+    if not _puede_manejar_citaciones(request.user):
         return HttpResponseForbidden()
+
     fecha = parse_date(request.POST.get("fecha"))
     hora = parse_time(request.POST.get("hora"))
     dur = request.POST.get("duracion_min")
@@ -135,15 +156,17 @@ def editar(request, pk: int):
 @login_required
 @require_POST
 def rechazar(request, pk: int):
-    if not es_director(request.user):
+    if not _puede_manejar_citaciones(request.user):
         return HttpResponseForbidden()
+
     c = queue_service.rechazar(pk, request.user)
     return JsonResponse({"ok": True, "id": c.id, "estado": c.estado})
+
 
 @login_required
 @require_POST
 def notificar(request, pk: int):
-    if not es_director(request.user):
+    if not _puede_manejar_citaciones(request.user):
         return HttpResponseForbidden()
 
     c = get_object_or_404(Citacion, id=pk)
@@ -159,19 +182,26 @@ def notificar(request, pk: int):
 
     if enviados == 0:
         return JsonResponse(
-            {"ok": False, "error": "No se encontró ningún padre vinculado al estudiante."}
+            {
+                "ok": False,
+                "error": "No se encontró ningún padre vinculado al estudiante.",
+            }
         )
 
-    return JsonResponse({"ok": True, "id": c.id, "estado": c.estado, "enviados": enviados})
+    return JsonResponse(
+        {"ok": True, "id": c.id, "estado": c.estado, "enviados": enviados}
+    )
+
 
 # ==============================
 #  Vista rango de agendadas
 # ==============================
 
+
 @login_required
 @require_http_methods(["GET"])
 def agendadas_rango(request):
-    if not es_director(request.user):
+    if not _puede_manejar_citaciones(request.user):
         return HttpResponseForbidden()
 
     hoy = localdate()
@@ -207,7 +237,7 @@ def agendadas_rango(request):
     )
 
     # Agrupar por día
-    por_dia: dict = {}
+    por_dia = {}
     for c in qs:
         por_dia.setdefault(c.fecha_citacion, []).append(c)
 
@@ -228,12 +258,12 @@ def agendadas_rango(request):
     return render(request, "citaciones/agendadas_rango.html", ctx)
 
 
-
 @login_required
 @require_http_methods(["GET", "POST"])
 def editar_form(request, pk: int):
-    if not es_director(request.user):
+    if not _puede_manejar_citaciones(request.user):
         return HttpResponseForbidden()
+
     c = get_object_or_404(Citacion, id=pk)
 
     if request.method == "POST":
