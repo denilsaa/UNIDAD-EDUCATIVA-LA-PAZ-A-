@@ -29,62 +29,77 @@
         <div class="sidebar-image">
           <img src="{% static 'img/logo.png' %}" alt="Logo UE" />
         </div>
+
         <!-- Secciones -->
         <h2 class="sidenav-title">Secciones</h2>
         <ul class="sidenav-list">
-          {# --- Director --- #}
+
+          {# --- DIRECTOR: todo de todo --- #}
           {% if "director" in role %}
             <li><a href="{% url 'cuentas:director_dashboard' %}">📊 Resumen</a></li>
-            <li><a href="{% url 'cuentas:lista_personal' %}">👤 Usuarios</a></li>
-            <li><a href="{% url 'cursos:lista_cursos' %}">📚 Cursos</a></li>
 
+            <li><a href="{% url 'cuentas:lista_personal' %}">👤 Usuarios</a></li>
+
+            <li><a href="{% url 'cursos:lista_cursos' %}">📚 Cursos</a></li>
             <li><a href="{% url 'estudiantes:asistencia_calendario' %}">🗓️ Calendario asistencia</a></li>
             <li><a href="{% url 'cursos:lista_cursos' %}">📋 Tomar asistencia</a></li>
 
             <li><a href="{% url 'cuentas:crear_personal' %}">➕ Nuevo usuario</a></li>
             <li><a href="{% url 'cursos:crear_curso' %}">➕ Nuevo curso</a></li>
+
             <li><a href="{% url 'estudiantes:kardex_items_listar' %}">🗂️ Kárdex</a></li>
 
-            <!-- 👇 Bandejas de citaciones -->
             <li><a href="{% url 'citaciones:pendientes' %}">📑 Citaciones por aprobar</a></li>
             <li><a href="{% url 'citaciones:agendadas_rango' %}">📑 Citaciones agendadas</a></li>
 
-            <!-- 👇 NUEVO: Historial de estudiantes (auditoría) -->
             <li><a href="{% url 'auditoria:historial_estudiantes' %}">📝 Historial estudiantes</a></li>
 
             <li class="sep"></li>
             <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
             <li><a href="{% url 'estudiantes:crear' %}">➕ Nuevo estudiante</a></li>
+
             <li><a href="{% url 'cuentas:lista_padres' %}">👥 Padre de Familia</a></li>
             <li><a href="{% url 'cuentas:crear_padre' %}">➕ Nuevo Padre</a></li>
-          {# --- Regente --- #}
+
+          {# --- REGENTE: solo sobre sus cursos --- #}
           {% elif "regente" in role %}
             <li><a href="{% url 'cuentas:regente_dashboard' %}">📊 Resumen</a></li>
+
             <li><a href="{% url 'cursos:mis_cursos_regente' %}">📚 Mis cursos</a></li>
-            <!-- 👇 NUEVO: Tomar asistencia (Regente) va por sus cursos -->
+
+            {# Desde "Mis cursos" eliges curso para marcar asistencia y kárdex #}
+            <li><a href="{% url 'estudiantes:asistencia_calendario' %}">🗓️ Calendario asistencia</a></li>
             <li><a href="{% url 'cursos:mis_cursos_regente' %}">📋 Tomar asistencia</a></li>
 
-          {# --- Secretaría --- #}
+            {# Citaciones agendadas (la vista debe filtrar por cursos del regente) #}
+            <li><a href="{% url 'citaciones:agendadas_rango' %}">📑 Citaciones agendadas</a></li>
+
+          {# --- SECRETARÍA: gestiona alumnos, padres, cursos y citaciones --- #}
           {% elif "secretaria" in role or "secretaría" in role %}
             <li><a href="{% url 'cuentas:secretaria_dashboard' %}">📊 Resumen</a></li>
-            <li><a href="{% url 'cuentas:lista_usuarios' %}">📄 Usuarios</a></li>
-            <li class="sep"></li>
+
             <li><a href="{% url 'estudiantes:listar' %}">👥 Estudiantes</a></li>
             <li><a href="{% url 'estudiantes:crear' %}">➕ Nuevo estudiante</a></li>
-            <li><a href="{% url 'estudiantes:kardex_items_listar' %}">🗂️ Kárdex</a></li>
 
-          {# --- Padre de familia --- #}
+            <li><a href="{% url 'cuentas:lista_padres' %}">👥 Padre de Familia</a></li>
+            <li><a href="{% url 'cuentas:crear_padre' %}">➕ Nuevo Padre</a></li>
+
+            <li><a href="{% url 'cursos:lista_cursos' %}">📚 Cursos</a></li>
+            <li><a href="{% url 'cursos:crear_curso' %}">➕ Nuevo curso</a></li>
+
+            <li><a href="{% url 'citaciones:pendientes' %}">📑 Citaciones por aprobar</a></li>
+            <li><a href="{% url 'citaciones:agendadas_rango' %}">📑 Citaciones agendadas</a></li>
+
+          {# --- PADRE DE FAMILIA: solo ve a sus hijos --- #}
           {% elif "padre" in role %}
             <li><a href="{% url 'cuentas:padre_dashboard' %}">🏠 Inicio</a></li>
             <li><a href="{% url 'estudiantes:mis_hijos' %}">👨‍👩‍👧 Mis hijos</a></li>
-            <!-- Para ver asistencia, entra al detalle del hijo -->
+            {# Asistencia, kárdex y citaciones se ven en el detalle de cada hijo #}
           {% endif %}
 
           <li class="sep"></li>
           <li><a href="{% url 'cuentas:logout' %}">🚪 Cerrar sesión</a></li>
         </ul>
-
-
       </nav>
     </aside>
 
@@ -97,15 +112,15 @@
         <button id="notif-bell" class="notif-bell" type="button" aria-label="Notificaciones">
           <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
             <path d="M12 2a6 6 0 0 0-6 6v3.586l-.707.707A1 1 0 0 0 6 14h12a1 1 0 0 0 .707-1.707L18 11.586V8a6 6 0 0 0-6-6zm0 20a3 3 0 0 0 2.995-2.824L15 19h-6a3 3 0 0 0 2.824 2.995L12 22z"/>
-          </svg>
-          <!-- Badge que el WS actualiza + valor inicial desde BD -->
-          <span
-            id="notif-badge"
-            class="notif-badge"
-            {% if not notif_panel_unread %}style="display:none"{% endif %}
-          >
-            {{ notif_panel_unread|default:0 }}
-          </span>
+            </svg>
+            <!-- Badge que el WS actualiza + valor inicial desde BD -->
+            <span
+              id="notif-badge"
+              class="notif-badge"
+              {% if not notif_panel_unread %}style="display:none"{% endif %}
+            >
+              {{ notif_panel_unread|default:0 }}
+            </span>
         </button>
       </div>
 
@@ -131,36 +146,36 @@
     </main>
   </div>
 
-  <!-- Panel lateral de notificaciones (opcional) -->
-<aside id="notif-panel" class="notif-panel" hidden>
-  <header class="notif-panel__hdr">
-    <strong>Notificaciones</strong>
-    <button type="button" id="notif-close" class="notif-close" aria-label="Cerrar">✕</button>
-  </header>
-  <div class="notif-panel__content">
-    {% if notif_panel_list %}
-      {% for n in notif_panel_list %}
-        <div class="notif-item" style="padding:8px 0; border-bottom:1px solid #f3f3f3">
-          <strong>
-            {% if n.citacion_id %}
-              Citación #{{ n.citacion_id }}
-            {% else %}
-              Notificación
+  <!-- Panel lateral de notificaciones -->
+  <aside id="notif-panel" class="notif-panel" hidden>
+    <header class="notif-panel__hdr">
+      <strong>Notificaciones</strong>
+      <button type="button" id="notif-close" class="notif-close" aria-label="Cerrar">✕</button>
+    </header>
+    <div class="notif-panel__content">
+      {% if notif_panel_list %}
+        {% for n in notif_panel_list %}
+          <div class="notif-item" style="padding:8px 0; border-bottom:1px solid #f3f3f3">
+            <strong>
+              {% if n.citacion_id %}
+                Citación #{{ n.citacion_id }}
+              {% else %}
+                Notificación
+              {% endif %}
+            </strong><br>
+            {% if n.citacion and n.citacion.estudiante %}
+              {{ n.citacion.estudiante }} —
             {% endif %}
-          </strong><br>
-          {% if n.citacion and n.citacion.estudiante %}
-            {{ n.citacion.estudiante }} —
-          {% endif %}
-          {{ n.cuerpo }}
-          <br>
-          <small style="opacity:.7">{{ n.enviada_en }}</small>
-        </div>
-      {% endfor %}
-    {% else %}
-      <p data-no-notifs="1" style="opacity:.7">Sin notificaciones aún.</p>
-    {% endif %}
-  </div>
-</aside>
+            {{ n.cuerpo }}
+            <br>
+            <small style="opacity:.7">{{ n.enviada_en }}</small>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p data-no-notifs="1" style="opacity:.7">Sin notificaciones aún.</p>
+      {% endif %}
+    </div>
+  </aside>
 
   {{ request.user.id|default:0|json_script:"user-id" }}
   {{ request.user.rol.nombre|default:''|json_script:"user-role" }}
@@ -171,7 +186,7 @@
       role: JSON.parse(document.getElementById('user-role').textContent)
     };
   </script>
-  <!-- Scripts -->
+
   {% block extra_js %}
     <script src="{% static 'cuentas/js/base_dashboard.js' %}"></script>
   {% endblock %}
