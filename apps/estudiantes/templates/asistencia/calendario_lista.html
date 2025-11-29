@@ -15,9 +15,10 @@
 
 <div class="asistencia-container">
 
-  <!-- =========================
-       Configuración del Calendario
-       ========================= -->
+  {# =========================
+     Configuración del Calendario (SOLO DIRECTOR)
+     ========================= #}
+  {% if puede_configurar_calendario %}
   <div class="columna-calendario">
     <form method="post" class="form-calendario card shadow-lg rounded-4 overflow-hidden">
       {% csrf_token %}
@@ -63,6 +64,7 @@
       </div>
     </form>
   </div>
+  {% endif %}
 
   <!-- =========================
        Resumen mensual
@@ -120,7 +122,9 @@
       <tr>
         <th>Rango</th>
         <th>Activo</th>
-        <th>Acciones</th>
+        {% if puede_gestionar_exclusiones %}
+          <th>Acciones</th>
+        {% endif %}
       </tr>
     </thead>
     <tbody>
@@ -128,12 +132,18 @@
       <tr>
         <td>{{ c.fecha_inicio }} → {{ c.fecha_fin }}</td>
         <td>{{ c.activo|yesno:"Sí,No" }}</td>
-        <td>
-          <a class="btn-accion" href="{% url 'estudiantes:asistencia_exclusiones' c.id %}">Exclusiones</a>
-        </td>
+        {% if puede_gestionar_exclusiones %}
+          <td>
+            <a class="btn-accion" href="{% url 'estudiantes:asistencia_exclusiones' c.id %}">Exclusiones</a>
+          </td>
+        {% endif %}
       </tr>
       {% empty %}
-      <tr><td colspan="3" class="text-center">Sin calendarios.</td></tr>
+      <tr>
+        <td colspan="{% if puede_gestionar_exclusiones %}3{% else %}2{% endif %}" class="text-center">
+          Sin calendarios.
+        </td>
+      </tr>
       {% endfor %}
     </tbody>
   </table>

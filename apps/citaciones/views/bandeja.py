@@ -1,59 +1,20 @@
 # apps/citaciones/views/bandeja.py
-from django.http import JsonResponse, HttpResponseForbidden
-from django.shortcuts import render
-from django.views.decorators.http import require_http_methods, require_POST
-from django.contrib.auth.decorators import login_required
-from django.utils.dateparse import parse_date, parse_time
-
-from apps.citaciones.models.citacion import Citacion
-from apps.citaciones.models.config import AtencionConfig
-from apps.citaciones.services import queue_service
-from apps.cuentas.roles import es_director
-from django.shortcuts import get_object_or_404, redirect
-from apps.citaciones.forms import CitacionEditForm
-from apps.citaciones.services.metrics_service import metrics_payload
-
-from apps.citaciones.services.agenda_service import suggest_free_slot
-from apps.citaciones.services.metrics_service import metrics_payload
-
-from apps.citaciones.services import queue_service
-from apps.cuentas.roles import es_director
 
 from datetime import datetime, timedelta
-from django.utils.timezone import localdate
-from django.utils.dateparse import parse_date
-from django.db.models import Q
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponseForbidden
-from django.shortcuts import render
 
-from apps.cuentas.roles import es_director
-from apps.citaciones.models.citacion import Citacion
-from apps.citaciones.forms import CitacionEditForm
-from apps.citaciones.models.citacion import Citacion
-from apps.citaciones.models.config import AtencionConfig
-from apps.citaciones.services import queue_service
-from apps.citaciones.services.agenda_service import suggest_free_slot
-from apps.citaciones.services.metrics_service import metrics_payload
-from apps.citaciones.services.notify_service import resolve_padres_ids
-from apps.citaciones.services.notificaciones_service import notificar_citacion_aprobada
-from apps.cuentas.roles import es_director
-from apps.citaciones.services.notify_service import resolve_padres_ids
-from datetime import timedelta
-from django.utils.timezone import localdate
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.decorators.http import require_http_methods, require_POST
-from django.contrib.auth.decorators import login_required
 from django.utils.dateparse import parse_date, parse_time
+from django.utils.timezone import localdate
+from django.views.decorators.http import require_http_methods, require_POST
 
+from apps.citaciones.forms import CitacionEditForm
 from apps.citaciones.models.citacion import Citacion
 from apps.citaciones.models.config import AtencionConfig
-from apps.citaciones.forms import CitacionEditForm
 from apps.citaciones.services import queue_service
-from apps.citaciones.services.metrics_service import metrics_payload
 from apps.citaciones.services.agenda_service import suggest_free_slot
+from apps.citaciones.services.metrics_service import metrics_payload
 from apps.citaciones.services.notify_service import resolve_padres_ids
 from apps.citaciones.services.notificaciones_service import notificar_citacion_aprobada
 from apps.cuentas.roles import es_director
@@ -67,12 +28,24 @@ def _es_secretaria(user):
     return nombre.lower() in ("secretaria", "secretaría")
 
 
+def _es_regente(user):
+    """
+    Devuelve True si el usuario tiene rol Regente.
+    """
+    nombre = getattr(getattr(user, "rol", None), "nombre", "") or ""
+    return "regente" in nombre.lower()
+
+
 def _puede_manejar_citaciones(user):
     """
-    Director y Secretaría pueden ver y gestionar citaciones.
+    Director y Secretaría pueden ver y gestionar citaciones (aprobar, editar, cancelar, notificar).
     """
     return es_director(user) or _es_secretaria(user)
 
+
+# ==============================
+#  Bandeja pendientes (aprobación)
+# ==============================
 
 @login_required
 @require_http_methods(["GET"])
@@ -194,9 +167,8 @@ def notificar(request, pk: int):
 
 
 # ==============================
-#  Vista rango de agendadas
+#  Vista rango de agendadas (Director / Secretaría)
 # ==============================
-
 
 @login_required
 @require_http_methods(["GET"])
@@ -219,7 +191,6 @@ def agendadas_rango(request):
     dias = int(request.GET.get("dias", 3) or 3)
 
     # Si el usuario manda "desde" por GET, respetarlo.
-    # Si no manda nada, usamos el día hábil calculado arriba.
     desde_str = request.GET.get("desde")
     desde = parse_date(desde_str) if desde_str else desde_base
     if desde is None:
@@ -233,6 +204,7 @@ def agendadas_rango(request):
             fecha_citacion__gte=desde,
             fecha_citacion__lte=hasta,
         )
+        .select_related("estudiante", "estudiante__curso")
         .order_by("fecha_citacion", "hora_citacion")
     )
 
@@ -254,9 +226,81 @@ def agendadas_rango(request):
         "hoy": hoy,
         "prev_desde": prev_desde,
         "next_desde": next_desde,
+        "puede_gestionar_citaciones": True,
+        "url_base": "citaciones:agendadas_rango",
     }
     return render(request, "citaciones/agendadas_rango.html", ctx)
 
+
+# ==============================
+#  Vista rango de agendadas (Regente: solo sus cursos)
+# ==============================
+
+@login_required
+@require_http_methods(["GET"])
+def agendadas_mis_cursos(request):
+    """
+    Regente: ve citaciones AGENDADAS / NOTIFICADAS SOLO de los cursos donde él es regente.
+    No puede editarlas ni cancelarlas, solo consultar.
+    """
+    if not _es_regente(request.user):
+        return HttpResponseForbidden()
+
+    hoy = localdate()
+
+    if hoy.weekday() >= 5:
+        offset = (7 - hoy.weekday()) % 7
+        if offset == 0:
+            offset = 1
+        desde_base = hoy + timedelta(days=offset)
+    else:
+        desde_base = hoy
+
+    dias = int(request.GET.get("dias", 3) or 3)
+
+    desde_str = request.GET.get("desde")
+    desde = parse_date(desde_str) if desde_str else desde_base
+    if desde is None:
+        desde = desde_base
+
+    hasta = desde + timedelta(days=dias)
+
+    qs = (
+        Citacion.objects.filter(
+            estado__in=[Citacion.Estado.AGENDADA, Citacion.Estado.NOTIFICADA],
+            fecha_citacion__gte=desde,
+            fecha_citacion__lte=hasta,
+            estudiante__curso__regente=request.user,
+        )
+        .select_related("estudiante", "estudiante__curso")
+        .order_by("fecha_citacion", "hora_citacion")
+    )
+
+    por_dia = {}
+    for c in qs:
+        por_dia.setdefault(c.fecha_citacion, []).append(c)
+
+    prev_desde = desde - timedelta(days=dias)
+    next_desde = desde + timedelta(days=dias)
+
+    ctx = {
+        "desde": desde,
+        "hasta": hasta,
+        "dias": dias,
+        "por_dia": por_dia,
+        "total": qs.count(),
+        "hoy": hoy,
+        "prev_desde": prev_desde,
+        "next_desde": next_desde,
+        "puede_gestionar_citaciones": False,   # regente solo consulta
+        "url_base": "citaciones:agendadas_mis_cursos",
+    }
+    return render(request, "citaciones/agendadas_rango.html", ctx)
+
+
+# ==============================
+#  Editar vía formulario clásico
+# ==============================
 
 @login_required
 @require_http_methods(["GET", "POST"])

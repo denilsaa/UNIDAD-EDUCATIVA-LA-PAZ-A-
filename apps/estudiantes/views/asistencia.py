@@ -6,6 +6,7 @@ import calendar
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Count
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
 from django.views.decorators.http import require_http_methods
@@ -43,19 +44,32 @@ def _cal_activo():
 
 
 # =========================
-# Director: calendario + resumen mensual
+# Director/Regente: calendario + resumen mensual
 # =========================
-@role_required("director")
+@role_required("director", "regente")
 @require_http_methods(["GET", "POST"])
 def asistencia_calendario(request):
     """
-    - Crea/activa un calendario (POST).
-    - Lista calendarios existentes.
-    - Muestra un resumen mensual (P/F/R) del calendario ACTIVO filtrando por anio/mes.
+    - Director:
+        * Crea/activa un calendario (POST).
+        * Lista todos los calendarios.
+        * Muestra un resumen mensual (P/F/R) del calendario ACTIVO.
+    - Regente:
+        * Solo ve el resumen mensual.
+        * Solo ve el ÚLTIMO calendario creado.
+        * No puede crear ni editar calendarios.
     """
-    form = CalendarioAsistenciaForm(request.POST or None)
+    rol = (getattr(getattr(request.user, "rol", None), "nombre", "") or "").lower()
+    es_director = (rol == "director")
+
+    # Solo el director usa el formulario
+    form = CalendarioAsistenciaForm(request.POST or None) if es_director else None
 
     if request.method == "POST":
+        if not es_director:
+            # Un regente no debería estar posteando aquí
+            return HttpResponseForbidden("No tienes permiso para modificar el calendario.")
+
         if form.is_valid():
             cal = form.save(commit=False)
             cal.creado_por = request.user
@@ -70,8 +84,13 @@ def asistencia_calendario(request):
                 for error in errors:
                     messages.error(request, f"{error}")
 
-
-    calendarios = AsistenciaCalendario.objects.all()
+    # Listado de calendarios
+    qs_cal = AsistenciaCalendario.objects.all().order_by("-creado_en")
+    if es_director:
+        calendarios = qs_cal
+    else:
+        ultimo = qs_cal.first()
+        calendarios = [ultimo] if ultimo else []
 
     # Filtros de mes/año para el resumen
     hoy = now().date()
@@ -125,6 +144,8 @@ def asistencia_calendario(request):
         "calendarios": calendarios,
         "resumen": resumen,
         "meses": list(range(1, 13)),
+        "puede_configurar_calendario": es_director,
+        "puede_gestionar_exclusiones": es_director,
     }
     return render(request, "asistencia/calendario_lista.html", ctx)
 
@@ -138,12 +159,11 @@ def asistencia_exclusiones(request, cal_id):
     cal = get_object_or_404(AsistenciaCalendario, pk=cal_id)
 
     form = ExclusionAsistenciaForm(request.POST or None)
-    # ⬇️ Clave: asignar la FK en la instancia ANTES de validar (evita RelatedObjectDoesNotExist en clean())
+    # Clave: asignar la FK en la instancia ANTES de validar
     form.instance.calendario = cal
 
     if request.method == "POST":
         if form.is_valid():
-            # La instancia ya tiene calendario; guardar directo
             ex = form.save(commit=False)
             ex.save()
             messages.success(request, "Día marcado como sin lista.")

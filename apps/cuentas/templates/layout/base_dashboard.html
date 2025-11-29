@@ -61,6 +61,7 @@
             <li><a href="{% url 'cuentas:lista_padres' %}">👥 Padre de Familia</a></li>
             <li><a href="{% url 'cuentas:crear_padre' %}">➕ Nuevo Padre</a></li>
 
+
           {# --- REGENTE: solo sobre sus cursos --- #}
           {% elif "regente" in role %}
             <li><a href="{% url 'cuentas:regente_dashboard' %}">📊 Resumen</a></li>
@@ -71,8 +72,10 @@
             <li><a href="{% url 'estudiantes:asistencia_calendario' %}">🗓️ Calendario asistencia</a></li>
             <li><a href="{% url 'cursos:mis_cursos_regente' %}">📋 Tomar asistencia</a></li>
 
-            {# Citaciones agendadas (la vista debe filtrar por cursos del regente) #}
-            <li><a href="{% url 'citaciones:agendadas_rango' %}">📑 Citaciones agendadas</a></li>
+            {# Citaciones agendadas SOLO de sus cursos #}
+            <li><a href="{% url 'citaciones:agendadas_mis_cursos' %}">📑 Citaciones agendadas</a></li>
+
+
 
           {# --- SECRETARÍA: gestiona alumnos, padres, cursos y citaciones --- #}
           {% elif "secretaria" in role or "secretaría" in role %}

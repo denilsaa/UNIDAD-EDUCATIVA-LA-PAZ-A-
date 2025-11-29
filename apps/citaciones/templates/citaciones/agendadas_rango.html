@@ -24,9 +24,10 @@
     <input type="number" name="dias" min="1" max="31" value="{{ dias }}" class="input-dias">
     <button type="submit" class="btn-buscar">Ver</button>
 
-    <a href="{% url 'citaciones:agendadas_rango' %}?desde={{ hoy|date:'Y-m-d' }}&dias={{ dias }}" class="btn-hoy">Hoy</a>
-    <a href="{% url 'citaciones:agendadas_rango' %}?desde={{ prev_desde|date:'Y-m-d' }}&dias={{ dias }}" class="btn-navegar">⟵ Anterior</a>
-    <a href="{% url 'citaciones:agendadas_rango' %}?desde={{ next_desde|date:'Y-m-d' }}&dias={{ dias }}" class="btn-navegar">Siguiente ⟶</a>
+    {# url_base viene del contexto: citaciones:agendadas_rango o citaciones:agendadas_mis_cursos #}
+    <a href="{% url url_base %}?desde={{ hoy|date:'Y-m-d' }}&dias={{ dias }}" class="btn-hoy">Hoy</a>
+    <a href="{% url url_base %}?desde={{ prev_desde|date:'Y-m-d' }}&dias={{ dias }}" class="btn-navegar">⟵ Anterior</a>
+    <a href="{% url url_base %}?desde={{ next_desde|date:'Y-m-d' }}&dias={{ dias }}" class="btn-navegar">Siguiente ⟶</a>
 
     <span class="total">Total: {{ total }}</span>
   </form>
@@ -42,7 +43,9 @@
               <th>Estudiante</th>
               <th>Motivo</th>
               <th>Duración</th>
-              <th>Acciones</th>
+              {% if puede_gestionar_citaciones %}
+                <th>Acciones</th>
+              {% endif %}
             </tr>
           </thead>
           <tbody>
@@ -52,11 +55,13 @@
               <td>{{ c.estudiante }}</td>
               <td>{{ c.motivo_resumen }}</td>
               <td>{{ c.duracion_min }} min</td>
+              {% if puede_gestionar_citaciones %}
               <td>
-                {# SOLO estas dos acciones, nada de Editar #}
+                {# SOLO Director / Secretaría gestionan #}
                 <button type="button" class="btn-notificar" data-id="{{ c.id }}">Mandar notificación</button>
                 <button type="button" class="btn-eliminar btn-cancelar" data-id="{{ c.id }}">Cancelar</button>
               </td>
+              {% endif %}
             </tr>
           {% endfor %}
           </tbody>
@@ -69,7 +74,8 @@
     <div class="alerta">No hay citaciones agendadas en el rango.</div>
   {% endif %}
 
-  {# Modal reutilizable #}
+  {# Modal reutilizable (solo lo usa Director/Secretaría al gestionar) #}
+  {% if puede_gestionar_citaciones %}
   <div id="modal-lite" class="modal-lite">
     <div class="modal-lite__box">
       <h3 class="modal-lite__title" id="modal-lite-title"></h3>
@@ -82,4 +88,5 @@
   </div>
 
   <script src="{% static 'citaciones/js/agenda.js' %}"></script>
+  {% endif %}
 {% endblock %}
