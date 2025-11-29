@@ -9,27 +9,118 @@
 
 {% block content %}
 <div class="dashboard-header">
-  <h2>Bienvenido, {{ user.first_name }}!</h2>
-  <p>Explora las secciones para ver Citaciones, Asistencias y más.</p>
+  <h2>Bienvenido, {{ user.first_name|default:user.username }}!</h2>
+  <p>Desde aquí puedes revisar rápidamente la situación de tus hijos.</p>
 </div>
 
+{# ===== RESUMEN RÁPIDO ===== #}
 <div class="dashboard-cards">
+  <div class="dashboard-card">
+    <div class="icon">👨‍👩‍👧</div>
+    <h3>Hijos registrados</h3>
+    <p>
+      <strong>{{ total_hijos|default:"0" }}</strong>
+      {% if total_hijos %} alumno(s) vinculados a tu cuenta.{% else %} Aún no hay alumnos vinculados.{% endif %}
+    </p>
+  </div>
+
   <div class="dashboard-card">
     <div class="icon">📄</div>
     <h3>Citaciones</h3>
-    <p>Visualiza las citaciones enviadas por la institución.</p>
+    <p>
+      <strong>{{ total_citaciones|default:"0" }}</strong> citación(es) registradas para tus hijos.
+    </p>
   </div>
 
   <div class="dashboard-card">
-    <div class="icon">📝</div>
-    <h3>Asistencia</h3>
-    <p>Consulta el registro de asistencia de tus hijos.</p>
+    <div class="icon">⛔</div>
+    <h3>Faltas acumuladas</h3>
+    <p>
+      <strong>{{ total_faltas|default:"0" }}</strong> falta(s) en el historial de asistencia.
+    </p>
   </div>
 
   <div class="dashboard-card">
-    <div class="icon">📚</div>
-    <h3>Kárdex</h3>
-    <p>Accede a los registros académicos históricos.</p>
+    <div class="icon">⏰</div>
+    <h3>Atrasos acumulados</h3>
+    <p>
+      <strong>{{ total_atrasos|default:"0" }}</strong> atraso(s) registrados.
+    </p>
+  </div>
+</div>
+
+{# ===== DETALLE: HIJOS & MOVIMIENTOS RECIENTES ===== #}
+<div class="dashboard-cards" style="margin-top:32px;">
+  <div class="dashboard-card" style="text-align:left;">
+    <div class="icon">👦</div>
+    <h3>Mis hijos</h3>
+    {% if hijos %}
+      <ul style="list-style:none; padding:0; margin-top:8px;">
+        {% for h in hijos %}
+          <li style="padding:6px 0; border-bottom:1px solid #eee;">
+            <strong>{{ h.apellidos }} {{ h.nombres }}</strong><br>
+            <small>Curso: {{ h.curso }}</small>
+          </li>
+        {% endfor %}
+      </ul>
+      <p style="margin-top:10px;">
+        <a href="{% url 'estudiantes:mis_hijos' %}">Ver detalle de cada hijo →</a>
+      </p>
+    {% else %}
+      <p>No hay hijos asociados a esta cuenta todavía.</p>
+    {% endif %}
+  </div>
+
+  <div class="dashboard-card" style="text-align:left;">
+    <div class="icon">📌</div>
+    <h3>Últimas citaciones</h3>
+    {% if ultimas_citaciones %}
+      <table style="width:100%; font-size:0.9rem;">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Fecha</th>
+            <th style="text-align:left;">Estudiante</th>
+            <th style="text-align:left;">Motivo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in ultimas_citaciones %}
+          <tr>
+            <td>{{ c.fecha_citacion|date:"d/m/Y" }}</td>
+            <td>{{ c.estudiante }}</td>
+            <td>{{ c.motivo_resumen }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No hay citaciones recientes.</p>
+    {% endif %}
+
+    <hr style="margin:12px 0;">
+    <h3 style="margin-top:0;">Última asistencia</h3>
+    {% if ultimas_asistencias %}
+      <table style="width:100%; font-size:0.9rem;">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Fecha</th>
+            <th style="text-align:left;">Estudiante</th>
+            <th style="text-align:left;">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in ultimas_asistencias %}
+          <tr>
+            <td>{{ a.fecha|date:"d/m/Y" }}</td>
+            <td>{{ a.estudiante }}</td>
+            <td>{{ a.get_estado_display }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No hay registros de asistencia todavía.</p>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

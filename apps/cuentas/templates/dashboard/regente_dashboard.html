@@ -9,33 +9,117 @@
 
 {% block content %}
 <div class="dashboard-header">
-  <h2>Resumen del Regente</h2>
-  <p>Bienvenido al panel principal. Aquí podrás acceder a tus cursos, eventos y reportes.</p>
+  <h2>Panel del Regente</h2>
+  <p>Controla rápidamente tus cursos, asistencia y citaciones agendadas.</p>
 </div>
 
+{# ===== RESUMEN RÁPIDO ===== #}
 <div class="dashboard-cards">
   <div class="dashboard-card">
     <div class="icon">📚</div>
     <h3>Cursos a tu cargo</h3>
-    <p>Gestiona y revisa los cursos que tienes asignados.</p>
-  </div>
-
-  <div class="dashboard-card">
-    <div class="icon">📅</div>
-    <h3>Próximos eventos</h3>
-    <p>Consulta las actividades o reuniones programadas.</p>
-  </div>
-
-  <div class="dashboard-card">
-    <div class="icon">📊</div>
-    <h3>Reportes y asistencia</h3>
-    <p>Visualiza estadísticas de asistencia y comportamiento.</p>
+    <p>
+      <strong>{{ total_cursos|default:"0" }}</strong> curso(s) asignados.
+    </p>
   </div>
 
   <div class="dashboard-card">
     <div class="icon">👥</div>
     <h3>Estudiantes</h3>
-    <p>Explora la lista de estudiantes bajo tu supervisión.</p>
+    <p>
+      <strong>{{ total_estudiantes|default:"0" }}</strong> estudiante(s) en tus cursos.
+    </p>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="icon">✅</div>
+    <h3>Asistencia de hoy</h3>
+    {% if pct_presentes_hoy is not None %}
+      <p><strong>{{ pct_presentes_hoy }}%</strong> de presencia<br>
+      <small>en {{ total_marcas_hoy }} registros de hoy.</small></p>
+    {% else %}
+      <p>No se ha registrado asistencia hoy.</p>
+    {% endif %}
+  </div>
+
+  <div class="dashboard-card">
+    <div class="icon">📑</div>
+    <h3>Citaciones próximas</h3>
+    <p>
+      <strong>{{ citaciones_proximas|length }}</strong> citación(es) agendadas para tus cursos.
+    </p>
+  </div>
+</div>
+
+{# ===== DETALLE: CURSOS & CITACIONES ===== #}
+<div class="dashboard-cards" style="margin-top:32px;">
+  <div class="dashboard-card" style="text-align:left;">
+    <div class="icon">🏫</div>
+    <h3>Mis cursos</h3>
+    {% if cursos %}
+      <ul style="list-style:none; padding:0; margin-top:8px;">
+        {% for c in cursos %}
+          <li style="padding:6px 0; border-bottom:1px solid #eee;">
+            <strong>{{ c.nombre }}</strong> – <small>{{ c.paralelo }}</small><br>
+            <a href="{% url 'cursos:detalle_curso' c.id %}">Ir al curso →</a>
+          </li>
+        {% endfor %}
+      </ul>
+      <p style="margin-top:10px;">
+        <a href="{% url 'cursos:mis_cursos_regente' %}">Ver todos mis cursos →</a>
+      </p>
+    {% else %}
+      <p>No tienes cursos asignados actualmente.</p>
+    {% endif %}
+  </div>
+
+  <div class="dashboard-card" style="text-align:left;">
+    <div class="icon">🕒</div>
+    <h3>Citaciones agendadas</h3>
+    {% if citaciones_proximas %}
+      <table style="width:100%; font-size:0.9rem;">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Fecha</th>
+            <th style="text-align:left;">Hora</th>
+            <th style="text-align:left;">Estudiante</th>
+            <th style="text-align:left;">Curso</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in citaciones_proximas %}
+          <tr>
+            <td>{{ c.fecha_citacion|date:"d/m" }}</td>
+            <td>{{ c.hora_citacion|time:"H:i" }}</td>
+            <td>{{ c.estudiante }}</td>
+            <td>{{ c.estudiante.curso }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No hay citaciones próximas para tus cursos.</p>
+    {% endif %}
+
+    <p style="margin-top:10px;">
+      <a href="{% url 'citaciones:agendadas_mis_cursos' %}">Ver agenda completa →</a>
+    </p>
+  </div>
+</div>
+
+{# ===== ACCESOS RÁPIDOS ===== #}
+<div class="dashboard-cards" style="margin-top:32px;">
+  <div class="dashboard-card">
+    <div class="icon">📋</div>
+    <h3>Tomar asistencia</h3>
+    <p>Ve a <strong>Mis cursos</strong> y selecciona el curso para registrar la asistencia.</p>
+    <p><a href="{% url 'cursos:mis_cursos_regente' %}">Ir a Mis cursos →</a></p>
+  </div>
+  <div class="dashboard-card">
+    <div class="icon">🗓️</div>
+    <h3>Calendario de asistencia</h3>
+    <p>Revisa el calendario general de días hábiles y reportes mensuales.</p>
+    <p><a href="{% url 'estudiantes:asistencia_calendario' %}">Ver calendario →</a></p>
   </div>
 </div>
 {% endblock %}
