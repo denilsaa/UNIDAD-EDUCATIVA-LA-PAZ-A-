@@ -39,13 +39,20 @@
           <td>{{ curso.paralelo }}</td>
           <td>{{ curso.regente }}</td>
           <td>
-            <a href="{% url 'cursos:ver_curso' curso.id %}" class="btn-ver">Ver</a> 
-            <a href="{% url 'cursos:editar_curso' curso.id %}" class="btn-editar">Editar</a> 
-            <a href="{% url 'cursos:eliminar_curso' curso.id %}" class="btn-eliminar">Eliminar</a>
-            <a href="{% url 'estudiantes:por_curso' curso.id %}" class="btn-estudiantes">Ver estudiantes</a>
-
-            <!-- 👉 NUEVO: Llamar asistencia (usa la fecha de hoy por defecto) -->
-            <a href="{% url 'estudiantes:asistencia_tomar' curso.id %}?fecha={{ hoy }}" class="btn-llamar-asistencia">Llamar asistencia</a>
+            {% if "secretaria" in role or "secretaría" in role %}
+              {# Secretaría: solo ver, editar y ver estudiantes #}
+              <a href="{% url 'cursos:ver_curso' curso.id %}" class="btn-ver">Ver</a>
+              <a href="{% url 'cursos:editar_curso' curso.id %}" class="btn-editar">Editar</a>
+              <a href="{% url 'estudiantes:por_curso' curso.id %}" class="btn-estudiantes">Ver estudiantes</a>
+            {% else %}
+              {# Director (u otros roles que usen esta vista): todo como antes #}
+              <a href="{% url 'cursos:ver_curso' curso.id %}" class="btn-ver">Ver</a> 
+              <a href="{% url 'cursos:editar_curso' curso.id %}" class="btn-editar">Editar</a> 
+              <a href="{% url 'cursos:eliminar_curso' curso.id %}" class="btn-eliminar">Eliminar</a>
+              <a href="{% url 'estudiantes:por_curso' curso.id %}" class="btn-estudiantes">Ver estudiantes</a>
+              <!-- Llamar asistencia (usa la fecha de hoy por defecto) -->
+              <a href="{% url 'estudiantes:asistencia_tomar' curso.id %}?fecha={{ hoy }}" class="btn-llamar-asistencia">Llamar asistencia</a>
+            {% endif %}
           </td>
         </tr>
         {% empty %}

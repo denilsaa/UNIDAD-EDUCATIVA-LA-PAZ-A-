@@ -67,7 +67,8 @@
                 <td class="acciones">
                   <a href="{% url 'cuentas:ver_usuario' u.id %}" class="btn-ver">Ver</a>
                   <a href="{% url 'cuentas:editar_padre' u.id %}" class="btn-editar">Editar</a>
-                  {% if u.id != request.user.id %}
+                  {# Solo el director puede eliminar padres #}
+                  {% if "director" in role and u.id != request.user.id %}
                     <a href="{% url 'cuentas:eliminar_usuario' u.id %}" class="btn-eliminar">Eliminar</a>
                   {% endif %}
                 </td>
@@ -85,7 +86,7 @@
                 <td class="acciones">
                   <a href="{% url 'cuentas:ver_usuario' u.id %}" class="btn-ver">Ver</a>
                   <a href="{% url 'cuentas:editar_personal' u.id %}" class="btn-editar">Editar</a>
-                  {% if u.id != request.user.id %}
+                  {% if "director" in role and u.id != request.user.id %}
                     <a href="{% url 'cuentas:eliminar_usuario' u.id %}" class="btn-eliminar">Eliminar</a>
                   {% endif %}
                 </td>

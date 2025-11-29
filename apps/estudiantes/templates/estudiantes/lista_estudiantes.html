@@ -24,7 +24,14 @@
   <table class="tabla">
     <thead>
       <tr>
-        <th>#</th><th>Apellidos</th><th>Nombres</th><th>CI</th><th>Curso</th><th>Padre/Tutor</th><th>Kardex</th><th></th>
+        <th>#</th>
+        <th>Apellidos</th>
+        <th>Nombres</th>
+        <th>CI</th>
+        <th>Curso</th>
+        <th>Padre/Tutor</th>
+        <th>Kardex</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -38,10 +45,16 @@
         <td>{{ e.padre }}</td>
         <td>{% if e.kardex_id %}Asignado{% else %}-{% endif %}</td>
         <td>
-          <a href="{% url 'estudiantes:editar' e.pk %}">Editar</a>
-          <a href="{% url 'estudiantes:eliminar' e.pk %}">Eliminar</a>
-          <a href="{% url 'estudiantes:kardex_listar' e.pk %}" class="btn-kardex">Ver Kárdex</a>
-          <a href="{% url 'estudiantes:kardex_nuevo' e.pk %}" class="btn-registro">Registro</a>
+          {% if "secretaria" in role or "secretaría" in role %}
+            {# Secretaría: solo puede editar #}
+            <a href="{% url 'estudiantes:editar' e.pk %}">Editar</a>
+          {% else %}
+            {# Director / otros roles: todo como antes #}
+            <a href="{% url 'estudiantes:editar' e.pk %}">Editar</a>
+            <a href="{% url 'estudiantes:eliminar' e.pk %}">Eliminar</a>
+            <a href="{% url 'estudiantes:kardex_listar' e.pk %}" class="btn-kardex">Ver Kárdex</a>
+            <a href="{% url 'estudiantes:kardex_nuevo' e.pk %}" class="btn-registro">Registro</a>
+          {% endif %}
         </td>
       </tr>
       {% empty %}

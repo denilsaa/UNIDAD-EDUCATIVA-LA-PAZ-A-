@@ -52,13 +52,16 @@
           <td>{{ e.padre|default:"—" }}</td>
           <td>{% if e.kardex_id %}Asignado{% else %}—{% endif %}</td>
           <td>
+            {# Director y Secretaría pueden editar los datos del estudiante #}
             {% if "director" in role or "secretaria" in role or "secretaría" in role %}
               <a href="{% url 'estudiantes:editar' e.pk %}" class="btn-editar">Editar</a>
             {% endif %}
 
+            {# Todos los roles que llegan aquí pueden ver el kárdex #}
             <a href="{% url 'estudiantes:kardex_listar' e.pk %}" class="btn-ver">Ver kárdex</a>
 
-            {% if "director" in role or "regente" in role or "secretaria" in role or "secretaría" in role %}
+            {# Solo Director y Regente pueden AGREGAR kárdex #}
+            {% if "director" in role or "regente" in role %}
               <a href="{% url 'estudiantes:kardex_nuevo' e.pk %}" class="btn-agregar-kardex">Agregar kárdex</a>
             {% endif %}
           </td>
