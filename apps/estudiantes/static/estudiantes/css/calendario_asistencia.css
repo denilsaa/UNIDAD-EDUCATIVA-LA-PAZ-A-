@@ -569,3 +569,12 @@
     padding: 6px 8px;
   }
 }
+/* === Vista Regente: solo resumen === */
+.asistencia-container.solo-resumen {
+  display: block;          /* rompe el layout de dos columnas */
+}
+
+.asistencia-container.solo-resumen .columna-resumen {
+  max-width: 100%;
+  margin: 0 auto;
+}
