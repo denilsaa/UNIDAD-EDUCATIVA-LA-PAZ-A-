@@ -9,8 +9,14 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # === SEGURIDAD / LOGIN ===
-DEBUG = True
-#ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+DEBUG = os.environ.get("DEBUG", "True") == "True"
+
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    os.environ.get("RENDER_EXTERNAL_HOSTNAME", ""),
+]
+
 
 SECRET_KEY = "django-insecure-if^n0ab85w_-8nsbz5!o^t=dk4%+ml^v&72vpez383d_ohdncf"
 
@@ -112,23 +118,23 @@ WSGI_APPLICATION = "configuraciones.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "beu0hpduvweswzq20pvc",
-        "USER": "uffjaj6pssk7gxuz",
-        "PASSWORD": "SNMfzxXMBbtDLKmHT5Y1",
-        "HOST": "beu0hpduvweswzq20pvc-mysql.services.clever-cloud.com",
-        "PORT": "3306",
+        "NAME": os.environ.get("DB_NAME", "beu0hpduvweswzq20pvc"),
+        "USER": os.environ.get("DB_USER", "uffjaj6pssk7gxuz"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", "SNMfzxXMBbtDLKmHT5Y1"),
+        "HOST": os.environ.get("DB_HOST", "beu0hpduvweswzq20pvc-mysql.services.clever-cloud.com"),
+        "PORT": os.environ.get("DB_PORT", "3306"),
 
-        "CONN_MAX_AGE": 0,            # nueva conexión por request
-        "CONN_HEALTH_CHECKS": True,   # valida conexión antes de usarla
+        "CONN_MAX_AGE": 0,
+        "CONN_HEALTH_CHECKS": True,
 
         "OPTIONS": {
             "charset": "utf8mb4",
             "use_unicode": True,
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-            # 'ssl': {'ca': '/ruta/al/ca.pem'}  # si tu instancia requiere SSL
         },
     }
 }
+
 
 # === VALIDADORES DE PASSWORD ===
 AUTH_PASSWORD_VALIDATORS = [
