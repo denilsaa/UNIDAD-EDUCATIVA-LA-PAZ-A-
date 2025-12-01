@@ -1,0 +1,102 @@
+{% extends "layout/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Historial de citaciones{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'citaciones/css/historial_estudiante.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="director-dashboard">
+  <!-- Encabezado -->
+  <div class="dashboard-header">
+    <h2 class="hdr-sub">Historial de citaciones</h2>
+    <p>
+      Estudiante:
+      <strong>{{ estudiante.apellidos }} {{ estudiante.nombres }}</strong>
+      {% if estudiante.curso %}
+        · Curso: <strong>{{ estudiante.curso }}</strong>
+      {% endif %}
+    </p>
+  </div>
+
+  <!-- Barra superior: volver + buscador -->
+  <div class="historial-toolbar">
+    <a href="{% url 'estudiantes:listar' %}" class="btn-volver">
+      &larr; Volver a estudiantes
+    </a>
+
+    <div class="historial-busqueda">
+      <label for="busqueda-citaciones">Buscar:</label>
+      <input
+        type="text"
+        id="busqueda-citaciones"
+        placeholder="Motivo, estado, fecha..."
+      >
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-wrapper">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Creado</th>
+          <th>Fecha citación</th>
+          <th>Hora</th>
+          <th>Estado</th>
+          <th>Motivo</th>
+          <th>Aprobado por</th>
+          <th>Duración</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in citaciones %}
+        <tr data-row="citacion">
+          <td>{{ forloop.counter }}</td>
+          <td>{{ c.creado_en|date:"d/m/Y H:i" }}</td>
+          <td>
+            {% if c.fecha_citacion %}
+              {{ c.fecha_citacion|date:"d/m/Y" }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if c.hora_citacion %}
+              {{ c.hora_citacion|time:"H:i" }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge-estado badge-estado-{{ c.estado|lower }}">
+              {{ c.get_estado_display }}
+            </span>
+          </td>
+          <td>{{ c.motivo_resumen|default:"(Sin resumen)" }}</td>
+            <td>
+            {% if c.aprobado_por %}
+                {{ c.aprobado_por.get_full_name|default:c.aprobado_por.ci|default:"(sin usuario)" }}
+            {% else %}
+                -
+            {% endif %}
+            </td>
+          <td>{{ c.duracion_min }} min</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8">El estudiante no tiene citaciones registradas.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'citaciones/js/historial_estudiante.js' %}"></script>
+{% endblock %}

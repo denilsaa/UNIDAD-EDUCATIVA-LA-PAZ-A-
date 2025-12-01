@@ -1,7 +1,8 @@
 # apps/citaciones/urls.py
 
 from django.urls import path
-from .views import bandeja
+from .views import bandeja, historial
+
 
 app_name = "citaciones"
 
@@ -14,4 +15,11 @@ urlpatterns = [
     path("<int:pk>/editar-form/", bandeja.editar_form, name="editar_form"),
     path("<int:pk>/rechazar/", bandeja.rechazar, name="rechazar"),
     path("<int:pk>/notificar/", bandeja.notificar, name="notificar"),
+
+
+    path(
+        "historial/estudiante/<int:estudiante_id>/",
+        historial.historial_estudiante,
+        name="historial_estudiante",
+    ),
 ]

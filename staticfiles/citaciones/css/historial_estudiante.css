@@ -1,0 +1,160 @@
+/* ================== CONTENEDOR PRINCIPAL ================== */
+.director-dashboard {
+  padding: 16px;
+  background: #f9fafe;
+}
+
+/* === ENCABEZADO DEL DASHBOARD (mismo estilo que otros) === */
+.dashboard-header {
+  background: linear-gradient(90deg, #0c2a57, #13386f);
+  color: #fff;
+  padding: 1.8rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dashboard-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.dashboard-header p {
+  font-size: 1rem;
+  color: #dce6ff;
+}
+
+/* ================== TOOLBAR SUPERIOR ================== */
+.historial-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-volver {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background-color: #6c757d;
+  color: #fff;
+  font-size: 0.9rem;
+  border: 1px solid #6c757d;
+  transition: all 0.2s ease;
+}
+
+.btn-volver:hover {
+  background-color: #545b62;
+  border-color: #545b62;
+  transform: translateY(-1px);
+}
+
+.historial-busqueda {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.historial-busqueda label {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+#busqueda-citaciones {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  min-width: 220px;
+}
+
+/* ================== TABLA ================== */
+.table-wrapper {
+  margin-top: 8px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.tabla th,
+.tabla td {
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+.tabla thead th {
+  background-color: #cce0ff;
+  color: #004a99;
+  font-weight: 600;
+}
+
+.tabla tbody tr:nth-child(even) {
+  background: #e6f0ff;
+}
+
+.tabla tbody tr:hover {
+  background: #dbe7ff;
+  transition: background 0.2s ease;
+}
+
+/* ================== BADGES DE ESTADO ================== */
+.badge-estado {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Colores por estado */
+.badge-estado-abierta {
+  background-color: #6c757d; /* gris */
+}
+
+.badge-estado-agendada {
+  background-color: #17a2b8; /* celeste/teal */
+}
+
+.badge-estado-notificada {
+  background-color: #007bff; /* azul */
+}
+
+.badge-estado-atendida {
+  background-color: #28a745; /* verde */
+}
+
+.badge-estado-cancelada {
+  background-color: #dc3545; /* rojo */
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 900px) {
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  .tabla {
+    min-width: 100%;
+  }
+
+  .historial-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
