@@ -9,12 +9,18 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # === SEGURIDAD / LOGIN ===
+
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     os.environ.get("RENDER_EXTERNAL_HOSTNAME", ""),
+]
+
+# 👇 AÑADE ESTO DEBAJO
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME', '')}",
 ]
 
 
