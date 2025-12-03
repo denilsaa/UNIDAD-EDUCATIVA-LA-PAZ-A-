@@ -322,15 +322,65 @@ def _es_personal(usuario: Usuario) -> bool:
     return not _es_padre(usuario)
 
 # -------- LISTADOS --------
+@role_required("director")
 def lista_personal(request):
-    usuarios = Usuario.objects.filter(rol__nombre__iregex=_PERSONAL_REGEX).order_by("-id")
-    ctx = {"usuarios": usuarios, "tipo": "personal", "titulo": "Usuarios (Personal Administrativo)"}
+    """
+    Listado de Director, Secretaria(s) y Regentes con filtro de búsqueda.
+    """
+    query = request.GET.get("q", "").strip()
+
+    usuarios = Usuario.objects.filter(
+        rol__nombre__iregex=_PERSONAL_REGEX
+    )
+
+    if query:
+        usuarios = usuarios.filter(
+            Q(rol__nombre__icontains=query) |
+            Q(ci__icontains=query) |
+            Q(apellidos__icontains=query) |
+            Q(nombres__icontains=query)
+        )
+
+    usuarios = usuarios.order_by("-id")
+
+    ctx = {
+        "usuarios": usuarios,
+        "tipo": "personal",
+        "titulo": "Usuarios (Personal Administrativo)",
+        "query": query,
+    }
     return render(request, "cuentas/lista_usuarios.html", ctx)
 
+
+@role_required("director")
 def lista_padres(request):
-    usuarios = Usuario.objects.filter(rol__nombre__iregex=_PADRE_REGEX).order_by("-id")
-    ctx = {"usuarios": usuarios, "tipo": "padres", "titulo": "Usuarios (Padres de familia)"}
+    """
+    Listado de Padres de familia con filtro de búsqueda.
+    """
+    query = request.GET.get("q", "").strip()
+
+    usuarios = Usuario.objects.filter(
+        rol__nombre__iregex=_PADRE_REGEX
+    )
+
+    if query:
+        usuarios = usuarios.filter(
+            Q(rol__nombre__icontains=query) |
+            Q(ci__icontains=query) |
+            Q(apellidos__icontains=query) |
+            Q(nombres__icontains=query)
+        )
+
+    usuarios = usuarios.order_by("-id")
+
+    ctx = {
+        "usuarios": usuarios,
+        "tipo": "padres",
+        "titulo": "Usuarios (Padres de familia)",
+        "query": query,
+    }
     return render(request, "cuentas/lista_usuarios.html", ctx)
+
 
 # -------- CREACIÓN --------
 @require_http_methods(["GET", "POST"])
