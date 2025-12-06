@@ -3,7 +3,13 @@ from django.contrib.auth.hashers import make_password, check_password
 from .rol import Rol
 from .base import SelladoTiempo
 
+class UsuarioManager(models.Manager):
+    def get_by_natural_key(self, ci):
+        return self.get(ci=ci)
+
 class Usuario(SelladoTiempo, models.Model):
+    objects = UsuarioManager()
+    
     rol = models.ForeignKey(Rol, on_delete=models.RESTRICT, related_name="usuarios")
     ci = models.CharField("CI", max_length=40, unique=True, null=True, blank=True)
     nombres = models.CharField(max_length=120)

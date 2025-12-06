@@ -52,7 +52,7 @@ class ThrottleLoginMiddleware:
                 # Modo "solo el primero cuenta"
                 lock_key = f"login:lock:{ip}:{username}"
                 if not cache.add(lock_key, "1", timeout=self.WINDOW_SECONDS):
-                    messages.info(request, "Ya estamos procesando tu ingreso…")
+                    #messages.info(request, "Ya estamos procesando tu ingreso…")
                     login_url = getattr(settings, "LOGIN_URL", "/login/")
                     return redirect(login_url)
             else:
@@ -132,8 +132,8 @@ class AuthRequiredMiddleware:
     def __call__(self, request):
         path = request.path_info
 
-         # Permitir rutas API sin redirección ni render HTML
-        if path.startswith("/api/"):
+        # Permitir rutas API y WebSockets sin redirección ni render HTML
+        if path.startswith("/api/") or path.startswith("/ws/"):
             return self.get_response(request)
 
         # Permitir las rutas exentas

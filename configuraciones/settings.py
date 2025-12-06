@@ -15,6 +15,8 @@ DEBUG = os.environ.get("DEBUG", "True") == "True"
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "192.168.0.14",
+    "10.0.7.218",  # Added for new network
     os.environ.get("RENDER_EXTERNAL_HOSTNAME", ""),
 ]
 
@@ -35,6 +37,7 @@ AUTH_USER_MODEL = "cuentas.Usuario"
 
 # === APPS ===
 INSTALLED_APPS = [
+    "daphne", # 👈 REQUIRED for Channels ASGI
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
