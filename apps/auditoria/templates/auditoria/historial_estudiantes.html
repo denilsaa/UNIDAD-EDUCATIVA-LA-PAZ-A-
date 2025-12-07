@@ -9,28 +9,38 @@
 
 {% block content %}
 
-<div class="audit-wrapper">
-  <div class="audit-card">
-    <div class="audit-header">
-      <h1 class="audit-title">Historial de acciones sobre estudiantes</h1>
-      <p class="audit-subtitle">
-        Aquí puedes ver quién creó, modificó o eliminó estudiantes, con fecha, hora, IP y navegador.
-      </p>
+<div class="audit-page">
+
+  <!-- HERO / BANNER (como Usuarios) -->
+  <section class="audit-hero">
+    <h1 class="audit-hero-title">Historial de acciones sobre estudiantes</h1>
+    <p class="audit-hero-subtitle">
+      Aquí puedes ver quién creó, modificó o eliminó estudiantes, con fecha, hora, IP y navegador.
+    </p>
+  </section>
+
+  <!-- CARD CONTENIDO -->
+  <section class="audit-panel">
+    <!-- FILTROS -->
+    <div class="audit-toolbar">
+      <div class="audit-search">
+        <label for="audit-search" class="audit-label">Buscar</label>
+        <input
+          id="audit-search"
+          type="text"
+          class="audit-input"
+          placeholder="Filtrar por usuario, estudiante, descripción, IP o navegador..."
+          value="{{ q }}"
+          data-server-value="{{ q }}"
+        >
+      </div>
+
+      <div class="audit-actions">
+        <button id="audit-clear" type="button" class="audit-btn audit-btn-secondary">Limpiar</button>
+      </div>
     </div>
 
-    <div class="audit-filters">
-      <label for="audit-search" class="audit-label">Buscar:</label>
-      <input
-        id="audit-search"
-        type="text"
-        class="audit-input"
-        placeholder="Filtrar por usuario, estudiante, descripción, IP o navegador..."
-        value="{{ q }}"
-        data-server-value="{{ q }}"
-      >
-      <button id="audit-clear" type="button" class="audit-btn-secondary">Limpiar</button>
-    </div>
-
+    <!-- TABLA -->
     <div class="audit-table-wrapper">
       <table class="audit-table" id="audit-table">
         <thead>
@@ -44,34 +54,47 @@
             <th>Navegador</th>
           </tr>
         </thead>
+
         <tbody>
           {% for log in logs %}
             <tr>
-              <td data-label="Fecha y hora">{{ log.creado_en }}</td>
+              <td data-label="Fecha y hora" class="audit-col-date">{{ log.creado_en }}</td>
+
               <td data-label="Usuario">
                 {% if log.usuario %}
-                  {{ log.usuario }}
+                  <span class="audit-strong">{{ log.usuario }}</span>
                 {% else %}
                   <span class="audit-muted">—</span>
                 {% endif %}
               </td>
+
               <td data-label="Acción">
                 <span class="audit-badge audit-badge-{{ log.accion|lower }}">
                   {{ log.get_accion_display }}
                 </span>
               </td>
-           <td data-label="Estudiante">
-              {% if log.estudiante %}
-                {{ log.estudiante }}
-              {% elif log.estudiante_nombre %}
-                {{ log.estudiante_nombre }}
-              {% else %}
-                <span class="audit-muted">—</span>
-              {% endif %}
-            </td>
-              <td data-label="Descripción">{{ log.descripcion }}</td>
-              <td data-label="IP">{{ log.ip|default:"—" }}</td>
-              <td data-label="Navegador" class="audit-ua">{{ log.user_agent }}</td>
+
+              <td data-label="Estudiante">
+                {% if log.estudiante %}
+                  {{ log.estudiante }}
+                {% elif log.estudiante_nombre %}
+                  {{ log.estudiante_nombre }}
+                {% else %}
+                  <span class="audit-muted">—</span>
+                {% endif %}
+              </td>
+
+              <td data-label="Descripción" class="audit-col-desc">
+                {{ log.descripcion }}
+              </td>
+
+              <td data-label="IP">
+                <span class="audit-mono">{{ log.ip|default:"—" }}</span>
+              </td>
+
+              <td data-label="Navegador" class="audit-ua" title="{{ log.user_agent }}">
+                {{ log.user_agent }}
+              </td>
             </tr>
           {% empty %}
             <tr>
@@ -87,7 +110,7 @@
     <p class="audit-note">
       Mostrando hasta 500 registros más recientes.
     </p>
-  </div>
+  </section>
 </div>
 
 <script src="{% static 'auditoria/js/historial_estudiantes.js' %}"></script>
