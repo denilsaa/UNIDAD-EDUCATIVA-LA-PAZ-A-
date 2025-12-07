@@ -2,12 +2,42 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.db.models import Q
 from django.urls import reverse_lazy
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 
 from apps.estudiantes.models.kardex_item import KardexItem
 from apps.estudiantes.forms import KardexItemForm
 
 # 🔒 mixin por rol
 from apps.cuentas.mixins import RoleRequiredMixin
+
+
+@require_GET
+def kardex_item_existe(request):
+    """
+    Endpoint AJAX:
+    Verifica si ya existe un KardexItem con (area, descripcion) en BD.
+    - area: string
+    - descripcion: string
+    - exclude_id: (opcional) id a excluir cuando se edita
+    Retorna: {"exists": true/false}
+    """
+    area = (request.GET.get("area") or "").strip()
+    descripcion = (request.GET.get("descripcion") or "").strip()
+    exclude_id = (request.GET.get("exclude_id") or "").strip()
+
+    if not area or not descripcion:
+        return JsonResponse({"exists": False})
+
+    qs = KardexItem.objects.filter(
+        area=area,
+        descripcion__iexact=descripcion,  # ignora mayúsculas/minúsculas
+    )
+
+    if exclude_id.isdigit():
+        qs = qs.exclude(id=int(exclude_id))
+
+    return JsonResponse({"exists": qs.exists()})
 
 
 class KardexItemListView(RoleRequiredMixin, ListView):

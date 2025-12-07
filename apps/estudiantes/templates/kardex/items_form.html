@@ -37,6 +37,11 @@
   </form>
 </div>
 {% block scripts %}
+<script>
+  window.KARDEX_ITEM_CHECK_URL = "{% url 'estudiantes:kardex_item_existe' %}";
+  window.KARDEX_ITEM_EXCLUDE_ID = "{% if object %}{{ object.id }}{% endif %}";
+</script>
 <script src="{% static 'estudiantes/js/items_form.js' %}"></script>
 {% endblock %}
+
 {% endblock %}

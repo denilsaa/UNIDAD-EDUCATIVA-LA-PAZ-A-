@@ -16,6 +16,7 @@ from apps.estudiantes.views.asistencia import (
     asistencia_calendario, asistencia_exclusiones, asistencia_exclusion_eliminar,
     asistencia_tomar, asistencia_padre_detalle,
 )
+from apps.estudiantes.views.kardex_item import kardex_item_existe
 
 app_name = "estudiantes"
 
@@ -36,6 +37,7 @@ urlpatterns = [
     path("kardex-items/nuevo/", KardexItemCreateView.as_view(), name="kardex_items_nuevo"),
     path("kardex-items/<int:pk>/editar/", KardexItemUpdateView.as_view(), name="kardex_items_editar"),
     path("kardex-items/<int:pk>/eliminar/", KardexItemDeleteView.as_view(), name="kardex_items_eliminar"),
+    path("kardex/items/existe/", kardex_item_existe, name="kardex_item_existe"),
 
     # Padre (ya tenías)
     path("mis-hijos/", MisHijosListView.as_view(), name="mis_hijos"),
