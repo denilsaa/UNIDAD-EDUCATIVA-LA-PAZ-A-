@@ -33,13 +33,13 @@
         {% if usuario.rol %} <span class="label">({{ usuario.rol }})</span>{% endif %}.
       </p>
 
-      {# ==========================
+    <!--  {# ==========================
          DEPENDENCIAS (DETALLADAS)
          Requiere que la view envíe:
          - estudiantes (queryset con select_related("curso"))
          - cursos_regente (queryset)
          - n_calendarios (int)
-         ========================== #}
+         ========================== #} -->
 
       <div class="deps">
         {% if estudiantes %}
