@@ -18,7 +18,7 @@
 <body class="layout">
   <div class="wrap">
     <!-- Sidebar -->
-    <aside class="sidenav">
+    <aside class="sidenav" id="sidenav">
       <nav>
         <!-- Texto superior -->
         <div class="sidebar-header">
@@ -61,23 +61,18 @@
             <li><a href="{% url 'cuentas:lista_padres' %}">👥 Padre de Familia</a></li>
             <li><a href="{% url 'cuentas:crear_padre' %}">➕ Nuevo Padre</a></li>
 
-
           {# --- REGENTE: solo sobre sus cursos --- #}
           {% elif "regente" in role %}
             <li><a href="{% url 'cuentas:regente_dashboard' %}">📊 Resumen</a></li>
 
             <li><a href="{% url 'cursos:mis_cursos_regente' %}">📚 Mis cursos</a></li>
 
-            {# Desde "Mis cursos" eliges curso para marcar asistencia y kárdex #}
             <li><a href="{% url 'estudiantes:asistencia_calendario' %}">🗓️ Calendario asistencia</a></li>
             <li><a href="{% url 'cursos:mis_cursos_regente' %}">📋 Tomar asistencia</a></li>
 
-            {# Citaciones agendadas SOLO de sus cursos #}
             <li><a href="{% url 'citaciones:agendadas_mis_cursos' %}">📑 Citaciones agendadas</a></li>
 
-
-
-          {# --- SECRETARÍA: gestiona alumnos, padres, cursos y citaciones --- #}
+          {# --- SECRETARÍA --- #}
           {% elif "secretaria" in role or "secretaría" in role %}
             <li><a href="{% url 'cuentas:secretaria_dashboard' %}">📊 Resumen</a></li>
 
@@ -93,11 +88,10 @@
             <li><a href="{% url 'citaciones:pendientes' %}">📑 Citaciones por aprobar</a></li>
             <li><a href="{% url 'citaciones:agendadas_rango' %}">📑 Citaciones agendadas</a></li>
 
-          {# --- PADRE DE FAMILIA: solo ve a sus hijos --- #}
+          {# --- PADRE DE FAMILIA --- #}
           {% elif "padre" in role %}
             <li><a href="{% url 'cuentas:padre_dashboard' %}">🏠 Inicio</a></li>
             <li><a href="{% url 'estudiantes:mis_hijos' %}">👨‍👩‍👧 Mis hijos</a></li>
-            {# Asistencia, kárdex y citaciones se ven en el detalle de cada hijo #}
           {% endif %}
 
           <li class="sep"></li>
@@ -109,21 +103,26 @@
     <!-- Contenido -->
     <main class="main">
 
-      <!-- Topbar con campana -->
+      <!-- Topbar -->
       <div class="topbar">
-        <!-- Campana de notificaciones -->
+        <!-- ☰ hamburguesa (izquierda) -->
+        <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Abrir menú" aria-controls="sidenav">
+          <span></span><span></span><span></span>
+        </button>
+
+        <!-- Campana (derecha) -->
         <button id="notif-bell" class="notif-bell" type="button" aria-label="Notificaciones">
           <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
             <path d="M12 2a6 6 0 0 0-6 6v3.586l-.707.707A1 1 0 0 0 6 14h12a1 1 0 0 0 .707-1.707L18 11.586V8a6 6 0 0 0-6-6zm0 20a3 3 0 0 0 2.995-2.824L15 19h-6a3 3 0 0 0 2.824 2.995L12 22z"/>
-            </svg>
-            <!-- Badge que el WS actualiza + valor inicial desde BD -->
-            <span
-              id="notif-badge"
-              class="notif-badge"
-              {% if not notif_panel_unread %}style="display:none"{% endif %}
-            >
-              {{ notif_panel_unread|default:0 }}
-            </span>
+          </svg>
+
+          <span
+            id="notif-badge"
+            class="notif-badge"
+            {% if not notif_panel_unread %}style="display:none"{% endif %}
+          >
+            {{ notif_panel_unread|default:0 }}
+          </span>
         </button>
       </div>
 
@@ -148,6 +147,9 @@
       {% block content %}{% endblock %}
     </main>
   </div>
+
+  <!-- Overlay sidebar (móvil) -->
+  <div id="sidebar-overlay" class="sidebar-overlay" hidden></div>
 
   <!-- Panel lateral de notificaciones -->
   <aside id="notif-panel" class="notif-panel" hidden>
