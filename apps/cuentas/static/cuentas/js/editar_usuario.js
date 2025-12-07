@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
         upper: 'Al menos 1 mayúscula',
         lower: 'Al menos 1 minúscula',
         number: 'Al menos 1 número',
-        symbol: 'Al menos 1 símbolo',
+        symbol: 'Al menos 1 símbolo ',
         match: 'Coinciden ambas contraseñas'
     };
 
