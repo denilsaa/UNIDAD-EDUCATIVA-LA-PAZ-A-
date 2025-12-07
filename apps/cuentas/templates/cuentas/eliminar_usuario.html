@@ -19,7 +19,10 @@
 
     <a
       href="{% if tipo == 'padres' %}{% url 'cuentas:lista_padres' %}{% elif tipo == 'personal' %}{% url 'cuentas:lista_personal' %}{% else %}{% url 'cuentas:lista_usuarios' %}{% endif %}"
-      class="btn btn-volver">Volver</a>
+      class="btn-volver"
+    >
+      Volver
+    </a>
 
   {% else %}
 
@@ -70,39 +73,42 @@
       {% endif %}
     </div>
 
-    <form method="post" class="acciones-detalle" style="display:block; margin-top:12px;">
+    <form method="post" class="acciones-detalle">
       {% csrf_token %}
 
-      {# === MODO FORZADO (DESTRUCTIVO) ===
-         Marca esta casilla para borrar todo lo que bloquea el delete:
-         - Citaciones del/los estudiante(s) (incl. las que referencian su Kárdex)
-         - Registros de Kárdex de esos estudiantes
-         - Estudiantes asociados al usuario (si es Padre o Regente)
-         - Calendarios de asistencia creados por el usuario (si es Director)
-      #}
       {% if permite_forzado %}
-        <div class="alert alert-danger" style="margin:10px 0;">
-          <label style="cursor:pointer;">
+        <div class="danger-zone">
+          <label class="danger-check">
             <input type="checkbox" name="eliminar_todo" value="1">
-            <strong>Eliminar también dependencias históricas</strong> (Citaciones, Kárdex, Estudiantes asociados y/o Calendarios de asistencia).
-            <br>Esta acción es <u>permanente</u> y no se puede deshacer.
+            <span class="danger-text">
+              <strong>Eliminar también dependencias históricas</strong>
+              <span class="muted">
+                (Citaciones, Kárdex, Estudiantes asociados y/o Calendarios de asistencia).
+              </span>
+              <span class="warning">
+                Esta acción es <u>permanente</u> y no se puede deshacer.
+              </span>
+            </span>
           </label>
         </div>
       {% endif %}
 
-      <div class="btns-row" style="display:flex; gap:8px; align-items:center;">
+      <div class="btns-row">
         <button type="submit" class="btn-eliminar">
           Sí, eliminar usuario
         </button>
 
         <a
           href="{% if tipo == 'padres' %}{% url 'cuentas:lista_padres' %}{% elif tipo == 'personal' %}{% url 'cuentas:lista_personal' %}{% else %}{% url 'cuentas:lista_usuarios' %}{% endif %}"
-          class="btn btn-volver">Cancelar</a>
+          class="btn-volver"
+        >
+          Cancelar
+        </a>
       </div>
     </form>
 
     {% if nota_integridad %}
-      <p class="nota" style="margin-top:10px; color:#666;">
+      <p class="nota">
         * Para preservar la integridad, si no marcas la casilla de borrado total y existen dependencias
         protegidas por el sistema, se intentará eliminar de forma segura; si no es posible, el usuario
         se <strong>inactivará</strong> y se te informará.
