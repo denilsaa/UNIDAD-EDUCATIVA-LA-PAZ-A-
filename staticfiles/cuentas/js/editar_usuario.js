@@ -157,4 +157,173 @@ document.addEventListener('DOMContentLoaded', () => {
     activoInput.addEventListener('change', () => {
         estadoTexto.textContent = activoInput.checked ? "Activo" : "Inactivo";
     });
+    // =====================
+    // Cambio de contraseña + Reglas + Checklist
+    // =====================
+    const form = document.getElementById('editar-usuario-form');
+    const pass1 = document.getElementById('new_password1');
+    const pass2 = document.getElementById('new_password2');
+    const passMsg = document.getElementById('pass-msg');
+
+    const PASSWORD_RULES = {
+    min: 8,
+    max: 64,
+    requireUpper: true,
+    requireLower: true,
+    requireNumber: true,
+    requireSymbol: true
+    };
+
+    const setPassMessage = (html, ok = false) => {
+    if (!passMsg) return;
+    passMsg.innerHTML = html || '';
+    passMsg.style.display = html ? 'block' : 'none';
+    passMsg.style.color = ok ? '#14804A' : '#B42318';
+    };
+
+    const hasUpper = (s) => /[A-ZÁÉÍÓÚÑ]/.test(s);
+    const hasLower = (s) => /[a-záéíóúñ]/.test(s);
+    const hasNumber = (s) => /\d/.test(s);
+    const hasSymbol = (s) => /[^A-Za-zÁÉÍÓÚÑáéíóúñ0-9\s]/.test(s);
+
+    const validatePassword = () => {
+    const p1 = pass1 ? pass1.value : '';
+    const p2 = pass2 ? pass2.value : '';
+
+    // opcional: si no llenan nada, OK
+    if (!p1 && !p2) {
+        setPassMessage('');
+        pass1 && pass1.setCustomValidity('');
+        pass2 && pass2.setCustomValidity('');
+        return true;
+    }
+
+    if (p1 && !p2) {
+        const msg = 'Confirma la contraseña en el segundo campo.';
+        setPassMessage(msg);
+        pass2.setCustomValidity(msg);
+        return false;
+    }
+
+    if (!p1 && p2) {
+        const msg = 'Escribe la nueva contraseña en el primer campo.';
+        setPassMessage(msg);
+        pass1.setCustomValidity(msg);
+        return false;
+    }
+
+    if (p1.length < PASSWORD_RULES.min) {
+        const msg = `La contraseña debe tener al menos ${PASSWORD_RULES.min} caracteres.`;
+        setPassMessage(msg);
+        pass1.setCustomValidity(msg);
+        return false;
+    }
+
+    if (p1.length > PASSWORD_RULES.max) {
+        const msg = `La contraseña no debe superar ${PASSWORD_RULES.max} caracteres.`;
+        setPassMessage(msg);
+        pass1.setCustomValidity(msg);
+        return false;
+    }
+
+    if (/\s/.test(p1)) {
+        const msg = 'La contraseña no debe contener espacios.';
+        setPassMessage(msg);
+        pass1.setCustomValidity(msg);
+        return false;
+    }
+
+    const missing = [];
+    if (PASSWORD_RULES.requireUpper && !hasUpper(p1)) missing.push('1 mayúscula');
+    if (PASSWORD_RULES.requireLower && !hasLower(p1)) missing.push('1 minúscula');
+    if (PASSWORD_RULES.requireNumber && !hasNumber(p1)) missing.push('1 número');
+    if (PASSWORD_RULES.requireSymbol && !hasSymbol(p1)) missing.push('1 símbolo');
+
+    if (missing.length) {
+        const msg = `Falta: <b>${missing.join(', ')}</b>.`;
+        setPassMessage(msg);
+        pass1.setCustomValidity('No cumple las reglas de seguridad.');
+        return false;
+    }
+
+    if (p1 !== p2) {
+        const msg = 'Las contraseñas no coinciden.';
+        setPassMessage(msg);
+        pass2.setCustomValidity(msg);
+        return false;
+    }
+
+    setPassMessage('Contraseña segura ✅', true);
+    pass1 && pass1.setCustomValidity('');
+    pass2 && pass2.setCustomValidity('');
+    return true;
+    };
+
+    // ===== Checklist debajo =====
+    const passRulesBox = document.getElementById('pass-rules');
+
+    const renderRules = () => {
+    if (!passRulesBox) return;
+    passRulesBox.innerHTML = `
+        <ul class="rules-list">
+        <li data-rule="len">✖ Mínimo ${PASSWORD_RULES.min} caracteres</li>
+        <li data-rule="upper">✖ Al menos 1 mayúscula</li>
+        <li data-rule="lower">✖ Al menos 1 minúscula</li>
+        <li data-rule="number">✖ Al menos 1 número</li>
+        <li data-rule="symbol">✖ Al menos 1 símbolo</li>
+        <li data-rule="match">✖ Coinciden ambas contraseñas</li>
+        </ul>
+    `;
+    };
+
+    const setRuleState = (rule, ok) => {
+    if (!passRulesBox) return;
+    const el = passRulesBox.querySelector(`[data-rule="${rule}"]`);
+    if (!el) return;
+
+    // Importante: reconstruye el texto sin depender del replace
+    const texts = {
+        len: `Mínimo ${PASSWORD_RULES.min} caracteres`,
+        upper: 'Al menos 1 mayúscula',
+        lower: 'Al menos 1 minúscula',
+        number: 'Al menos 1 número',
+        symbol: 'Al menos 1 símbolo',
+        match: 'Coinciden ambas contraseñas'
+    };
+
+    el.textContent = `${ok ? '✔' : '✖'} ${texts[rule] || ''}`;
+    el.classList.toggle('ok', ok);
+    el.classList.toggle('bad', !ok);
+    };
+
+    const updateRulesLive = () => {
+    const p1 = pass1 ? pass1.value : '';
+    const p2 = pass2 ? pass2.value : '';
+
+    // si está vacío, todo en ✖
+    setRuleState('len', p1.length >= PASSWORD_RULES.min && p1.length <= PASSWORD_RULES.max);
+    setRuleState('upper', hasUpper(p1));
+    setRuleState('lower', hasLower(p1));
+    setRuleState('number', hasNumber(p1));
+    setRuleState('symbol', hasSymbol(p1));
+    setRuleState('match', !!p1 && !!p2 && p1 === p2);
+    };
+
+    renderRules();
+    updateRulesLive();
+
+    // Eventos
+    if (pass1) pass1.addEventListener('input', () => { updateRulesLive(); validatePassword(); });
+    if (pass2) pass2.addEventListener('input', () => { updateRulesLive(); validatePassword(); });
+
+    if (form) {
+    form.addEventListener('submit', (e) => {
+        const ok = validatePassword();
+        if (!ok) {
+        e.preventDefault();
+        pass1 && pass1.reportValidity();
+        pass2 && pass2.reportValidity();
+        }
+    });
+    }
 });

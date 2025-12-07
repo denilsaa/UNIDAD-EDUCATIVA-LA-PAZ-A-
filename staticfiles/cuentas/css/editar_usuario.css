@@ -100,7 +100,29 @@ p select#id_rol:focus {
   color: #004a99;
   padding: 0 8px;
 }
+/* Quitar puntitos (viñetas) */
+.pass-rules .rules-list{
+  list-style: none;
+  padding-left: 0;
+  margin: 8px 0 0;
+}
 
+/* Espaciado de cada regla */
+.pass-rules .rules-list li{
+  margin: 4px 0;
+}
+
+/* En rojo cuando NO cumple */
+.pass-rules .rules-list li.bad{
+  color: #B42318; /* rojo */
+  font-weight: 600;
+}
+
+/* En verde cuando SÍ cumple */
+.pass-rules .rules-list li.ok{
+  color: #14804A; /* verde */
+  font-weight: 600;
+}
 /* ================== BOTONES DEL FORMULARIO ================== */
 p.form-actions {
   margin-top: 24px; /* separa los botones del resto del formulario */
