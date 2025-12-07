@@ -172,6 +172,43 @@
   color: #666;
   font-size: 0.9rem;
 }
+/* ===== Dependencias con detalle ===== */
+.deps {
+  margin-top: 10px;
+  display: grid;
+  gap: 14px;
+}
+
+.deps-title {
+  margin: 10px 0 8px;
+  font-size: 1.05rem;
+  color: #004a99;
+}
+
+.lista-deps li.dep-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Chip para curso/turno */
+.chip {
+  background: #eaf2ff;
+  border: 1px solid #cfe2ff;
+  color: #004a99;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.deps-empty {
+  margin-top: 6px;
+  color: #004a99;
+  font-weight: 600;
+}
 
 /* ================== RESPONSIVE ================== */
 @media (max-width: 640px) {

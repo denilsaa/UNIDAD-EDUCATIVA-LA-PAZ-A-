@@ -33,44 +33,69 @@
         {% if usuario.rol %} <span class="label">({{ usuario.rol }})</span>{% endif %}.
       </p>
 
-      {# Si tu view manda 'estudiantes', se listan; si no, se muestran contadores #}
-      {% if estudiantes %}
-        <p>Este usuario tiene los siguientes estudiantes asignados:</p>
-        <ul class="lista-detalle">
-          {% for estudiante in estudiantes %}
-            <li>
-              <span class="valor">{{ estudiante.apellidos }} {{ estudiante.nombres }}</span>
-              {% if estudiante.curso %}
-                <span class="label">{{ estudiante.curso.nivel }} {{ estudiante.curso.paralelo }}</span>
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <ul class="lista-detalle">
-          {% if n_estudiantes_asociados %}
-            <li>
-              <span class="valor">{{ n_estudiantes_asociados }}</span>
-              <span class="label">estudiante(s) asociado(s)</span>
-            </li>
-          {% endif %}
-          {% if n_cursos_regente %}
-            <li>
-              <span class="valor">{{ n_cursos_regente }}</span>
-              <span class="label">curso(s) donde es regente</span>
-            </li>
-          {% endif %}
-          {% if n_calendarios %}
-            <li>
-              <span class="valor">{{ n_calendarios }}</span>
-              <span class="label">calendario(s) de asistencia creados por este usuario</span>
-            </li>
-          {% endif %}
-          {% if not n_estudiantes_asociados and not n_cursos_regente and not n_calendarios %}
-            <li><span class="label">No se encontraron dependencias relevantes.</span></li>
-          {% endif %}
-        </ul>
-      {% endif %}
+      {# ==========================
+         DEPENDENCIAS (DETALLADAS)
+         Requiere que la view envíe:
+         - estudiantes (queryset con select_related("curso"))
+         - cursos_regente (queryset)
+         - n_calendarios (int)
+         ========================== #}
+
+      <div class="deps">
+        {% if estudiantes and estudiantes|length > 0 %}
+          <div class="deps-block">
+            <h4 class="deps-title">Estudiantes asociados</h4>
+            <ul class="lista-detalle lista-deps">
+              {% for estudiante in estudiantes %}
+                <li class="dep-row">
+                  <span class="valor">
+                    {{ estudiante.apellidos }} {{ estudiante.nombres }}
+                  </span>
+
+                  <span class="label chip">
+                    {% if estudiante.curso %}
+                      {{ estudiante.curso.nivel }} {{ estudiante.curso.paralelo }}
+                    {% else %}
+                      Sin curso
+                    {% endif %}
+                  </span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        {% if cursos_regente and cursos_regente|length > 0 %}
+          <div class="deps-block">
+            <h4 class="deps-title">Cursos donde es regente</h4>
+            <ul class="lista-detalle lista-deps">
+              {% for curso in cursos_regente %}
+                <li class="dep-row">
+                  <span class="valor">{{ curso.nivel }} {{ curso.paralelo }}</span>
+
+                  {# Si tu modelo Curso NO tiene turno, puedes borrar este bloque #}
+                  {% if curso.turno %}
+                    <span class="label chip">{{ curso.turno }}</span>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        {% if n_calendarios %}
+          <div class="deps-block">
+            <h4 class="deps-title">Calendarios de asistencia</h4>
+            <p class="deps-empty">
+              <strong>Calendarios creados por este usuario:</strong> {{ n_calendarios }}
+            </p>
+          </div>
+        {% endif %}
+
+        {% if (not estudiantes or estudiantes|length == 0) and (not cursos_regente or cursos_regente|length == 0) and not n_calendarios %}
+          <p class="deps-empty"><strong>No se encontraron dependencias relevantes.</strong></p>
+        {% endif %}
+      </div>
     </div>
 
     <form method="post" class="acciones-detalle">
@@ -110,7 +135,7 @@
     {% if nota_integridad %}
       <p class="nota">
         * Para preservar la integridad, si no marcas la casilla de borrado total y existen dependencias
-        protegidas por el sistema, se intentará eliminar de forma segura si no es posible, el usuario
+        protegidas por el sistema, se intentará eliminar de forma segura; si no es posible, el usuario
         se <strong>inactivará</strong> y se te informará.
       </p>
     {% endif %}

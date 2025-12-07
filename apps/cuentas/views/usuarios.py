@@ -278,23 +278,35 @@ def eliminar_usuario(request, user_id):
             )
             return redirect("cuentas:ver_usuario", user_id=usuario.pk)
 
-    # GET: mostrar confirmación con opción de borrado forzado
-    n_estudiantes_asociados = Estudiante.objects.filter(
-        Q(padre=usuario) | Q(curso__regente=usuario)
-    ).distinct().count()
-    n_cursos_regente = Curso.objects.filter(regente=usuario).count()
+    # GET: mostrar confirmación con opción de borrado forzado (con detalle)
+    estudiantes = (
+        Estudiante.objects
+        .filter(Q(padre=usuario) | Q(curso__regente=usuario))
+        .select_related("curso")
+        .distinct()
+        .order_by("apellidos", "nombres")
+    )
+
+    cursos_regente = (
+        Curso.objects
+        .filter(regente=usuario)
+        .order_by("nivel", "paralelo")
+    )
+
     n_calendarios = 0
     if AsistenciaCalendario is not None:
         n_calendarios = AsistenciaCalendario.objects.filter(creado_por=usuario).count()
 
     ctx = {
         "usuario": usuario,
-        "n_estudiantes_asociados": n_estudiantes_asociados,
-        "n_cursos_regente": n_cursos_regente,
+        "estudiantes": estudiantes,
+        "cursos_regente": cursos_regente,
         "n_calendarios": n_calendarios,
         "permite_forzado": True,
+        "nota_integridad": True,
     }
     return render(request, "cuentas/eliminar_usuario.html", ctx)
+
 
 
 # Nueva vista para verificar CI en tiempo real
