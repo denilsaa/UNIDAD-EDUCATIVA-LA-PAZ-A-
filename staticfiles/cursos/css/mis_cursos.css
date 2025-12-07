@@ -75,10 +75,24 @@
   transition: all 0.2s ease;
   border: 1px solid #007bff;
 }
-
+.btn-llamar-asistencia{
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #09ff00;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  border: 1px solid #09ff00;
+}
 .btn-ver:hover {
   background-color: #004a99;
   border-color: #004a99;
+}
+.btn-llamar-asistencia:hover {
+  background-color: #036800;
+  border-color: #036800;
 }
 
 /* ================== EMPTY STATE ================== */
