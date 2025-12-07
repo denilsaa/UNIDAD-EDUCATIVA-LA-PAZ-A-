@@ -164,54 +164,54 @@ thead {
   margin-right: 10px; 
 }
 
-/* ================== TOPBAR & NOTIFICACIONES ================== */
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  border-bottom: 1px solid #fff;
-  background: #fff;
-  position: sticky;
-  top: 0;
-  z-index: 1002;
+/* ================== TOPBAR ================== */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+  background:#fff;
+  position:sticky;
+  top:0;
+  z-index:1002;
 }
 
-/* Campana */
-.notif-bell {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  cursor: pointer;
-  transition: background 0.2s;
+/* Campana siempre a la derecha */
+.notif-bell{
+  margin-left:auto;
+  position:relative;
+  width:44px;
+  height:44px;
+  border:none;
+  border-radius:50%;
+  background:transparent;
+  cursor:pointer;
 }
-.notif-bell:hover { 
-  background: rgba(0,0,0,0.06); 
+.notif-bell:hover{ 
+  background:rgba(0,0,0,0.06); 
 }
+
 .notif-bell svg { 
   width: 22px; 
   height: 22px; 
   color: #333; 
 }
 
-.notif-badge {
-  position: absolute;
-  top: -4px;
-  right: -2px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: 999px;
-  background: #e11;
-  color: #fff;
-  font-size: 12px;
-  line-height: 18px;
-  text-align: center;
-  box-shadow: 0 0 0 2px #fff;
-  display: none;
+.notif-badge{
+  position:absolute;
+  top:-4px;
+  right:-2px;
+  min-width:18px;
+  height:18px;
+  padding:0 6px;
+  border-radius:999px;
+  background:#e11;
+  color:#fff;
+  font-size:12px;
+  line-height:18px;
+  text-align:center;
+  box-shadow:0 0 0 2px #fff;
 }
 
 /* Panel lateral de notificaciones */
@@ -252,27 +252,33 @@ thead {
   background: rgba(0,0,0,0.06); 
 }
 
-/* ================== OVERLAY SIDEBAR (móvil) ================== */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.35);
-  z-index: 900;
+/* ================== OVERLAY PARA MÓVIL ================== */
+.sidebar-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.35);
+  z-index:999;
 }
-.layout.sidebar-open .sidebar-overlay { display: block; }
+
+.layout.sidebar-open .sidebar-overlay { 
+  display: block; 
+}
 
 /* ================== BOTÓN HAMBURGUESA ================== */
-.menu-toggle {
-  display: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  border: 1px solid #dbe3f3;
-  background: #f7f9ff;
-  cursor: pointer;
-  position: relative;
-  transition: background 0.2s, transform 0.2s;
+.menu-toggle{
+  display:none;
+  width:44px;
+  height:44px;
+  border:none;
+  border-radius:10px;
+  background:#0c2a57;
+  color:#fff;
+  font-size:22px;
+  cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,0.18);
+}
+.menu-toggle:active{ 
+  transform: scale(0.98); 
 }
 .menu-toggle:hover { 
   background: #eef3ff; 
@@ -313,25 +319,35 @@ thead {
 
 /* ================== RESPONSIVE (drawer) ================== */
 @media (max-width: 900px) {
-  .menu-toggle { 
-    display: inline-flex; 
-    align-items: center; 
-    justify-content: center; 
+  .menu-toggle{ 
+    display:inline-flex; 
+    align-items:center; 
+    justify-content:center; 
   }
 
-  /* sidebar como drawer */
-  .sidenav {
-    transform: translateX(-102%);
-    width: 280px;
-    max-width: 86vw;
+  .sidenav{
+    transform:translateX(-105%);  /* 👈 escondido */
+    width:240px;
+    z-index:1000;
+    transition:transform .25s ease;
   }
-  .layout.sidebar-open .sidenav {
+
+  .sidenav.open{
+    transform:translateX(0);      /* 👈 visible */
+  }
+
+  /* Evita scroll del body cuando menú abierto */
+  body.sidebar-open{
+    overflow:hidden;
+    touch-action:none;
+  }
+  .layout .sidenav {
     transform: translateX(0);
   }
 
   /* main ocupa todo */
-  .main {
-    margin-left: 0;
-    padding: 16px;
+  .main{
+    margin-left:0; /* 👈 en móvil no reservamos espacio */
+    padding:16px;
   }
 }
