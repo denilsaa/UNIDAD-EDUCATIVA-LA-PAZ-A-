@@ -40,6 +40,59 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ==========================
+  // MENU HAMBURGUESA (MÓVIL)
+  // ==========================
+  (function initMobileSidebar() {
+    const btn = document.getElementById("menu-toggle");
+    const sidenav = document.getElementById("sidenav");
+    const overlay = document.getElementById("sidebar-overlay");
+
+    if (!btn || !sidenav || !overlay) return;
+
+    const open = () => {
+      sidenav.classList.add("open");
+      overlay.hidden = false;
+      document.body.classList.add("sidebar-open");
+      btn.setAttribute("aria-label", "Cerrar menú");
+    };
+
+    const close = () => {
+      sidenav.classList.remove("open");
+      overlay.hidden = true;
+      document.body.classList.remove("sidebar-open");
+      btn.setAttribute("aria-label", "Abrir menú");
+    };
+
+    // Siempre inicia cerrado
+    close();
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (sidenav.classList.contains("open")) close();
+      else open();
+    });
+
+    overlay.addEventListener("click", close);
+
+    // Cierra con ESC
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") close();
+    });
+
+    // Si pasas a desktop, cierra y limpia estados
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 900) close();
+    });
+
+    // Si haces click en un link del menú en móvil, cierra
+    sidenav.addEventListener("click", (e) => {
+      const a = e.target.closest("a");
+      if (a && window.innerWidth <= 900) close();
+    });
+  })();
+
+  // ==========================
   // Overlay global "Procesando..."
   // ==========================
   function showOverlay() {
@@ -101,7 +154,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const panel = document.getElementById("notif-panel");
   const closeBtn = document.getElementById("notif-close");
   const panelContent = panel ? panel.querySelector(".notif-panel__content") : null;
-  const notifBadge = document.getElementById("notif-badge");
 
   function addNotifRow(html) {
     if (!panelContent) return;
@@ -118,10 +170,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (bell && panel && closeBtn) {
-    // Mostrar el panel
     bell.addEventListener("click", () => {
       panel.removeAttribute("hidden");
-      panel.classList.add("show");
 
       // Marcar todas como leídas cuando se abre el panel
       fetch("/notifs/marcar-leidas/", {
@@ -133,18 +183,13 @@ document.addEventListener("DOMContentLoaded", function () {
       })
         .then(r => (r.ok ? r.json() : Promise.reject(r)))
         .then(data => {
-          if (data.ok) {
-            resetBadge();
-            console.log("[NOTIFS] Marcadas como leídas:", data.marcadas);
-          }
+          if (data.ok) resetBadge();
         })
         .catch(err => console.error("Error marcando notificaciones:", err));
     });
 
-    // Cerrar el panel
     closeBtn.addEventListener("click", () => {
-      panel.classList.remove("show");
-      setTimeout(() => panel.setAttribute("hidden", ""), 300);
+      panel.setAttribute("hidden", "");
     });
   }
 
@@ -153,9 +198,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // ==========================
   (function initNotifSocket() {
     let socket;
-
     try {
-      // 👇 AQUI VA EL CAMBIO IMPORTANTE: mandamos ?uid=<id>
       const uid = (window.userData && window.userData.id) ? String(window.userData.id) : "";
       const path = uid ? `/ws/notifs/?uid=${encodeURIComponent(uid)}` : "/ws/notifs/";
       socket = new WebSocket(buildWsUrl(path));
@@ -170,7 +213,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     socket.onclose = function (e) {
       console.warn("[WS NOTIFS] CLOSE", e.code, e.reason || "");
-      // Si quieres reconectar automáticamente, puedes hacerlo aquí.
     };
 
     socket.onerror = function (e) {
@@ -186,20 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      // Esperamos el payload que mandamos desde notificar_citacion_aprobada
-      // {
-      //   "type": "notify.unread",
-      //   "event": "citacion",
-      //   "citacion_id": ...,
-      //   "estudiante": "...",
-      //   "mensaje": "...",
-      //   "cuando": "...",
-      //   "unread": 1
-      // }
-
       if (data.type === "notify.unread") {
-        console.log("[WS NOTIFS] Nueva notificación:", data);
-
         incrementBadge(data.unread || 1);
 
         const html = `
@@ -213,42 +242,26 @@ document.addEventListener("DOMContentLoaded", function () {
   })();
 
   // ==========================
-  // Otros WebSockets opcionales (cola, dashboard)
+  // Otros WebSockets opcionales
   // ==========================
   (function initColaSocket() {
     let socket;
-    try {
-      socket = new WebSocket(buildWsUrl("/ws/cola/"));
-    } catch (err) {
-      console.error("[WS COLA] Error al crear socket:", err);
-      return;
-    }
+    try { socket = new WebSocket(buildWsUrl("/ws/cola/")); }
+    catch (err) { console.error("[WS COLA] Error al crear socket:", err); return; }
 
     socket.onopen = () => console.log("[WS COLA] OPEN");
     socket.onclose = (e) => console.warn("[WS COLA] CLOSE", e.code, e.reason || "");
     socket.onerror = (e) => console.error("[WS COLA] ERROR", e);
-    socket.onmessage = (e) => {
-      // Aquí puedes manejar mensajes de la cola si tu proyecto los usa
-      // console.log("[WS COLA] MSG", e.data);
-    };
   })();
 
   (function initDashSocket() {
     let socket;
-    try {
-      socket = new WebSocket(buildWsUrl("/ws/dashboard/"));
-    } catch (err) {
-      console.error("[WS DASH] Error al crear socket:", err);
-      return;
-    }
+    try { socket = new WebSocket(buildWsUrl("/ws/dashboard/")); }
+    catch (err) { console.error("[WS DASH] Error al crear socket:", err); return; }
 
     socket.onopen = () => console.log("[WS DASH] OPEN");
     socket.onclose = (e) => console.warn("[WS DASH] CLOSE", e.code, e.reason || "");
     socket.onerror = (e) => console.error("[WS DASH] ERROR", e);
-    socket.onmessage = (e) => {
-      // Mensajes del dashboard en tiempo real (si los usas)
-      // console.log("[WS DASH] MSG", e.data);
-    };
   })();
 
   // ==========================
@@ -263,4 +276,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 5000);
   });
 
-}); // Fin DOMContentLoaded
+});
