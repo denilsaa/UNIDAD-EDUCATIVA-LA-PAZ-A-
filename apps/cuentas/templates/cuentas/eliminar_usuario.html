@@ -42,7 +42,7 @@
          ========================== #}
 
       <div class="deps">
-        {% if estudiantes and estudiantes|length > 0 %}
+        {% if estudiantes %}
           <div class="deps-block">
             <h4 class="deps-title">Estudiantes asociados</h4>
             <ul class="lista-detalle lista-deps">
@@ -51,7 +51,6 @@
                   <span class="valor">
                     {{ estudiante.apellidos }} {{ estudiante.nombres }}
                   </span>
-
                   <span class="label chip">
                     {% if estudiante.curso %}
                       {{ estudiante.curso.nivel }} {{ estudiante.curso.paralelo }}
@@ -65,15 +64,13 @@
           </div>
         {% endif %}
 
-        {% if cursos_regente and cursos_regente|length > 0 %}
+        {% if cursos_regente %}
           <div class="deps-block">
             <h4 class="deps-title">Cursos donde es regente</h4>
             <ul class="lista-detalle lista-deps">
               {% for curso in cursos_regente %}
                 <li class="dep-row">
                   <span class="valor">{{ curso.nivel }} {{ curso.paralelo }}</span>
-
-                  {# Si tu modelo Curso NO tiene turno, puedes borrar este bloque #}
                   {% if curso.turno %}
                     <span class="label chip">{{ curso.turno }}</span>
                   {% endif %}
@@ -92,10 +89,11 @@
           </div>
         {% endif %}
 
-        {% if (not estudiantes or estudiantes|length == 0) and (not cursos_regente or cursos_regente|length == 0) and not n_calendarios %}
+        {% if not estudiantes and not cursos_regente and not n_calendarios %}
           <p class="deps-empty"><strong>No se encontraron dependencias relevantes.</strong></p>
         {% endif %}
       </div>
+
     </div>
 
     <form method="post" class="acciones-detalle">
