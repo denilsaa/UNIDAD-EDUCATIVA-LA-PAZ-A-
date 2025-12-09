@@ -356,3 +356,75 @@ def editar_form(request, pk: int):
             "sugerido": sugerido,
         },
     )
+
+
+@login_required
+@require_http_methods(["GET"])
+def detalle_kardex(request, pk: int):
+    """
+    Devuelve en JSON los registros de Kárdex vinculados a esta citación
+    para mostrarlos en un modal.
+
+    LÓGICA ACUMULABLE:
+    - Tomamos el kardex_registro asociado a la citación.
+    - Buscamos TODOS los registros de Kárdex del MISMO estudiante y MISMA FECHA.
+    - Así, si luego se añaden más registros ese día, también aparecerán aquí.
+    """
+    if not _puede_manejar_citaciones(request.user):
+        return HttpResponseForbidden()
+
+    c = get_object_or_404(
+        Citacion.objects.select_related(
+            "estudiante",
+            "kardex_registro__kardex_item",
+            "kardex_registro__docente",
+        ),
+        id=pk,
+    )
+
+    kr_base = c.kardex_registro
+    if not kr_base:
+        return JsonResponse(
+            {
+                "ok": False,
+                "error": "Esta citación no tiene registros de Kárdex vinculados.",
+            }
+        )
+
+    # Modelo real de los registros de Kárdex (lo inferimos del propio objeto)
+    KardexRegistro = type(kr_base)
+
+    # 🔁 Buscamos TODOS los registros del mismo estudiante y misma FECHA
+    registros_qs = (
+        KardexRegistro.objects.filter(
+            estudiante=c.estudiante,
+            fecha=kr_base.fecha,
+        )
+        .select_related("kardex_item", "docente")
+        .order_by("hora", "id")
+    )
+
+    registros = []
+    for kr in registros_qs:
+        registros.append(
+            {
+                "id": kr.id,
+                "fecha": kr.fecha.strftime("%Y-%m-%d"),
+                "hora": kr.hora.strftime("%H:%M") if kr.hora else "",
+                "item": kr.kardex_item.descripcion,
+                "area": kr.kardex_item.get_area_display(),
+                "sentido": kr.kardex_item.get_sentido_display(),
+                "observacion": kr.observacion or "",
+                "sello_maestro": kr.sello_maestro,
+                "docente": str(kr.docente) if kr.docente else "",
+            }
+        )
+
+    return JsonResponse(
+        {
+            "ok": True,
+            "citacion": c.id,
+            "estudiante": str(c.estudiante),
+            "registros": registros,
+        }
+    )

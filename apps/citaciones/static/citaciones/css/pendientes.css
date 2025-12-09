@@ -182,3 +182,17 @@
     margin-bottom: 6px;
   }
 }
+.btn-kardex {
+  background-color: #6b7280; /* gris */
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin: 0 4px;
+}
+
+.btn-kardex:hover {
+  filter: brightness(0.95);
+}

@@ -19,7 +19,7 @@
     <tr>
       <th>Estudiante</th>
       <th>Motivo</th>
-      {# cambiamos el encabezado porque ya no es solo sugerida #}
+      {# ya no es solo sugerida #}
       <th>Fecha y Hora (citación / sugerida)</th>
       <th>Acciones</th>
     </tr>
@@ -50,10 +50,21 @@
                 data-ajax="1">
           Aprobar
         </button>
+
+        {# Botón para ver los registros de Kárdex vinculados a esta citación #}
+        {% if c.kardex_registro_id %}
+        <button type="button"
+                class="btn-kardex"
+                data-id="{{ c.id }}">
+          Ver Acumulados
+        </button>
+        {% endif %}
+
         <a class="btn-secondary"
            href="{% url 'citaciones:editar_form' c.id %}">
           Editar
         </a>
+
         <button type="button"
                 class="btn-rechazar"
                 data-id="{{ c.id }}"

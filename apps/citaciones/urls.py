@@ -14,6 +14,7 @@ urlpatterns = [
     path("<int:pk>/aprobar/", bandeja.aprobar, name="aprobar"),
     path("<int:pk>/editar/", bandeja.editar, name="editar"),
     path("<int:pk>/editar-form/", bandeja.editar_form, name="editar_form"),
+    path("<int:pk>/kardex/", bandeja.detalle_kardex, name="detalle_kardex"),
     path("<int:pk>/rechazar/", bandeja.rechazar, name="rechazar"),
     path("<int:pk>/notificar/", bandeja.notificar, name="notificar"),
 
