@@ -20,6 +20,10 @@ from apps.citaciones.services.notificaciones_service import notificar_citacion_a
 from apps.cuentas.roles import es_director
 
 
+# ==============================
+#  Helpers de rol
+# ==============================
+
 def _es_secretaria(user):
     """
     Devuelve True si el usuario tiene rol Secretaría.
@@ -38,7 +42,8 @@ def _es_regente(user):
 
 def _puede_manejar_citaciones(user):
     """
-    Director y Secretaría pueden ver y gestionar citaciones (aprobar, editar, cancelar, notificar).
+    Director y Secretaría pueden ver y gestionar citaciones
+    (aprobar, editar, cancelar, notificar).
     """
     return es_director(user) or _es_secretaria(user)
 
@@ -94,6 +99,10 @@ def pendientes(request):
     )
 
 
+# ==============================
+#  Acciones sobre pendientes
+# ==============================
+
 @login_required
 @require_POST
 def aprobar(request, pk: int):
@@ -115,14 +124,23 @@ def aprobar(request, pk: int):
 @login_required
 @require_POST
 def editar(request, pk: int):
+    """
+    Edición vía AJAX (usada inicialmente por la cola).
+    Mantengo esta vista porque la referencia existe en urls.py.
+    """
     if not _puede_manejar_citaciones(request.user):
         return HttpResponseForbidden()
 
-    fecha = parse_date(request.POST.get("fecha"))
-    hora = parse_time(request.POST.get("hora"))
-    dur = request.POST.get("duracion_min")
-    dur = int(dur) if dur else None
+    fecha_str = request.POST.get("fecha")
+    hora_str = request.POST.get("hora")
+    dur_str = request.POST.get("duracion_min")
+
+    fecha = parse_date(fecha_str) if fecha_str else None
+    hora = parse_time(hora_str) if hora_str else None
+    dur = int(dur_str) if dur_str else None
+
     c = queue_service.editar(pk, fecha, hora, dur, request.user)
+
     return JsonResponse({"ok": True, "id": c.id, "estado": c.estado})
 
 
@@ -313,9 +331,28 @@ def editar_form(request, pk: int):
     if request.method == "POST":
         form = CitacionEditForm(request.POST, instance=c)
         if form.is_valid():
-            form.save()
+            form.save()  # guarda fecha_citacion, hora_citacion y duracion_min
             return redirect("citaciones:pendientes")
     else:
         form = CitacionEditForm(instance=c)
 
-    return render(request, "citaciones/editar.html", {"form": form, "citacion": c})
+    # Sugerencia informativa M/M/1
+    sugerido = None
+    try:
+        cfg = AtencionConfig.objects.first()
+        dur_def = int(getattr(cfg, "duracion_por_defecto", 30) or 30)
+        dur = int(c.duracion_min or dur_def)
+        f, h = suggest_free_slot(duracion_min=dur, desde=None)
+        sugerido = datetime.combine(f, h)
+    except Exception:
+        sugerido = None
+
+    return render(
+        request,
+        "citaciones/editar.html",
+        {
+            "form": form,
+            "citacion": c,
+            "sugerido": sugerido,
+        },
+    )

@@ -14,36 +14,59 @@
   </h2>
 </div>
 
-  <table class="tabla mt-3">
-    <thead>
-      <tr>
-        <th>Estudiante</th>
-        <th>Motivo</th>
-        <th>Fecha y Hora sugerida</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for c in rows %}
-      <tr>
-        <td>{{ c.estudiante }}</td>
-        <td>{{ c.motivo_resumen }}</td>
-        <td>
-          {% if c.eta_fecha and c.eta_hora %}
-            {{ c.eta_fecha|date:"Y-m-d" }} {{ c.eta_hora|time:"H:i" }}
-          {% else %}—{% endif %}
-        </td>
-        <td>
-          <button type="button" class="btn-aprobar" data-id="{{ c.id }}" data-ajax="1">Aprobar</button>
-          <a class="btn-secondary" href="{% url 'citaciones:editar_form' c.id %}">Editar</a>
-          <button type="button" class="btn-rechazar" data-id="{{ c.id }}" data-ajax="1">Rechazar</button>
-        </td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="6">Sin pendientes.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<table class="tabla mt-3">
+  <thead>
+    <tr>
+      <th>Estudiante</th>
+      <th>Motivo</th>
+      {# cambiamos el encabezado porque ya no es solo sugerida #}
+      <th>Fecha y Hora (citación / sugerida)</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in rows %}
+    <tr>
+      <td>{{ c.estudiante }}</td>
+      <td>{{ c.motivo_resumen }}</td>
+      <td>
+        {# 1️⃣ Si YA tiene fecha/hora de citación (las que editas), mostramos esas #}
+        {% if c.fecha_citacion and c.hora_citacion %}
+          {{ c.fecha_citacion|date:"Y-m-d" }} {{ c.hora_citacion|time:"H:i" }}
+
+        {# 2️⃣ Si aún no tiene, mostramos la FECHA/HORA SUGERIDA por M/M/1 #}
+        {% elif c.eta_fecha and c.eta_hora %}
+          {{ c.eta_fecha|date:"Y-m-d" }} {{ c.eta_hora|time:"H:i" }}
+
+        {# 3️⃣ Si no hay nada, guion #}
+        {% else %}
+          —
+        {% endif %}
+      </td>
+      <td>
+        <button type="button"
+                class="btn-aprobar"
+                data-id="{{ c.id }}"
+                data-ajax="1">
+          Aprobar
+        </button>
+        <a class="btn-secondary"
+           href="{% url 'citaciones:editar_form' c.id %}">
+          Editar
+        </a>
+        <button type="button"
+                class="btn-rechazar"
+                data-id="{{ c.id }}"
+                data-ajax="1">
+          Rechazar
+        </button>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">Sin pendientes.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock content %}
 
 {% block scripts %}
