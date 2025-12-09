@@ -2,7 +2,8 @@
 
 from django.urls import path
 from .views import bandeja, historial
-
+from django.urls import path
+from .views import estadisticas as estadisticas_views
 
 app_name = "citaciones"
 
@@ -21,5 +22,11 @@ urlpatterns = [
         "historial/estudiante/<int:estudiante_id>/",
         historial.historial_estudiante,
         name="historial_estudiante",
+    ),
+
+    path(
+        "estadisticas-colas/",
+        estadisticas_views.estadisticas_teoria_colas,
+        name="citaciones_estadisticas_colas",
     ),
 ]

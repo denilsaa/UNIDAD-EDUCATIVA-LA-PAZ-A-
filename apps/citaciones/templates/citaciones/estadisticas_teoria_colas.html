@@ -1,0 +1,200 @@
+{% extends "layout/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Teoría de Colas{% endblock %}
+
+{% block extra_css %}
+<style>
+  .chart-card {
+    background: #fff;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border-radius: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.05);
+  }
+  .chart-card h3 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+  }
+
+  .kpi-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .kpi {
+    background: #f5f7fb;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: .85rem;
+  }
+  .kpi span {
+    font-weight: 600;
+  }
+
+  .chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 24px;
+  }
+
+  /* Barras genéricas */
+  .bar-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 70px;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-size: .85rem;
+  }
+  .bar-label {
+    color: #555;
+  }
+  .bar-track {
+    background: #edf0f6;
+    border-radius: 999px;
+    overflow: hidden;
+    height: 18px;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 999px;
+  }
+
+  .bar-fill-lambda { background: #4b8fff; }
+  .bar-fill-mu     { background: #25c48d; }
+
+  .bar-fill-ocupado { background: #ff6b6b; }
+  .bar-fill-libre   { background: #b2f2bb; }
+
+  .estado-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 60px 60px;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 7px;
+    font-size: .84rem;
+  }
+  .estado-label {
+    font-weight: 500;
+  }
+
+  .legend {
+    display: flex;
+    gap: 12px;
+    font-size: .8rem;
+    margin-bottom: 8px;
+  }
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .legend-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+  <h2>Teoría de Colas</h2>
+  <p>Métricas calculadas a partir de las citaciones registradas.</p>
+</div>
+
+<!-- KPIs -->
+<div class="chart-card">
+  <h3>M/M/1 (últimos 7 días)</h3>
+  <div class="kpi-row">
+    <div class="kpi">λ: <span>{{ mm1.lambda|default:0|floatformat:3 }}</span> lleg/h</div>
+    <div class="kpi">μ: <span>{{ mm1.mu|default:0|floatformat:3 }}</span> serv/h</div>
+    <div class="kpi">ρ: <span>{{ mm1.rho|default:0|floatformat:2 }}</span></div>
+    <div class="kpi">Wq: <span>{{ mm1.Wq_min|default:0|floatformat:1 }}</span> min</div>
+    <div class="kpi">Ws: <span>{{ mm1.Ws_min|default:0|floatformat:1 }}</span> min</div>
+  </div>
+</div>
+
+<!-- λ vs μ -->
+<div class="chart-card">
+  <h3>Capacidad vs carga</h3>
+  <div class="legend">
+    <div class="legend-item">
+      <span class="legend-color" style="background:#4b8fff;"></span> λ llegadas
+    </div>
+    <div class="legend-item">
+      <span class="legend-color" style="background:#25c48d;"></span> μ servicio
+    </div>
+  </div>
+
+  <div class="bar-row">
+    <span class="bar-label">λ (lleg/h)</span>
+    <div class="bar-track">
+      <div class="bar-fill bar-fill-lambda" style="width: {{ lambda_pct }}%;"></div>
+    </div>
+    <span>{{ mm1.lambda|default:0|floatformat:3 }}</span>
+  </div>
+
+  <div class="bar-row">
+    <span class="bar-label">μ (serv/h)</span>
+    <div class="bar-track">
+      <div class="bar-fill bar-fill-mu" style="width: {{ mu_pct }}%;"></div>
+    </div>
+    <span>{{ mm1.mu|default:0|floatformat:3 }}</span>
+  </div>
+</div>
+
+<!-- GRID: ocupación + estados -->
+<div class="chart-grid">
+
+  <!-- OCUPACIÓN -->
+  <div class="chart-card">
+    <h3>Ocupación del módulo</h3>
+    <div class="legend">
+      <div class="legend-item">
+        <span class="legend-color" style="background:#ff6b6b;"></span> Ocupado
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background:#b2f2bb;"></span> Libre
+      </div>
+    </div>
+
+    <div class="bar-row">
+      <span class="bar-label">Ocupado (ρ)</span>
+      <div class="bar-track">
+        <div class="bar-fill bar-fill-ocupado" style="width: {{ rho_pct }}%;"></div>
+      </div>
+      <span>{{ rho_pct|floatformat:1 }}%</span>
+    </div>
+
+    <div class="bar-row">
+      <span class="bar-label">Libre</span>
+      <div class="bar-track">
+        <div class="bar-fill bar-fill-libre" style="width: {{ libre_pct }}%;"></div>
+      </div>
+      <span>{{ libre_pct|floatformat:1 }}%</span>
+    </div>
+  </div>
+
+  <!-- ESTADOS -->
+  <div class="chart-card">
+    <h3>Citaciones por estado</h3>
+
+    {% for e in estados %}
+      <div class="estado-row">
+        <span class="estado-label">{{ e.label }}</span>
+        <div class="bar-track">
+          <div class="bar-fill bar-fill-lambda" style="width: {{ e.pct }}%;"></div>
+        </div>
+        <span>{{ e.count }}</span>
+        <span>{{ e.pct|floatformat:1 }}%</span>
+      </div>
+    {% empty %}
+      <p style="font-size:.85rem;color:#666;">Sin citaciones registradas.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+    
